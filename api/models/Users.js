@@ -6,26 +6,49 @@
  */
 
 module.exports = {
-    create: function (str, callback) {
+    save: function (str, callback) {
         returns = [];
-        var userid = sails.ObjectID();
-        sails.MongoClient.connect(sails.url, function (err, db) {
-            var cuser = db.collection('users').insert({
-                _id: userid
-            }, str, function (err, created) {
-                if (created) {
-                    console.log(userid);
-                    var uusercreate = db.collection('users').update({
-                        _id: userid
-                    }, {
-                        $set: str
-                    }, function (err, updated) {
-                        if (updated) {
-                            console.log("true");
-                        }
-                    });
+        if (!str._id) {
+            str._id = sails.ObjectID();
+            sails.query(function (err, db) {
+                var cuser = db.collection('users').insert(str, function (err, created) {
+                    if (created) {
+                        console.log(userid);
+                        callback("true");
+                    }
+                });
+            });
+        } else {
+            sails.query(function (err, db) {
+                var cuser = db.collection('users').update({
+                    _id: str.id
+                }, {
+                    $set: str
+                }, function (err, updated) {
+                    if (updated) {
+                        console.log(userid);
+                        callback("true");
+                    }
+                });
+            });
+        }
+    },
+    finduser: function (str, callback) {
+        returns = [];
+        sails.query(function (err, db) {
+            var finduser = db.collection('users').find({name:str.name}).each(function (err, data) {
+                if (data != null) {
+                    returns.push(data);
+                } else {
+                    callback(returns);
                 }
             });
+        });
+    },
+    deleteuser: function (str, callback) {
+        returns=[];
+        sails.query(function (err,db){
+            
         });
     }
 };

@@ -22,7 +22,11 @@ module.exports.bootstrap = function (cb) {
         sails.assert = require('assert');
     // Connection URL
     sails.url = 'mongodb://localhost:27017/noteshare';
-    // It's very important to trigger this callback method when you are finished
-    // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
+
+    sails.query = function (myfunc) {
+            sails.MongoClient.connect(sails.url, myfunc);
+        }
+        // It's very important to trigger this callback method when you are finished
+        // with the bootstrap!  (otherwise your server will never lift, since it's waiting on the bootstrap)
     cb();
 };
