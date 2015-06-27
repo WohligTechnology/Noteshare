@@ -28,7 +28,7 @@ module.exports = {
             });
         } else {
             sails.query(function (err, db) {
-                var user=sails.ObjectID(str._id);
+                var user = sails.ObjectID(str._id);
                 delete str._id
                 var cuser = db.collection('user').update({
                     _id: user
@@ -140,19 +140,83 @@ module.exports = {
                 _id: sails.ObjectID(str._id),
                 email: str.email,
                 password: str.password
-            },{"firstname":1,"lastname":1,"fbid":1,"email":1,"gid":1,"passcode":1,"profilepic":1,"username":1}).each(function (err, found) {
+            }, {
+                "firstname": 1,
+                "lastname": 1,
+                "fbid": 1,
+                "email": 1,
+                "gid": 1,
+                "passcode": 1,
+                "profilepic": 1,
+                "username": 1
+            }).each(function (err, found) {
                 if (err) {
                     callback({
                         value: false
                     });
                     console.log(err);
                 }
-                if (found !=null) {
+                if (found != null) {
                     callback(found);
                     console.log(found);
+                } else {
+                    db.collection('user').find({
+                        _id: sails.ObjectID(str._id),
+                        email: str.email,
+                        forgotpassword: str.password
+                    }, {
+                        "firstname": 1,
+                        "lastname": 1,
+                        "fbid": 1,
+                        "email": 1,
+                        "gid": 1,
+                        "passcode": 1,
+                        "profilepic": 1,
+                        "username": 1
+                    }).each(function (err, found) {
+                        if (err) {
+                            callback({
+                                value: false
+                            });
+                            console.log(err);
+                        }
+                        if (found != null) {
+                            callback(found);
+
+                            console.log(found);
+                        }
+                    });
                 }
-                else{
-                    
+            });
+        });
+    },
+    forgotpassword: function (str, callback) {
+        var text = "";
+        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+        for (var i = 0; i < 8; i++) {
+            text += possible.charAt(Math.floor(Math.random() * possible.length));
+        }
+        console.log(text);
+        sails.query(function (err, db) {
+            var user = sails.ObjectID(str._id);
+            var cuser = db.collection('user').update({
+                _id: user
+            }, {
+                $set: {
+                    forgotpassword: md5(text)
+                }
+            }, function (err, updated) {
+                if (err) {
+                    console.log(err);
+                    callback({
+                        value: false
+                    });
+                }
+                if (updated) {
+                    console.log(updated);
+                    callback({
+                        value: true
+                    });
                 }
             });
         });
