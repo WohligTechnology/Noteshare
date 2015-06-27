@@ -33,7 +33,8 @@ module.exports = {
                             });
                         }
                         if (updated) {
-                            callback(updated);
+                            callback({value:true});
+                            console.log(updated);
 //                            var logid = sails.ObjectID();
 //                            var log = {
 //                                _id: logid,
@@ -79,7 +80,8 @@ module.exports = {
                             });
                         }
                         if (updated) {
-                            callback(updated);
+                            callback({value:true});
+                            console.log(updated);
 //                            var logid = sails.ObjectID();
 //                            var log = {
 //                                _id: logid,
@@ -107,6 +109,7 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({value:false});
             }
             if (db) {
 
@@ -127,7 +130,8 @@ module.exports = {
                         });
                     }
                     if (updated) {
-                        callback(updated);
+                        callback({value:true});
+                        console.log(updated);
 //                        var logid = sails.ObjectID();
 //                        var log = {
 //                            _id: logid,
@@ -154,6 +158,7 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({value:false});
             }
             if (db) {
                 db.collection("user").find({
@@ -164,6 +169,7 @@ module.exports = {
                 }).each(function (err, data2) {
                     if (data2 != null) {
                         callback(data2.folder[0]);
+                        console.log(data2);
 //                        var logid = sails.ObjectID();
 //                        var log = {
 //                            _id: logid,
@@ -181,6 +187,12 @@ module.exports = {
 //                            }
 //                        });
                     }
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
                 });
             }
         });
@@ -190,6 +202,7 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({value:false});
             }
             if (db) {
 
@@ -198,6 +211,7 @@ module.exports = {
                 }).each(function (err, data) {
                     if (data != null) {
                         callback(data.folder);
+                        console.log(data);
 //                        var logid = sails.ObjectID();
 //                        var log = {
 //                            _id: logid,
@@ -217,6 +231,12 @@ module.exports = {
 //                                });
 //                            }
 //                        });
+                    }
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
                     }
                 });
             }

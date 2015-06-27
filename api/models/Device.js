@@ -14,6 +14,9 @@ module.exports = {
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
+                    callback({
+                        value: false
+                    });
                 }
                 if (db) {
 
@@ -28,7 +31,10 @@ module.exports = {
                             console.log(err);
                         }
                         if (updated) {
-                            callback(updated);
+                            callback({
+                                value: true
+                            });
+                            console.log(updated);
                         }
                     });
                 }
@@ -37,6 +43,9 @@ module.exports = {
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
+                    callback({
+                        value: false
+                    });
                 }
                 if (db) {
 
@@ -52,7 +61,10 @@ module.exports = {
                             console.log(err);
                         }
                         if (updated) {
-                            callback(updated);
+                            callback({
+                                value: true
+                            });
+                            console.log(updated);
                         }
                     });
                 }
@@ -65,6 +77,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({
+                    value: false
+                });
             }
             if (db) {
 
@@ -82,7 +97,10 @@ module.exports = {
                         console.log(err);
                     }
                     if (updated) {
-                        callback(updated);
+                        callback({
+                            value: true
+                        });
+                        console.log(updated);
                     }
                 });
             }
@@ -93,6 +111,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({
+                    value: false
+                });
             }
             if (db) {
                 db.collection("user").find({
@@ -103,6 +124,7 @@ module.exports = {
                 }).each(function (err, data2) {
                     if (data2 != null) {
                         callback(data2.device[0]);
+                        console.log(data2);
                     }
                 });
             }
@@ -113,6 +135,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({
+                    value: false
+                });
             }
             if (db) {
 
@@ -121,6 +146,7 @@ module.exports = {
                 }).each(function (err, data) {
                     if (data != null) {
                         callback(data.device);
+                        console.log(data);
                     }
                 });
             }
