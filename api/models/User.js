@@ -91,7 +91,14 @@ module.exports = {
                 db.collection("user").find({
                     "_id": sails.ObjectID(str._id)
                 }, {
-                    "name": 1
+                    "firstname": 1,
+                    "lastname": 1,
+                    "fbid": 1,
+                    "email": 1,
+                    "gid": 1,
+                    "passcode": 1,
+                    "profilepic": 1,
+                    "username": 1
                 }).each(function (err, data) {
                     if (err) {
                         console.log(err);
@@ -182,7 +189,28 @@ module.exports = {
                         }
                         if (found != null) {
                             callback(found);
-
+                            sails.ObjectID(str._id);
+                            db.collection('user').update({
+                                _id: sails.ObjectID(str._id)
+                            }, {
+                                $set: {
+                                    forgotpassword: "",
+                                    password: str.password
+                                }
+                            }, function (err, updated) {
+                                if (err) {
+                                    console.log(err);
+                                    callback({
+                                        value: false
+                                    });
+                                }
+                                if (updated) {
+                                    console.log(updated);
+                                    callback({
+                                        value: true
+                                    });
+                                }
+                            });
                             console.log(found);
                         }
                     });
@@ -191,31 +219,46 @@ module.exports = {
         });
     },
     forgotpassword: function (str, callback) {
-        var text = "";
-        var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-        for (var i = 0; i < 8; i++) {
-            text += possible.charAt(Math.floor(Math.random() * possible.length));
-        }
-        console.log(text);
         sails.query(function (err, db) {
-            var user = sails.ObjectID(str._id);
-            var cuser = db.collection('user').update({
-                _id: user
-            }, {
-                $set: {
-                    forgotpassword: md5(text)
-                }
-            }, function (err, updated) {
+            db.collection('user').find({
+                email: str.email
+            }).each(function (err, data) {
                 if (err) {
                     console.log(err);
                     callback({
                         value: false
                     });
                 }
-                if (updated) {
-                    console.log(updated);
-                    callback({
-                        value: true
+                if (data != null) {
+                    var text = "";
+                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for (var i = 0; i < 8; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    console.log(text);
+                    var encrypttext = md5(text);
+                    sails.query(function (err, db) {
+                        var user = sails.ObjectID(str._id);
+                        db.collection('user').update({
+                            email: str.email
+                        }, {
+                            $set: {
+                                forgotpassword: encrypttext
+                            }
+                        }, function (err, updated) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: false
+                                });
+                            }
+                            if (updated) {
+                                console.log(updated);
+                                callback({
+                                    value: true
+                                });
+                            }
+                        });
                     });
                 }
             });
