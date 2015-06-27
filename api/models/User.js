@@ -4,9 +4,10 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
-
+var md5 = require('MD5');
 module.exports = {
     save: function (str, callback) {
+        str.password = md5(str.password);
         if (!str._id) {
             str._id = sails.ObjectID();
             sails.query(function (err, db) {
@@ -27,8 +28,10 @@ module.exports = {
             });
         } else {
             sails.query(function (err, db) {
+                var user=sails.ObjectID(str._id);
+                delete str._id
                 var cuser = db.collection('user').update({
-                    _id: str.id
+                    _id: user
                 }, {
                     $set: str
                 }, function (err, updated) {
@@ -86,7 +89,7 @@ module.exports = {
             }
             if (db) {
                 db.collection("user").find({
-                    "_id": sails.ObjectID(str.id)
+                    "_id": sails.ObjectID(str._id)
                 }, {
                     "name": 1
                 }).each(function (err, data) {
@@ -113,7 +116,7 @@ module.exports = {
                 });
             }
             var cuser = db.collection('user').remove({
-                _id: sails.ObjectID(str.id)
+                _id: sails.ObjectID(str._id)
             }, function (err, deleted) {
                 if (deleted) {
                     console.log(deleted);
@@ -126,6 +129,30 @@ module.exports = {
                     callback({
                         value: false
                     });
+                }
+            });
+        });
+    },
+    login: function (str, callback) {
+        str.password = md5(str.password);
+        sails.query(function (err, db) {
+            db.collection('user').find({
+                _id: sails.ObjectID(str._id),
+                email: str.email,
+                password: str.password
+            },{"firstname":1,"lastname":1,"fbid":1,"email":1,"gid":1,"passcode":1,"profilepic":1,"username":1}).each(function (err, found) {
+                if (err) {
+                    callback({
+                        value: false
+                    });
+                    console.log(err);
+                }
+                if (found !=null) {
+                    callback(found);
+                    console.log(found);
+                }
+                else{
+                    
                 }
             });
         });

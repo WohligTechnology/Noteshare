@@ -28,5 +28,23 @@ module.exports = {
             res.json(data);
         }
         User.delete(req.body, print);
+    },
+    login:function(req,res){
+        var print = function (data) {
+            res.json(data);
+        }
+        User.login(req.body, print);
+    },
+    changepassword:function(req,res){
+        var print = function (data) {
+            res.json(data);
+        }
+        User.changepassword(req.body, print);
+    },
+    forgotpassword:function(req,res){
+        var print = function (data) {
+            res.json(data);
+        }
+        User.forgotpassword(req.body, print);
     }
 };
