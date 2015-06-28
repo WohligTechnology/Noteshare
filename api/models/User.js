@@ -160,7 +160,7 @@ module.exports = {
                 "profilepic": 1,
                 "username": 1
             }).each(function (err, found) {
-                    exitup++;
+                exitup++;
                 if (err) {
                     callback({
                         value: false
@@ -271,6 +271,48 @@ module.exports = {
                     });
                 }
             });
+        });
+    },
+    changepassword: function (str, callback) {
+        str.password = md5(str.password);
+        var user = sails.ObjectID(str._id);
+        var newpass = md5(str.editpassword);
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (str.editpassword == "") {
+                console.log("Password can't be empty.");
+                callback({
+                    value: false
+                });
+            }
+            if (str.editpassword != "") {
+                db.collection('user').update({
+                    _id: user,
+                    password:str.password
+                }, {
+                    $set: {
+                        password: newpass
+                    }
+                }, function (err, updated) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
+                    if (updated) {
+                        console.log(updated);
+                        callback({
+                            value: true
+                        });
+                    }
+                });
+            }
         });
     }
 };
