@@ -141,6 +141,9 @@ module.exports = {
         });
     },
     login: function (str, callback) {
+        var exitup = 0;
+        var exit = 0;
+        var exitdown = 0;
         str.password = md5(str.password);
         sails.query(function (err, db) {
             db.collection('user').find({
@@ -157,6 +160,7 @@ module.exports = {
                 "profilepic": 1,
                 "username": 1
             }).each(function (err, found) {
+                    exitup++;
                 if (err) {
                     callback({
                         value: false
@@ -181,6 +185,7 @@ module.exports = {
                         "profilepic": 1,
                         "username": 1
                     }).each(function (err, found) {
+                        exit++;
                         if (err) {
                             callback({
                                 value: false
@@ -206,12 +211,18 @@ module.exports = {
                                 }
                                 if (updated) {
                                     console.log(updated);
-                                    callback({
-                                        value: true
-                                    });
                                 }
                             });
-                            console.log(found);
+                        } else {
+                            exitdown++;
+                            console.log(exit);
+                            console.log(exitup);
+                            console.log(exitdown);
+                            if (exit == exitup == exitdown) {
+                                callback({
+                                    value: false
+                                });
+                            }
                         }
                     });
                 }
@@ -254,9 +265,7 @@ module.exports = {
                             }
                             if (updated) {
                                 console.log(updated);
-                                callback({
-                                    value: true
-                                });
+                                callback(text);
                             }
                         });
                     });
