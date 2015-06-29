@@ -8,7 +8,6 @@
 module.exports = {
     save: function (data, callback) {
         var user = sails.ObjectID(data.user);
-        data.note = sails.ObjectID(data.note);
         delete data.user;
         if (!data._id) {
             data._id = sails.ObjectID();
@@ -44,7 +43,6 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
-            data.note = sails.ObjectID(data.note);
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);

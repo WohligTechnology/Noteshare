@@ -63,7 +63,6 @@ module.exports = {
                 }
             });
         } else {
-            console.log("in else");
             data._id = sails.ObjectID(data._id);
             data.folder=sails.ObjectID(data.folder);
             sails.query(function (err, db) {
