@@ -40,8 +40,7 @@ module.exports = {
                 }
             });
         } else {
-            var deviceid=sails.ObjectID(data._id);
-            delete data._id;
+            var data._id=sails.ObjectID(data._id);
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -53,7 +52,7 @@ module.exports = {
 
                     db.collection("user").update({
                         "_id": user,
-                        "device._id": deviceid
+                        "device._id": data._id
                     }, {
                         $set: {
                             "device.$": data

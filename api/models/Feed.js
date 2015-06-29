@@ -36,8 +36,7 @@ module.exports = {
                 }
             });
         } else {
-            var feedid=sails.ObjectID(data._id);
-            delete data._id;
+            var data._id=sails.ObjectID(data._id);
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -46,7 +45,7 @@ module.exports = {
                 if (db) {
                     db.collection("user").update({
                         "_id": user,
-                        "feed._id": feedid
+                        "feed._id": data._id
                     }, {
                         $set: {
                             "feed.$": data
