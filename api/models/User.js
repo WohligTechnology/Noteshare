@@ -5,6 +5,8 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 var md5 = require('MD5');
+var mandrill = require('mandrill-api/mandrill');
+mandrill_client = new mandrill.Mandrill('dzbY2mySNE_Zsqr3hsK70A');
 module.exports = {
     save: function (data, callback) {
         data.password = md5(data.password);
@@ -62,7 +64,14 @@ module.exports = {
             }
             if (db) {
                 db.collection("user").find({}, {
-                    "name": 1
+                    "firstname": 1,
+                    "lastname": 1,
+                    "fbid": 1,
+                    "email": 1,
+                    "gid": 1,
+                    "passcode": 1,
+                    "profilepic": 1,
+                    "username": 1
                 }).each(function (err, data) {
                     if (err) {
                         console.log({
@@ -293,7 +302,7 @@ module.exports = {
             if (data.editpassword != "") {
                 db.collection('user').update({
                     _id: user,
-                    password:data.password
+                    password: data.password
                 }, {
                     $set: {
                         password: newpass
@@ -313,6 +322,41 @@ module.exports = {
                     }
                 });
             }
+        });
+    },
+    sendmail: function (callback) {
+        var message = {
+            "html": "<p>Example HTML content</p>",
+            "text": "Example text content",
+            "subject": "example subject",
+            "from_email": "vigneshkasthuri2009@gmail.com",
+            "from_name": "Wohlig",
+            "to": [{
+                "email": "vigneshkasthuri2009@gmail.com",
+                "name": "Vignesh",
+                "type": "to"
+        }]
+        };
+        //        var async = false;
+        //        var ip_pool = "Main Pool";
+        //        var send_at = "example send_at";
+        mandrill_client.messages.send({
+            "message": message
+        }, function (result) {
+            console.log(result);
+            /*
+            [{
+                    "email": "recipient.email@example.com",
+                    "status": "sent",
+                    "reject_reason": "hard-bounce",
+                    "_id": "abc123abc123abc123abc123abc123"
+                }]
+            */
+            callback(result);
+        }, function (e) {
+            // Mandrill returns the error as an object with name and message keys
+            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
         });
     }
 };

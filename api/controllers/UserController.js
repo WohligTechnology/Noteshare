@@ -17,7 +17,8 @@ module.exports = {
             res.json(data);
         }
         User.find(req.body, print);
-    },findone: function (req, res) {
+    },
+    findone: function (req, res) {
         var print = function (data) {
             res.json(data);
         }
@@ -29,22 +30,28 @@ module.exports = {
         }
         User.delete(req.body, print);
     },
-    login:function(req,res){
+    login: function (req, res) {
         var print = function (data) {
             res.json(data);
         }
         User.login(req.body, print);
     },
-    changepassword:function(req,res){
+    changepassword: function (req, res) {
         var print = function (data) {
             res.json(data);
         }
         User.changepassword(req.body, print);
     },
-    forgotpassword:function(req,res){
+    forgotpassword: function (req, res) {
         var print = function (data) {
             res.json(data);
         }
         User.forgotpassword(req.body, print);
+    },
+    sendmail: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.sendmail(print);
     }
 };
