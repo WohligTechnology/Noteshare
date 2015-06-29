@@ -48,7 +48,7 @@ module.exports = {
                             };
                             db.collection('folder_log').insert(log, function (err, created) {
                                 if (created) {
-                                    concole.log("log created");
+                                    console.log("log created");
                                 }
                                 if (err) {
                                     console.log(err);
@@ -100,7 +100,7 @@ module.exports = {
                             };
                             db.collection('folder_log').insert(log, function (err, created) {
                                 if (created) {
-                                    concole.log("log created");
+                                    console.log("log created");
                                 }
                                 if (err) {
                                     console.log(err);
@@ -155,7 +155,7 @@ module.exports = {
                         };
                         db.collection('folder_log').insert(log, function (err, created) {
                             if (created) {
-                                concole.log("log created");
+                                console.log("log created");
                             }
                             if (err) {
                                 console.log(err);
@@ -196,7 +196,7 @@ module.exports = {
                         };
                         db.collection('folder_log').insert(log, function (err, created) {
                             if (created) {
-                                concole.log("log created");
+                                console.log("log created");
                             }
                             if (err) {
                                 console.log(err);
@@ -241,7 +241,7 @@ module.exports = {
                         };
                         db.collection('folder_log').insert(log, function (err, created) {
                             if (created) {
-                                concole.log("log created");
+                                console.log("log created");
                             }
                             if (err) {
                                 console.log(err);
