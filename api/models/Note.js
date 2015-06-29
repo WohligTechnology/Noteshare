@@ -202,6 +202,7 @@ module.exports = {
         });
     },
     find: function (data, callback) {
+        
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {

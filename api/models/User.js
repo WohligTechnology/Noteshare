@@ -6,12 +6,12 @@
  */
 var md5 = require('MD5');
 module.exports = {
-    save: function (str, callback) {
-        str.password = md5(str.password);
-        if (!str._id) {
-            str._id = sails.ObjectID();
+    save: function (data, callback) {
+        data.password = md5(data.password);
+        if (!data._id) {
+            data._id = sails.ObjectID();
             sails.query(function (err, db) {
-                var cuser = db.collection('user').insert(str, function (err, created) {
+                var cuser = db.collection('user').insert(data, function (err, created) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -28,12 +28,12 @@ module.exports = {
             });
         } else {
             sails.query(function (err, db) {
-                var user = sails.ObjectID(str._id);
-                delete str._id
+                var user = sails.ObjectID(data._id);
+                delete data._id
                 var cuser = db.collection('user').update({
                     _id: user
                 }, {
-                    $set: str
+                    $set: data
                 }, function (err, updated) {
                     if (err) {
                         console.log(err);
@@ -51,7 +51,7 @@ module.exports = {
             });
         }
     },
-    find: function (str, callback) {
+    find: function (data, callback) {
         returns = [];
         sails.query(function (err, db) {
             if (err) {
@@ -79,7 +79,7 @@ module.exports = {
             }
         });
     },
-    findone: function (str, callback) {
+    findone: function (data, callback) {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -89,7 +89,7 @@ module.exports = {
             }
             if (db) {
                 db.collection("user").find({
-                    "_id": sails.ObjectID(str._id)
+                    "_id": sails.ObjectID(data._id)
                 }, {
                     "firstname": 1,
                     "lastname": 1,
@@ -114,7 +114,7 @@ module.exports = {
             }
         });
     },
-    delete: function (str, callback) {
+    delete: function (data, callback) {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -123,7 +123,7 @@ module.exports = {
                 });
             }
             var cuser = db.collection('user').remove({
-                _id: sails.ObjectID(str._id)
+                _id: sails.ObjectID(data._id)
             }, function (err, deleted) {
                 if (deleted) {
                     console.log(deleted);
@@ -140,16 +140,16 @@ module.exports = {
             });
         });
     },
-    login: function (str, callback) {
+    login: function (data, callback) {
         var exitup = 0;
         var exit = 0;
         var exitdown = 0;
-        str.password = md5(str.password);
+        data.password = md5(data.password);
         sails.query(function (err, db) {
             db.collection('user').find({
-                _id: sails.ObjectID(str._id),
-                email: str.email,
-                password: str.password
+                _id: sails.ObjectID(data._id),
+                email: data.email,
+                password: data.password
             }, {
                 "firstname": 1,
                 "lastname": 1,
@@ -172,9 +172,9 @@ module.exports = {
                     console.log(found);
                 } else {
                     db.collection('user').find({
-                        _id: sails.ObjectID(str._id),
-                        email: str.email,
-                        forgotpassword: str.password
+                        _id: sails.ObjectID(data._id),
+                        email: data.email,
+                        forgotpassword: data.password
                     }, {
                         "firstname": 1,
                         "lastname": 1,
@@ -194,13 +194,13 @@ module.exports = {
                         }
                         if (found != null) {
                             callback(found);
-                            sails.ObjectID(str._id);
+                            sails.ObjectID(data._id);
                             db.collection('user').update({
-                                _id: sails.ObjectID(str._id)
+                                _id: sails.ObjectID(data._id)
                             }, {
                                 $set: {
                                     forgotpassword: "",
-                                    password: str.password
+                                    password: data.password
                                 }
                             }, function (err, updated) {
                                 if (err) {
@@ -229,10 +229,10 @@ module.exports = {
             });
         });
     },
-    forgotpassword: function (str, callback) {
+    forgotpassword: function (data, callback) {
         sails.query(function (err, db) {
             db.collection('user').find({
-                email: str.email
+                email: data.email
             }).each(function (err, data) {
                 if (err) {
                     console.log(err);
@@ -249,9 +249,9 @@ module.exports = {
                     console.log(text);
                     var encrypttext = md5(text);
                     sails.query(function (err, db) {
-                        var user = sails.ObjectID(str._id);
+                        var user = sails.ObjectID(data._id);
                         db.collection('user').update({
-                            email: str.email
+                            email: data.email
                         }, {
                             $set: {
                                 forgotpassword: encrypttext
@@ -273,10 +273,10 @@ module.exports = {
             });
         });
     },
-    changepassword: function (str, callback) {
-        str.password = md5(str.password);
-        var user = sails.ObjectID(str._id);
-        var newpass = md5(str.editpassword);
+    changepassword: function (data, callback) {
+        data.password = md5(data.password);
+        var user = sails.ObjectID(data._id);
+        var newpass = md5(data.editpassword);
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -284,16 +284,16 @@ module.exports = {
                     value: false
                 });
             }
-            if (str.editpassword == "") {
+            if (data.editpassword == "") {
                 console.log("Password can't be empty.");
                 callback({
                     value: false
                 });
             }
-            if (str.editpassword != "") {
+            if (data.editpassword != "") {
                 db.collection('user').update({
                     _id: user,
-                    password:str.password
+                    password:data.password
                 }, {
                     $set: {
                         password: newpass
