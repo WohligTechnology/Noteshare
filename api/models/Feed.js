@@ -36,7 +36,7 @@ module.exports = {
                 }
             });
         } else {
-            var data._id=sails.ObjectID(data._id);
+            data._id=sails.ObjectID(data._id);
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);

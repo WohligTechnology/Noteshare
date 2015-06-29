@@ -93,7 +93,7 @@ module.exports = {
                             console.log(time);
                             var log = {
                                 _id: logid,
-                                folder: folderid,
+                                folder: data._id,
                                 timestamp: time,
                                 type: "update",
                                 user: user
