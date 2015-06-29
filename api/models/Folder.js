@@ -181,7 +181,7 @@ module.exports = {
                 }).each(function (err, data2) {
                     if (data2 != null) {
                         callback(data2.folder[0]);
-                        console.log(data2);
+                        console.log("folder findone");
                         //                        var logid = sails.ObjectID();
                         //                        var log = {
                         //                            _id: logid,
@@ -225,7 +225,7 @@ module.exports = {
                 }).each(function (err, data) {
                     if (data != null) {
                         callback(data.folder);
-                        console.log(data);
+                        console.log("folder find");
                         //                        var logid = sails.ObjectID();
                         //                        var log = {
                         //                            _id: logid,

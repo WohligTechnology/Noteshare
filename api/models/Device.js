@@ -124,7 +124,7 @@ module.exports = {
                 }).each(function (err, data2) {
                     if (data2 != null) {
                         callback(data2.device[0]);
-                        console.log(data2);
+                        console.log("device findone");
                     }
                 });
             }
@@ -146,7 +146,7 @@ module.exports = {
                 }).each(function (err, data) {
                     if (data != null) {
                         callback(data.device);
-                        console.log(data);
+                        console.log("device find");
                     }
                 });
             }

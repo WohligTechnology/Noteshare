@@ -170,7 +170,6 @@ module.exports = {
                     if (data2 != null) {
                         callback(data2.note[0]);
                         console.log("note findone");
-                        console.log(data2);
                         //                        var logid = sails.ObjectID();
                         //                        var log = {
                         //                            _id: logid,
@@ -202,7 +201,8 @@ module.exports = {
         });
     },
     find: function (data, callback) {
-        
+        var timer=data.timebomb;
+        console.log(timer);
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -219,7 +219,6 @@ module.exports = {
                     if (data != null) {
                         callback(data.note);
                         console.log("note find");
-                        console.log(data);
                         //                        var logid = sails.ObjectID();
                         //                        var log = {
                         //                            _id: logid,

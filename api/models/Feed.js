@@ -109,7 +109,7 @@ module.exports = {
                 }).each(function (err, data2) {
                     if (data2 != null) {
                         callback(data2.feed[0]);
-                        console.log(data2);
+                        console.log("feed findone");
                     }
                 });
             }
@@ -128,7 +128,7 @@ module.exports = {
                 }).each(function (err, data) {
                     if (data != null) {
                         callback(data.feed);
-                        console.log(data);
+                        console.log("feed find");
                     }
                 });
             }

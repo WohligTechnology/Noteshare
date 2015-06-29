@@ -134,7 +134,6 @@ module.exports = {
                     if (data2 != null) {
                         callback(data2.share[0]);
                         console.log("share findone");
-                        console.log(data2);
                     }
                 });
             }
@@ -157,7 +156,6 @@ module.exports = {
                     if (data != null) {
                         callback(data.share);
                         console.log("share find");
-                        console.log(data);
                     }
                     if (err) {
                         console.log(err);
