@@ -17,7 +17,7 @@ module.exports = {
                     callback({value:false});
                 }
                 if (db) {
-
+                    data.timestamp=data._id.getTimestamp().toString();
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -36,6 +36,8 @@ module.exports = {
                 }
             });
         } else {
+            var feedid=sails.ObjectID(data._id);
+            delete data._id;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -44,7 +46,7 @@ module.exports = {
                 if (db) {
                     db.collection("user").update({
                         "_id": user,
-                        "feed._id": sails.ObjectID(data._id)
+                        "feed._id": feedid
                     }, {
                         $set: {
                             "feed.$": data

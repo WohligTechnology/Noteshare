@@ -58,6 +58,8 @@ module.exports = {
                 }
             });
         } else {
+            var folderid = sails.ObjectID(data._id);
+            delete data._id;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -69,7 +71,7 @@ module.exports = {
 
                     db.collection("user").update({
                         "_id": user,
-                        "folder._id": sails.ObjectID(data._id)
+                        "folder._id":folderid
                     }, {
                         $set: {
                             "folder.$": data
@@ -86,24 +88,24 @@ module.exports = {
                                 value: true
                             });
                             console.log(updated);
-//                            var logid = sails.ObjectID();
-//                            var time = logid.getTimestamp().toString();
-//                            console.log(time);
-//                            var log = {
-//                                _id: logid,
-//                                folder: data._id,
-//                                timestamp: time,
-//                                type: "update",
-//                                user: user
-//                            };
-//                            db.collection('folder_log').insert(log, function (err, created) {
-//                                if (created) {
-//                                    concole.log("log created");
-//                                }
-//                                if (err) {
-//                                    console.log(err);
-//                                }
-//                            });
+                            //                            var logid = sails.ObjectID();
+                            //                            var time = logid.getTimestamp().toString();
+                            //                            console.log(time);
+                            //                            var log = {
+                            //                                _id: logid,
+                            //                                folder: data._id,
+                            //                                timestamp: time,
+                            //                                type: "update",
+                            //                                user: user
+                            //                            };
+                            //                            db.collection('folder_log').insert(log, function (err, created) {
+                            //                                if (created) {
+                            //                                    concole.log("log created");
+                            //                                }
+                            //                                if (err) {
+                            //                                    console.log(err);
+                            //                                }
+                            //                            });
                         }
                     });
                 }

@@ -56,6 +56,8 @@ module.exports = {
                 }
             });
         } else {
+            var noteid= sails.ObjectID(data._id);
+            delete data._id;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -65,7 +67,7 @@ module.exports = {
 
                     db.collection("user").update({
                         "_id": user,
-                        "note._id": sails.ObjectID(data._id)
+                        "note._id":noteid
                     }, {
                         $set: {
                             "note.$": data

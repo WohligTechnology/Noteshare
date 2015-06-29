@@ -43,6 +43,8 @@ module.exports = {
                 }
             });
         } else {
+            var shareid=sails.ObjectID(data._id);
+            delete data._id;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -54,7 +56,7 @@ module.exports = {
 
                     db.collection("user").update({
                         "_id": user,
-                        "share._id": sails.ObjectID(data._id)
+                        "share._id": shareid
                     }, {
                         $set: {
                             "share.$": data

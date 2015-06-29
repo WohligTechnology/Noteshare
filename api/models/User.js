@@ -238,50 +238,6 @@ module.exports = {
             });
         });
     },
-    forgotpassword: function (data, callback) {
-        sails.query(function (err, db) {
-            db.collection('user').find({
-                email: data.email
-            }).each(function (err, data) {
-                if (err) {
-                    console.log(err);
-                    callback({
-                        value: false
-                    });
-                }
-                if (data != null) {
-                    var text = "";
-                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
-                    for (var i = 0; i < 8; i++) {
-                        text += possible.charAt(Math.floor(Math.random() * possible.length));
-                    }
-                    console.log(text);
-                    var encrypttext = md5(text);
-                    sails.query(function (err, db) {
-                        var user = sails.ObjectID(data._id);
-                        db.collection('user').update({
-                            email: data.email
-                        }, {
-                            $set: {
-                                forgotpassword: encrypttext
-                            }
-                        }, function (err, updated) {
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                            if (updated) {
-                                console.log(updated);
-                                callback(text);
-                            }
-                        });
-                    });
-                }
-            });
-        });
-    },
     changepassword: function (data, callback) {
         data.password = md5(data.password);
         var user = sails.ObjectID(data._id);
@@ -324,39 +280,79 @@ module.exports = {
             }
         });
     },
-    sendmail: function (callback) {
-        var message = {
-            "html": "<p>Example HTML content</p>",
-            "text": "Example text content",
-            "subject": "example subject",
-            "from_email": "vigneshkasthuri2009@gmail.com",
-            "from_name": "Wohlig",
-            "to": [{
-                "email": "vigneshkasthuri2009@gmail.com",
-                "name": "Vignesh",
-                "type": "to"
-        }]
-        };
-        //        var async = false;
-        //        var ip_pool = "Main Pool";
-        //        var send_at = "example send_at";
-        mandrill_client.messages.send({
-            "message": message
-        }, function (result) {
-            console.log(result);
-            /*
-            [{
-                    "email": "recipient.email@example.com",
-                    "status": "sent",
-                    "reject_reason": "hard-bounce",
-                    "_id": "abc123abc123abc123abc123abc123"
-                }]
-            */
-            callback(result);
-        }, function (e) {
-            // Mandrill returns the error as an object with name and message keys
-            console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-            // A mandrill error occurred: Unknown_Subaccount - No subaccount exists with the id 'customer-123'
+    forgotpassword: function (data, callback) {
+        sails.query(function (err, db) {
+            db.collection('user').find({
+                email: data.email
+            }).each(function (err, data) {
+                if (err) {
+                    console.log(err);
+                    callback({
+                        value: false
+                    });
+                }
+                if (data != null) {
+                    var text = "";
+                    var possible = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+                    for (var i = 0; i < 8; i++) {
+                        text += possible.charAt(Math.floor(Math.random() * possible.length));
+                    }
+                    console.log(text);
+                    var encrypttext = md5(text);
+                    sails.query(function (err, db) {
+                        var user = sails.ObjectID(data._id);
+                        db.collection('user').update({
+                            email: data.email
+                        }, {
+                            $set: {
+                                forgotpassword: encrypttext
+                            }
+                        }, function (err, updated) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: false
+                                });
+
+                            }
+                            if (updated) {
+                                var template_name = "Noteshare";
+                                var template_content = [{
+                                    "name": "noteshare",
+                                    "content": "noteshare"
+    }]
+                                var message = {
+                                    "from_email": "vigneshkasthuri2009@gmail.com",
+                                    "from_name": "Wohlig",
+                                    "to": [{
+                                        "email": data.email,
+                                        "type": "to"
+        }],
+                                    "global_merge_vars": [
+                                        {
+                                            "name": "password",
+                                            "content": text
+  }
+]
+                                };
+                                mandrill_client.messages.sendTemplate({
+                                    "template_name": template_name,
+                                    "template_content": template_content,
+                                    "message": message
+                                }, function (result) {
+                                    console.log(result);
+                                    callback(result);
+                                }, function (e) {
+                                    console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                });
+                            }
+                        });
+                    });
+                }
+            });
         });
+    },
+    sendmail: function (callback) {
+
     }
 };
