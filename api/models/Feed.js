@@ -14,10 +14,12 @@ module.exports = {
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
-                    callback({value:false});
+                    callback({
+                        value: false
+                    });
                 }
                 if (db) {
-                    data.timestamp=data._id.getTimestamp().toString();
+                    data.timestamp = data._id.getTimestamp().toString();
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -29,33 +31,40 @@ module.exports = {
                             console.log(err);
                         }
                         if (updated) {
-                            callback({value:true});
+                            callback({
+                                value: true
+                            });
                             console.log(updated);
                         }
                     });
                 }
             });
         } else {
-            data._id=sails.ObjectID(data._id);
+            data._id = sails.ObjectID(data._id);
+            _.forIn(data, function (value, key) {
+                tobechanged[attribute + key] = value;
+            });
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
-                    callback({value:false});
+                    callback({
+                        value: false
+                    });
                 }
                 if (db) {
                     db.collection("user").update({
                         "_id": user,
                         "feed._id": data._id
                     }, {
-                        $set: {
-                            "feed.$": data
-                        }
+                        $set: tobechanged
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
                         }
                         if (updated) {
-                            callback({value:true});
+                            callback({
+                                value: true
+                            });
                             console.log(updated);
                         }
                     });
@@ -69,7 +78,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
-                callback({value:false});
+                callback({
+                    value: false
+                });
             }
             if (db) {
 
@@ -87,7 +98,9 @@ module.exports = {
                         console.log(err);
                     }
                     if (updated) {
-                        callback({value:true});
+                        callback({
+                            value: true
+                        });
                         console.log(updated);
                     }
                 });
@@ -99,7 +112,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
-                callback({value:false});
+                callback({
+                    value: false
+                });
             }
             if (db) {
                 db.collection("user").find({
@@ -121,7 +136,9 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
-                callback({value:false});
+                callback({
+                    value: false
+                });
             }
             if (db) {
                 db.collection("user").find({

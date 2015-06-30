@@ -40,7 +40,12 @@ module.exports = {
                 }
             });
         } else {
-            data._id=sails.ObjectID(data._id);
+            data._id = sails.ObjectID(data._id);
+            var tobechanged = {};
+            var attribute = "share.$.";
+            _.forIn(data, function (value, key) {
+                tobechanged[attribute + key] = value;
+            });
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -54,9 +59,7 @@ module.exports = {
                         "_id": user,
                         "device._id": data._id
                     }, {
-                        $set: {
-                            "device.$": data
-                        }
+                        $set: tobechanged
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);

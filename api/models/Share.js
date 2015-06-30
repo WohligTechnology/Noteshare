@@ -43,6 +43,14 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
+            data.userfrom = sails.ObjectID(data.userfrom);
+            data.note = sails.ObjectID(data.note);
+            var tobechanged = {};
+            var attribute = "share.$.";
+            _.forIn(data, function (value, key) {
+                tobechanged[attribute + key] = value;
+            });
+
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -51,14 +59,11 @@ module.exports = {
                     });
                 }
                 if (db) {
-
                     db.collection("user").update({
                         "_id": user,
                         "share._id": data._id
                     }, {
-                        $set: {
-                            "share.$": data
-                        }
+                        $set: tobechanged
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
@@ -87,7 +92,6 @@ module.exports = {
                 });
             }
             if (db) {
-
                 db.collection("user").update({
                     "_id": user,
 
@@ -148,7 +152,6 @@ module.exports = {
                 });
             }
             if (db) {
-
                 db.collection("user").find({
                     "_id": user
                 }).each(function (err, data) {

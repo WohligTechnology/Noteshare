@@ -60,6 +60,11 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
+            var tobechanged = {};
+            var attribute = "share.$.";
+            _.forIn(data, function (value, key) {
+                tobechanged[attribute + key] = value;
+            });
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -73,9 +78,7 @@ module.exports = {
                         "_id": user,
                         "folder._id": data._id
                     }, {
-                        $set: {
-                            "folder.$": data
-                        },
+                        $set: tobechanged
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
