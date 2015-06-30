@@ -134,8 +134,7 @@ module.exports = {
             }
             if (db) {
                 db.collection("user").update({
-                    "_id": user,
-
+                    "_id": user
                 }, {
                     $pull: {
                         "note": {
@@ -239,27 +238,19 @@ module.exports = {
         });
     },
     localtoserver: function (data, callback) {
-        if (data.type == "create") {
-            delete data.type;
-            Note.save(data, callback);
-        } else if (data.type == "update") {
+        if (data.type == "create" || data.type == "update") {
             delete data.type;
             Note.save(data, callback);
         } else if (data.type == "delete") {
             delete data.type;
             Note.delete(data, callback);
+        } else if (data.type == "delete" && !data._id) {
+            callback({
+                value: false
+            });
         }
     },
     servertolocal: function (data, callback) {
-        if (data.type == "create") {
-            delete data.type;
-            Note.save(data, callback);
-        } else if (data.type == "update") {
-            delete data.type;
-            Note.save(data, callback);
-        } else if (data.type == "delete") {
-            delete data.type;
-            Note.delete(data, callback);
-        }
+
     }
 };

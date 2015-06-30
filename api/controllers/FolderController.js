@@ -36,5 +36,11 @@ module.exports = {
             res.json(data);
         };
         Folder.localtoserver(req.body, callback);
+    },
+    servertolocal: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Folder.servertolocal(req.body, callback);
     }
 };

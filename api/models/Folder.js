@@ -127,7 +127,7 @@ module.exports = {
             if (db) {
 
                 db.collection("user").update({
-                    "_id": user,
+                    "_id": user
 
                 }, {
                     $pull: {
@@ -151,7 +151,9 @@ module.exports = {
                             "_id": user,
                             "note.folder": sails.ObjectID(data._id)
                         }, {
-                            $set: {}
+                            $pull: {
+                                "
+                            }
                         }, function (err, updated) {
                             if (updated) {
 
@@ -244,27 +246,19 @@ module.exports = {
         });
     },
     localtoserver: function (data, callback) {
-        if (data.type == "create") {
-            delete data.type;
-            Folder.save(data, callback);
-        } else if (data.type == "update") {
+        if (data.type == "create" || data.type == "update") {
             delete data.type;
             Folder.save(data, callback);
         } else if (data.type == "delete") {
             delete data.type;
             Folder.delete(data, callback);
+        } else if (data.type == "delete" && !data._id) {
+            callback({
+                value: false
+            });
         }
     },
     servertolocal: function (data, callback) {
-        if (data.type == "create") {
-            delete data.type;
-            Folder.save(data, callback);
-        } else if (data.type == "update") {
-            delete data.type;
-            Folder.save(data, callback);
-        } else if (data.type == "delete") {
-            delete data.type;
-            Folder.delete(data, callback);
-        }
+
     }
 };
