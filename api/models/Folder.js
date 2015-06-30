@@ -151,9 +151,7 @@ module.exports = {
                             "_id": user,
                             "note.folder": sails.ObjectID(data._id)
                         }, {
-                            $pull: {
-                                "
-                            }
+                            $pull: {}
                         }, function (err, updated) {
                             if (updated) {
 

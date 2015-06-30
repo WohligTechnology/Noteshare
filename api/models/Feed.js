@@ -87,8 +87,7 @@ module.exports = {
             if (db) {
 
                 db.collection("user").update({
-                    "_id": user,
-
+                    "_id": user
                 }, {
                     $pull: {
                         "feed": {
