@@ -25,10 +25,22 @@ module.exports = {
         Note.find(req.body, callback);
 
     },
-    findone: function (req, res) {
+    findOne: function (req, res) {
         function callback(data) {
             res.json(data);
         };
-        Note.findone(req.body, callback);
+        Note.findOne(req.body, callback);
+    },
+    localtoserver: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Note.localtoserver(req.body, callback);
+    },
+    servertolocal: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Note.servertolocal(req.body, callback);
     }
 };

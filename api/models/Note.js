@@ -8,7 +8,7 @@
 module.exports = {
     save: function (data, callback) {
         var user = sails.ObjectID(data.user);
-        data.folder=sails.ObjectID(data.folder);
+        data.folder = sails.ObjectID(data.folder);
         delete data.user;
         if (!data._id) {
             data._id = sails.ObjectID();
@@ -39,7 +39,7 @@ module.exports = {
                             });
                             console.log(updated);
                             var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toString();
+                            var time = logid.getTimestamp().toJSON();
                             var log = {
                                 _id: logid,
                                 note: data._id,
@@ -64,12 +64,12 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
-            data.folder=sails.ObjectID(data.folder);
+            data.folder = sails.ObjectID(data.folder);
             var tobechanged = {};
-var attribute = "share.$.";
-_.forIn(data, function (value, key) {
-    tobechanged[attribute + key] = value;
-});
+            var attribute = "note.$.";
+            _.forIn(data, function (value, key) {
+                tobechanged[attribute + key] = value;
+            });
 
             sails.query(function (err, db) {
                 if (err) {
@@ -98,7 +98,7 @@ _.forIn(data, function (value, key) {
                             });
                             console.log(updated);
                             var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toString();
+                            var time = logid.getTimestamp().toJSON();
                             var log = {
                                 _id: logid,
                                 note: data._id,
@@ -155,7 +155,7 @@ _.forIn(data, function (value, key) {
                         });
                         console.log(updated);
                         var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
+                        var time = logid.getTimestamp().toJSON();
                         var log = {
                             _id: logid,
                             note: data._id,
@@ -179,7 +179,7 @@ _.forIn(data, function (value, key) {
             }
         });
     },
-    findone: function (data, callback) {
+    findOne: function (data, callback) {
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -198,26 +198,6 @@ _.forIn(data, function (value, key) {
                     if (data2 != null) {
                         callback(data2.note[0]);
                         console.log("note findone");
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
-                        var log = {
-                            _id: logid,
-                            note: data._id,
-                            timestamp: time,
-                            type: "findone",
-                            user: user
-                        };
-                        db.collection('note_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                        });
                     }
                     if (err) {
                         console.log(err);
@@ -230,8 +210,7 @@ _.forIn(data, function (value, key) {
         });
     },
     find: function (data, callback) {
-        var timer = data.timebomb;
-        console.log(timer);
+        var date = new Date();
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -248,26 +227,6 @@ _.forIn(data, function (value, key) {
                     if (data != null) {
                         callback(data.note);
                         console.log("note find");
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
-                        var log = {
-                            _id: logid,
-                            note: data._id,
-                            timestamp: time,
-                            type: "find",
-                            user: user
-                        };
-                        db.collection('note_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                        });
                     }
                     if (err) {
                         console.log(err);
@@ -278,5 +237,29 @@ _.forIn(data, function (value, key) {
                 });
             }
         });
+    },
+    localtoserver: function (data, callback) {
+        if (data.type == "create") {
+            delete data.type;
+            Note.save(data, callback);
+        } else if (data.type == "update") {
+            delete data.type;
+            Note.save(data, callback);
+        } else if (data.type == "delete") {
+            delete data.type;
+            Note.delete(data, callback);
+        }
+    },
+    servertolocal: function (data, callback) {
+        if (data.type == "create") {
+            delete data.type;
+            Note.save(data, callback);
+        } else if (data.type == "update") {
+            delete data.type;
+            Note.save(data, callback);
+        } else if (data.type == "delete") {
+            delete data.type;
+            Note.delete(data, callback);
+        }
     }
 };

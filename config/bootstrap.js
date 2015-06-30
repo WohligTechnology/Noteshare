@@ -15,6 +15,7 @@ module.exports.bootstrap = function (cb) {
         sails.Server = require('mongodb').Server,
         sails.ReplSetServers = require('mongodb').ReplSetServers,
         sails.ObjectID = require('mongodb').ObjectID,
+        sails.Timestamp = require('mongodb').Timestamp,
         sails.Binary = require('mongodb').Binary,
         sails.GridStore = require('mongodb').GridStore,
         sails.Grid = require('mongodb').Grid,

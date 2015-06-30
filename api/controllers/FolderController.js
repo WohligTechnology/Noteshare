@@ -25,10 +25,16 @@ module.exports = {
         Folder.find(req.body, callback);
 
     },
-    findone: function (req, res) {
+    findOne: function (req, res) {
         function callback(data) {
             res.json(data);
         };
         Folder.findone(req.body, callback);
+    },
+    localtoserver: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Folder.localtoserver(req.body, callback);
     }
 };

@@ -38,7 +38,7 @@ module.exports = {
                             });
                             console.log(updated);
                             var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toString();
+                            var time = logid.getTimestamp().toJSON();
                             var log = {
                                 _id: logid,
                                 folder: data._id,
@@ -61,7 +61,7 @@ module.exports = {
         } else {
             data._id = sails.ObjectID(data._id);
             var tobechanged = {};
-            var attribute = "share.$.";
+            var attribute = "folder.$.";
             _.forIn(data, function (value, key) {
                 tobechanged[attribute + key] = value;
             });
@@ -92,7 +92,7 @@ module.exports = {
                             });
                             console.log(updated);
                             var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toString();
+                            var time = logid.getTimestamp().toJSON();
                             console.log(time);
                             var log = {
                                 _id: logid,
@@ -147,8 +147,24 @@ module.exports = {
                             value: true
                         });
                         console.log(updated);
+                        db.collection("user").update({
+                            "_id": user,
+                            "note.folder": sails.ObjectID(data._id)
+                        }, {
+                            $set: {}
+                        }, function (err, updated) {
+                            if (updated) {
+
+                            }
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: false
+                                });
+                            }
+                        });
                         var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
+                        var time = logid.getTimestamp().toJSON();
                         var log = {
                             _id: logid,
                             folder: data._id,
@@ -169,7 +185,7 @@ module.exports = {
             }
         });
     },
-    findone: function (data, callback) {
+    findOne: function (data, callback) {
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -188,23 +204,6 @@ module.exports = {
                     if (data2 != null) {
                         callback(data2.folder[0]);
                         console.log("folder findone");
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
-                        var log = {
-                            _id: logid,
-                            folder: data._id,
-                            timestamp: time,
-                            type: "findone",
-                            user: user
-                        };
-                        db.collection('folder_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
-                            }
-                        });
                     }
                     if (err) {
                         console.log(err);
@@ -233,26 +232,6 @@ module.exports = {
                     if (data != null) {
                         callback(data.folder);
                         console.log("folder find");
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toString();
-                        var log = {
-                            _id: logid,
-                            folder: data._id,
-                            timestamp: time,
-                            type: "find",
-                            user: user
-                        };
-                        db.collection('folder_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                        });
                     }
                     if (err) {
                         console.log(err);
@@ -263,5 +242,29 @@ module.exports = {
                 });
             }
         });
+    },
+    localtoserver: function (data, callback) {
+        if (data.type == "create") {
+            delete data.type;
+            Folder.save(data, callback);
+        } else if (data.type == "update") {
+            delete data.type;
+            Folder.save(data, callback);
+        } else if (data.type == "delete") {
+            delete data.type;
+            Folder.delete(data, callback);
+        }
+    },
+    servertolocal: function (data, callback) {
+        if (data.type == "create") {
+            delete data.type;
+            Folder.save(data, callback);
+        } else if (data.type == "update") {
+            delete data.type;
+            Folder.save(data, callback);
+        } else if (data.type == "delete") {
+            delete data.type;
+            Folder.delete(data, callback);
+        }
     }
 };

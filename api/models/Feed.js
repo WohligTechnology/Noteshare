@@ -41,6 +41,8 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
+            var tobechanged = {};
+            var attribute = "feed.$.";
             _.forIn(data, function (value, key) {
                 tobechanged[attribute + key] = value;
             });

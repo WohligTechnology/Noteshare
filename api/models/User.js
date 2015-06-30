@@ -351,8 +351,5 @@ module.exports = {
                 }
             });
         });
-    },
-    sendmail: function (callback) {
-
     }
 };

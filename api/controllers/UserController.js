@@ -47,11 +47,5 @@ module.exports = {
             res.json(data);
         }
         User.forgotpassword(req.body, print);
-    },
-    sendmail: function (req, res) {
-        var print = function (data) {
-            res.json(data);
-        }
-        User.sendmail(print);
     }
 };
