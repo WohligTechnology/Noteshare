@@ -111,13 +111,14 @@ module.exports = {
                             value: false
                         });
                     }
+                    var datanote = "";
                     if (updated) {
                         db.collection("user").update({
                             "_id": user,
                             "note.folder": sails.ObjectID(data._id)
                         }, {
                             $set: {
-                                "note.folder": ""
+                                "note.folder": datanote
                             }
                         }, function (err, updated) {
                             if (updated) {
@@ -206,6 +207,9 @@ module.exports = {
         }
     },
     servertolocal: function (data, callback) {
+        console.log(data.modifytime);
+        var d = new Date(data.modifytime);
+        console.log(d);
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -215,12 +219,24 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    "_id": user
-                }).each(function (err, data) {
+                db.collection("user").aggregate([
+                    {
+                        $project: {
+                            "folder": 1
+                        }
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "folder.modifytime": {
+                                $gt: d
+                            }
+                        }
+                    }
+                ], function (err, data) {
                     if (data != null) {
-                        callback(data.folder);
-                        console.log("folder find");
+                        callback(data);
+                        console.log(data);
                     }
                     if (err) {
                         console.log(err);

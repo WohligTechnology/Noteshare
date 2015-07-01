@@ -168,7 +168,6 @@ module.exports = {
                 });
             }
             if (db) {
-
                 db.collection("user").find({
                     "_id": user
                 }).each(function (err, data) {
@@ -197,7 +196,5 @@ module.exports = {
             Note.delete(data, callback)
         }
     },
-    servertolocal: function (data, callback) {
-
-    }
+    servertolocal: function (data, callback) {}
 };
