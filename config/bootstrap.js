@@ -12,11 +12,10 @@
 module.exports.bootstrap = function (cb) {
     sails.Db = require('mongodb').Db,
         sails.MongoClient = require('mongodb').MongoClient,
+        sails.ISODate = require('mongodb').ISODate,
         sails.Server = require('mongodb').Server,
         sails.ReplSetServers = require('mongodb').ReplSetServers,
         sails.ObjectID = require('mongodb').ObjectID,
-        sails.Timestamp = require('mongodb').Timestamp,
-        sails.ISODate = require('mongodb').ISODate,
         sails.Binary = require('mongodb').Binary,
         sails.GridStore = require('mongodb').GridStore,
         sails.Grid = require('mongodb').Grid,

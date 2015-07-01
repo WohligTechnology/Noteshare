@@ -207,10 +207,6 @@ module.exports = {
         }
     },
     servertolocal: function (data, callback) {
-        console.log(data.modifytime);
-        var d = new Date(data.modifytime);
-        var dated = sails.ISODate(d);
-        console.log(dated);
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -220,24 +216,13 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([
-                    {
-                        $project: {
-                            "folder": 1
-                        }
-                    },
-                    {
-                        $match: {
-                            "_id": user,
-                            "folder.modifytime": {
-                                $gt: dated
-                            }
-                        }
-                    }
-                ], function (err, data) {
+                db.collection("user").find({
+                    "_id": user
+                }).sort({
+                    "folder.modifytime": -1
+                }).each(function (err, data) {
                     if (data != null) {
-                        callback(data);
-                        console.log(data);
+                        callback(data.folder);
                     }
                     if (err) {
                         console.log(err);
