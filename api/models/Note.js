@@ -20,6 +20,10 @@ module.exports = {
                     });
                 }
                 if (db) {
+                    if (!data.creationtime) {
+                        data.creationtime = data._id.getTimestamp();
+                    }
+                    data.modifytime = data.creationtime;
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -38,26 +42,6 @@ module.exports = {
                                 value: true
                             });
                             console.log(updated);
-                            var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toJSON();
-                            var log = {
-                                _id: logid,
-                                note: data._id,
-                                timestamp: time,
-                                type: "create",
-                                user: user
-                            };
-                            db.collection('note_log').insert(log, function (err, created) {
-                                if (created) {
-                                    console.log("log created");
-                                }
-                                if (err) {
-                                    console.log(err);
-                                    callback({
-                                        value: false
-                                    });
-                                }
-                            });
                         }
                     });
                 }
@@ -65,6 +49,10 @@ module.exports = {
         } else {
             data._id = sails.ObjectID(data._id);
             data.folder = sails.ObjectID(data.folder);
+            if (!data.modifytime) {
+                var dummy = sails.ObjectID();
+                data.modifytime = dummy.getTimestamp();
+            }
             var tobechanged = {};
             var attribute = "note.$.";
             _.forIn(data, function (value, key) {
@@ -97,26 +85,6 @@ module.exports = {
                                 value: true
                             });
                             console.log(updated);
-                            var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toJSON();
-                            var log = {
-                                _id: logid,
-                                note: data._id,
-                                timestamp: time,
-                                type: "update",
-                                user: user
-                            };
-                            db.collection('note_log').insert(log, function (err, created) {
-                                if (created) {
-                                    console.log("log created");
-                                }
-                                if (err) {
-                                    console.log(err);
-                                    callback({
-                                        value: false
-                                    });
-                                }
-                            });
                         }
                     });
                 }
@@ -133,13 +101,14 @@ module.exports = {
                 });
             }
             if (db) {
+                var dummy = sails.ObjectID();
+                data.modifytime = dummy.getTimestamp();
                 db.collection("user").update({
-                    "_id": user
+                    "_id": user,
+                    "note._id": data._id
                 }, {
-                    $pull: {
-                        "note": {
-                            "_id": sails.ObjectID(data._id)
-                        }
+                    $set: {
+                        "note.$": data
                     }
                 }, function (err, updated) {
                     if (err) {
@@ -153,26 +122,6 @@ module.exports = {
                             value: true
                         });
                         console.log(updated);
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toJSON();
-                        var log = {
-                            _id: logid,
-                            note: data._id,
-                            timestamp: time,
-                            type: "delete",
-                            user: user
-                        };
-                        db.collection('note_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                        });
                     }
                 });
             }
@@ -238,16 +187,14 @@ module.exports = {
         });
     },
     localtoserver: function (data, callback) {
-        if (data.type == "create" || data.type == "update") {
-            delete data.type;
+        if (data.creationtime) {
             Note.save(data, callback);
-        } else if (data.type == "delete") {
-            delete data.type;
-            Note.delete(data, callback);
-        } else if (data.type == "delete" && !data._id) {
+        } else if (!data._id && !data.creationtime) {
             callback({
                 value: false
             });
+        } else if (data.id && !data.creationtime) {
+            Note.delete(data, callback)
         }
     },
     servertolocal: function (data, callback) {

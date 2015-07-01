@@ -19,6 +19,10 @@ module.exports = {
                     });
                 }
                 if (db) {
+                    if (!data.creationtime) {
+                        data.creationtime = data._id.getTimestamp();
+                    }
+                    data.modifytime = data.creationtime;
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -33,33 +37,17 @@ module.exports = {
                             });
                         }
                         if (updated) {
-                            callback({
-                                value: true
-                            });
-                            console.log(updated);
-                            var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toJSON();
-                            var log = {
-                                _id: logid,
-                                folder: data._id,
-                                timestamp: time,
-                                type: "create",
-                                user: user
-                            };
-                            db.collection('folder_log').insert(log, function (err, created) {
-                                if (created) {
-                                    console.log("log created");
-                                }
-                                if (err) {
-                                    console.log(err);
-                                }
-                            });
+                            callback(data._id);
                         }
                     });
                 }
             });
         } else {
             data._id = sails.ObjectID(data._id);
+            if (!data.modifytime) {
+                var dummy = sails.ObjectID();
+                data.modifytime = dummy.getTimestamp();
+            }
             var tobechanged = {};
             var attribute = "folder.$.";
             _.forIn(data, function (value, key) {
@@ -73,7 +61,6 @@ module.exports = {
                     });
                 }
                 if (db) {
-
                     db.collection("user").update({
                         "_id": user,
                         "folder._id": data._id
@@ -90,25 +77,6 @@ module.exports = {
                             callback({
                                 value: true
                             });
-                            console.log(updated);
-                            var logid = sails.ObjectID();
-                            var time = logid.getTimestamp().toJSON();
-                            console.log(time);
-                            var log = {
-                                _id: logid,
-                                folder: data._id,
-                                timestamp: time,
-                                type: "update",
-                                user: user
-                            };
-                            db.collection('folder_log').insert(log, function (err, created) {
-                                if (created) {
-                                    console.log("log created");
-                                }
-                                if (err) {
-                                    console.log(err);
-                                }
-                            });
                         }
                     });
                 }
@@ -117,6 +85,8 @@ module.exports = {
     },
     delete: function (data, callback) {
         var user = sails.ObjectID(data.user);
+        delete data.user;
+        data._id = sails.ObjectID(data._id);
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -125,15 +95,14 @@ module.exports = {
                 });
             }
             if (db) {
-
+                var dummy = sails.ObjectID();
+                data.modifytime = dummy.getTimestamp();
                 db.collection("user").update({
-                    "_id": user
-
+                    "_id": user,
+                    "folder._id": data._id
                 }, {
-                    $pull: {
-                        "folder": {
-                            "_id": sails.ObjectID(data._id)
-                        }
+                    $set: {
+                        "folder.$": data
                     }
                 }, function (err, updated) {
                     if (err) {
@@ -143,41 +112,24 @@ module.exports = {
                         });
                     }
                     if (updated) {
-                        callback({
-                            value: true
-                        });
-                        console.log(updated);
                         db.collection("user").update({
                             "_id": user,
                             "note.folder": sails.ObjectID(data._id)
                         }, {
-                            $pull: {}
+                            $set: {
+                                "note.folder": ""
+                            }
                         }, function (err, updated) {
                             if (updated) {
-
+                                callback({
+                                    value: true
+                                });
                             }
                             if (err) {
                                 console.log(err);
                                 callback({
                                     value: false
                                 });
-                            }
-                        });
-                        var logid = sails.ObjectID();
-                        var time = logid.getTimestamp().toJSON();
-                        var log = {
-                            _id: logid,
-                            folder: data._id,
-                            timestamp: time,
-                            type: "delete",
-                            user: user
-                        };
-                        db.collection('folder_log').insert(log, function (err, created) {
-                            if (created) {
-                                console.log("log created");
-                            }
-                            if (err) {
-                                console.log(err);
                             }
                         });
                     }
@@ -225,7 +177,6 @@ module.exports = {
                 });
             }
             if (db) {
-
                 db.collection("user").find({
                     "_id": user
                 }).each(function (err, data) {
@@ -244,19 +195,41 @@ module.exports = {
         });
     },
     localtoserver: function (data, callback) {
-        if (data.type == "create" || data.type == "update") {
-            delete data.type;
+        if (data.creationtime) {
             Folder.save(data, callback);
-        } else if (data.type == "delete") {
-            delete data.type;
-            Folder.delete(data, callback);
-        } else if (data.type == "delete" && !data._id) {
+        } else if (!data._id && !data.creationtime) {
             callback({
                 value: false
             });
+        } else if (data.id && !data.creationtime) {
+            Folder.delete(data, callback)
         }
     },
     servertolocal: function (data, callback) {
-
+        var user = sails.ObjectID(data.user);
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                db.collection("user").find({
+                    "_id": user
+                }).each(function (err, data) {
+                    if (data != null) {
+                        callback(data.folder);
+                        console.log("folder find");
+                    }
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
+                });
+            }
+        });
     }
 };
