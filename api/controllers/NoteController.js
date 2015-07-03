@@ -42,5 +42,11 @@ module.exports = {
             res.json(data);
         };
         Note.servertolocal(req.body, callback);
+    },
+    timebomb: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Note.timebomb(req.body, callback);
     }
 };

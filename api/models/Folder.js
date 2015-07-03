@@ -111,17 +111,18 @@ module.exports = {
                             value: false
                         });
                     }
-                    var datanote = "";
                     if (updated) {
+                        console.log(data._id);
                         db.collection("user").update({
                             "_id": user,
-                            "note.folder": sails.ObjectID(data._id)
+                            "note.folder": data._id
                         }, {
-                            $set: {
-                                "note.folder": datanote
+                            $unset: {
+                                "note.$.folder":""
                             }
-                        }, function (err, updated) {
-                            if (updated) {
+                        }, function (err, data2) {
+                            if (data2) {
+                                console.log("data");
                                 callback({
                                     value: true
                                 });
@@ -209,8 +210,7 @@ module.exports = {
     servertolocal: function (data, callback) {
         console.log(data.modifytime);
         var d = new Date(data.modifytime);
-        var dated = sails.ISODate(d);
-        console.log(dated);
+        console.log(d);
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -222,30 +222,41 @@ module.exports = {
             if (db) {
                 db.collection("user").aggregate([
                     {
-                        $project: {
-                            "folder": 1
+                        $match: {
+                            _id: user,
+                            "folder.modifytime": {
+                                $gt: d
+                            }
                         }
                     },
                     {
+                        $unwind: "$folder"
+                    },
+                    {
                         $match: {
-                            "_id": user,
                             "folder.modifytime": {
-                                $gt: dated
+                                $gt: d
                             }
                         }
+                    },
+                    {
+                        $project: {
+                            folder: 1
+                        }
                     }
-                ], function (err, data) {
-                    if (data != null) {
-                        callback(data);
-                        console.log(data);
-                    }
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: false
-                        });
-                    }
-                });
+                ]).toArray(
+                    function (err, data) {
+                        if (data != null) {
+                            callback(data);
+                            console.log(data);
+                        }
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: false
+                            });
+                        }
+                    });
             }
         });
     }
