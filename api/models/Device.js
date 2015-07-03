@@ -7,6 +7,7 @@
 
 module.exports = {
     save: function (data, callback) {
+        
         var user = sails.ObjectID(data.user);
         delete data.user;
         if (!data._id) {
@@ -144,7 +145,6 @@ module.exports = {
                 });
             }
             if (db) {
-
                 db.collection("user").find({
                     "_id": user
                 }).each(function (err, data) {

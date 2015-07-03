@@ -24,6 +24,12 @@ module.exports = {
         }
         User.findone(req.body, print);
     },
+    searchmail: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.searchmail(req.body, print);
+    },
     delete: function (req, res) {
         var print = function (data) {
             res.json(data);

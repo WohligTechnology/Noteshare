@@ -123,6 +123,47 @@ module.exports = {
             }
         });
     },
+    searchmail: function (data, callback) {
+        var exit = 0;
+        var exitup = 0;
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                exit++;
+                db.collection("user").find({
+                    "email": data.email
+                }).each(function (err, data) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
+                    if (data != null) {
+                        exitup++;
+                        callback({
+                            value: true
+                        });
+                        console.log(exit);
+                        console.log(exitup);
+                    } else {
+                        if (exit != exitup) {
+                            console.log(exit);
+                            console.log(exitup);
+                            callback({
+                                value: false
+                            });
+                        }
+                    }
+                });
+            }
+        });
+    },
     delete: function (data, callback) {
         sails.query(function (err, db) {
             if (err) {
