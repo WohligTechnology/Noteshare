@@ -149,12 +149,8 @@ module.exports = {
                         callback({
                             value: true
                         });
-                        console.log(exit);
-                        console.log(exitup);
                     } else {
                         if (exit != exitup) {
-                            console.log(exit);
-                            console.log(exitup);
                             callback({
                                 value: false
                             });
@@ -298,24 +294,33 @@ module.exports = {
             }
             if (data.editpassword != "") {
                 db.collection('user').update({
-                    _id: user,
-                    password: data.password
+                    "_id": user,
+                    "email": data.email,
+                    "password": data.password
                 }, {
                     $set: {
-                        password: newpass
+                        "password": newpass
                     }
                 }, function (err, updated) {
                     if (err) {
                         console.log(err);
+                        console.log("Error");
                         callback({
                             value: false
                         });
                     }
                     if (updated) {
-                        console.log(updated);
-                        callback({
-                            value: true
-                        });
+                        if (updated.result.nModified == 1) {
+                            console.log(updated.result.nModified);
+                            callback({
+                                value: true
+                            });
+                        } else {
+                            console.log(updated.result.nModified);
+                            callback({
+                                value: false
+                            });
+                        }
                     }
                 });
             }

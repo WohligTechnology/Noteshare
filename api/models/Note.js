@@ -9,6 +9,9 @@ module.exports = {
     save: function (data, callback) {
         var user = sails.ObjectID(data.user);
         data.folder = sails.ObjectID(data.folder);
+        if (data.remindertime) {
+            data.remindertime = new Date(data.remindertime);
+        }
         if (data.timebomb) {
             data.timebomb = new Date(data.timebomb);
         }
@@ -52,7 +55,6 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
-            data.folder = sails.ObjectID(data.folder);
             if (!data.modifytime) {
                 var dummy = sails.ObjectID();
                 data.modifytime = dummy.getTimestamp();
@@ -97,6 +99,8 @@ module.exports = {
     },
     delete: function (data, callback) {
         var user = sails.ObjectID(data.user);
+        delete data.user;
+        data._id = sails.ObjectID(data._id);
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -162,7 +166,6 @@ module.exports = {
         });
     },
     find: function (data, callback) {
-        var date = new Date();
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -172,20 +175,43 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    "_id": user
-                }).each(function (err, data) {
-                    if (data != null) {
-                        callback(data.note);
-                        console.log("note find");
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            _id: user,
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$note"
+                    },
+                    {
+                        $match: {
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            note: 1
+                        }
                     }
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: false
-                        });
-                    }
-                });
+                ]).toArray(
+                    function (err, data) {
+                        if (data != null) {
+                            callback(data);
+                            console.log(data);
+                        }
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: false
+                            });
+                        }
+                    });
             }
         });
     },

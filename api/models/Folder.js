@@ -118,7 +118,7 @@ module.exports = {
                             "note.folder": data._id
                         }, {
                             $unset: {
-                                "note.$.folder":""
+                                "note.$.folder": ""
                             }
                         }, function (err, data2) {
                             if (data2) {
@@ -179,20 +179,43 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    "_id": user
-                }).each(function (err, data) {
-                    if (data != null) {
-                        callback(data.folder);
-                        console.log("folder find");
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            _id: user,
+                            "folder.name": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$folder"
+                    },
+                    {
+                        $match: {
+                            "folder.name": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            folder: 1
+                        }
                     }
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: false
-                        });
-                    }
-                });
+                ]).toArray(
+                    function (err, data) {
+                        if (data != null) {
+                            callback(data);
+                            console.log(data);
+                        }
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: false
+                            });
+                        }
+                    });
             }
         });
     },
