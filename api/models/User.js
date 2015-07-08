@@ -53,8 +53,83 @@ module.exports = {
             });
         }
     },
+    findlimited: function (data, callback) {
+        var newcallback = 0;
+        var newreturns = {};
+        newreturns.data = [];
+        var check = new RegExp(data.search, "i");
+        var pagesize = data.pagesize;
+        var pagenumber = data.pagenumber;
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                db.collection("user").count({
+                    $or: [{
+                        username: {
+                            '$regex': check
+                        }
+                }, {
+                        email: {
+                            '$regex': check
+                        }
+                }]
+                }, function (err, number) {
+                    newreturns.total = number;
+                    newreturns.totalpages = Math.ceil(number / data.pagesize);
+                    newcallback++;
+                    if (newcallback == 2) {
+                        callback(newreturns);
+                    }
+
+                });
+                db.collection("user").find({
+                    $or: [{
+                        username: {
+                            '$regex': check
+                        }
+                }, {
+                        email: {
+                            '$regex': check
+                        }
+                }]
+                }, {
+                    "firstname": 1,
+                    "lastname": 1,
+                    "fbid": 1,
+                    "email": 1,
+                    "gid": 1,
+                    "passcode": 1,
+                    "profilepic": 1,
+                    "username": 1
+                }).skip(pagesize * (pagenumber - 1)).limit(pagesize).each(function (err, found) {
+                    if (err) {
+                        console.log({
+                            value: false
+                        });
+                    }
+                    if (found != null) {
+                        newreturns.data.push(found);
+                    } else {
+                        if (found == null) {
+                            console.log(newreturns.data);
+                            newcallback++;
+                            if (newcallback == 2) {
+                                callback(newreturns);
+                            }
+                        }
+                    }
+                });
+            }
+        });
+    },
     find: function (data, callback) {
-        returns = [];
+        var returns = [];
+        console.log(check);
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -72,17 +147,18 @@ module.exports = {
                     "passcode": 1,
                     "profilepic": 1,
                     "username": 1
-                }).each(function (err, data) {
+                }).each(function (err, found) {
                     if (err) {
                         console.log({
                             value: false
                         });
                     }
-                    if (data != null) {
-                        returns.push(data);
+                    if (found != null) {
+                        returns.push(found);
                     } else {
-                        console.log(returns);
-                        callback(returns);
+                        if (found == null) {
+                            callback(returns);
+                        }
                     }
                 });
             }
@@ -99,15 +175,6 @@ module.exports = {
             if (db) {
                 db.collection("user").find({
                     "_id": sails.ObjectID(data._id)
-                }, {
-                    "firstname": 1,
-                    "lastname": 1,
-                    "fbid": 1,
-                    "email": 1,
-                    "gid": 1,
-                    "passcode": 1,
-                    "profilepic": 1,
-                    "username": 1
                 }).each(function (err, data) {
                     if (err) {
                         console.log(err);
@@ -117,6 +184,7 @@ module.exports = {
                     }
                     if (data != null) {
                         console.log(data);
+                        delete data.password;
                         callback(data);
                     }
                 });
@@ -397,5 +465,77 @@ module.exports = {
                 }
             });
         });
-    }
+    },
+    countusers: function (data, callback) {
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                db.collection("user").count({}, function (err, number) {
+                    if (number != null) {
+                        callback(number);
+                    }
+                });
+            }
+        });
+    },
+    countnotes: function (data, callback) {
+        var user = sails.ObjectID(data.user);
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$note"
+                    },
+                    {
+                        $match: {
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        callback(result[0].count);
+                    }
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
+                });
+            }
+        });
+    },
 };

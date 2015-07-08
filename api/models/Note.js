@@ -215,6 +215,123 @@ module.exports = {
             }
         });
     },
+    findlimited: function (data, callback) {
+        var newcallback = 0;
+        var newreturns = {};
+        newreturns.data = [];
+        var check = new RegExp(data.search, "i");
+        var pagesize = data.pagesize;
+        var pagenumber = data.pagenumber;
+        var user = sails.ObjectID(data.user);
+        sails.query(function (err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: false
+                });
+            }
+            if (db) {
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            _id: user,
+                            "note.title": {
+                                $exists: true
+                            },
+                            "note.title": {
+                                $regex: check
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$note"
+                    },
+                    {
+                        $match: {
+                            "note.title": {
+                                $exists: true
+                            },
+                            "note.title": {
+                                $regex: check
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturns.total = result[0].count;
+                        newreturns.totalpages = Math.ceil(result[0].count / data.pagesize);
+                        newcallback++;
+                    }
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                    }
+                });
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            _id: user,
+                            "note.title": {
+                                $exists: true
+                            },
+                            "note.title": {
+                                $regex: check
+                            },
+                            "note.title": {
+                                $regex: check
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$note"
+                    },
+                    {
+                        $match: {
+                            "note.title": {
+                                $exists: true
+                            },
+                            "note.title": {
+                                $regex: check
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            note: 1
+                        }
+                    }
+                ]).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(
+                    function (err, found) {
+                        if (data != null) {
+                            newreturns.data.push(found);
+                            callback(newreturns);
+
+                        }
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: false
+                            });
+                        }
+                    });
+            }
+        });
+    },
     localtoserver: function (data, callback) {
         if (data.creationtime) {
             Note.save(data, callback);

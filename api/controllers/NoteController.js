@@ -25,6 +25,13 @@ module.exports = {
         Note.find(req.body, callback);
 
     },
+    findlimited: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Note.findlimited(req.body, callback);
+
+    },
     findOne: function (req, res) {
         function callback(data) {
             res.json(data);

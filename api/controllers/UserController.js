@@ -18,6 +18,12 @@ module.exports = {
         }
         User.find(req.body, print);
     },
+    findlimited: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.findlimited(req.body, print);
+    },
     findone: function (req, res) {
         var print = function (data) {
             res.json(data);
@@ -53,5 +59,17 @@ module.exports = {
             res.json(data);
         }
         User.forgotpassword(req.body, print);
+    },
+    countusers: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.countusers(req.body, print);
+    },
+    countnotes: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.countnotes(req.body, print);
     }
 };
