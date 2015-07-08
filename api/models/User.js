@@ -129,7 +129,6 @@ module.exports = {
     },
     find: function (data, callback) {
         var returns = [];
-        console.log(check);
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
