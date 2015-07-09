@@ -651,7 +651,7 @@ module.exports = {
                         } else {
                             console.log(updated.result.nModified);
                             callback({
-                                value: false
+                                value: true
                             });
                         }
                     }
