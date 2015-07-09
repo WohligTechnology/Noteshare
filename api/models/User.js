@@ -164,6 +164,8 @@ module.exports = {
         });
     },
     findone: function (data, callback) {
+        var newreturn = {};
+        var newcallback=0;
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -172,8 +174,18 @@ module.exports = {
                 });
             }
             if (db) {
+                
+                db.collection
+                
                 db.collection("user").find({
                     "_id": sails.ObjectID(data._id)
+                }, {
+                    note: 0,
+                    folder: 0,
+                    device: 0,
+                    feed: 0,
+                    share: 0,
+                    password: 0
                 }).each(function (err, data) {
                     if (err) {
                         console.log(err);
@@ -182,9 +194,15 @@ module.exports = {
                         });
                     }
                     if (data != null) {
+                        for(elem in data)
+                        {
+                            newreturn[elem]=data[elem];
+                        }
                         console.log(data);
-                        delete data.password;
-                        callback(data);
+                        newcallback++;
+                        if (newcallback == 2) {
+                            callback(newreturn);
+                        }
                     }
                 });
             }
