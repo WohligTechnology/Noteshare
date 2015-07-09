@@ -112,7 +112,7 @@ module.exports = {
                         });
                     }
                     if (updated) {
-                        console.log(updated);
+                        console.log("updated");
                         callback({
                             value: true
                         });

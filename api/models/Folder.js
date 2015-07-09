@@ -117,8 +117,8 @@ module.exports = {
                             "_id": user,
                             "note.folder": data._id
                         }, {
-                            $unset: {
-                                "note.$.folder": ""
+                            $set: {
+                                "note.folder": " "
                             }
                         }, function (err, data2) {
                             if (data2) {
