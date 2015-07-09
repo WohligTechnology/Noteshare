@@ -260,7 +260,6 @@ module.exports = {
         data.password = md5(data.password);
         sails.query(function (err, db) {
             db.collection('user').find({
-                _id: sails.ObjectID(data._id),
                 email: data.email,
                 password: data.password
             }, {
@@ -285,7 +284,6 @@ module.exports = {
                     console.log(found);
                 } else {
                     db.collection('user').find({
-                        _id: sails.ObjectID(data._id),
                         email: data.email,
                         forgotpassword: data.password
                     }, {
@@ -309,7 +307,7 @@ module.exports = {
                             callback(found);
                             sails.ObjectID(data._id);
                             db.collection('user').update({
-                                _id: sails.ObjectID(data._id)
+                                email: data.email
                             }, {
                                 $set: {
                                     forgotpassword: "",
