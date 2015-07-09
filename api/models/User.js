@@ -164,8 +164,9 @@ module.exports = {
         });
     },
     findone: function (data, callback) {
+        var user = sails.ObjectID(data._id)
         var newreturn = {};
-        var newcallback=0;
+        var newcallback = 0;
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -174,11 +175,259 @@ module.exports = {
                 });
             }
             if (db) {
-                
-                db.collection
-                
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "_id": user,
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$note"
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "note.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturn.note = result[0].count;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                    if (err) {
+                        console.log(err);
+                        newcreturn.note = 0;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                });
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "_id": user,
+                            "folder.name": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$folder"
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "folder.name": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturn.folder = result[0].count;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                    if (err) {
+                        console.log(err);
+                        newreturn.folder = 0;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                });
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "_id": user,
+                            "device.OS": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$device"
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "device.OS": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturn.device = result[0].count;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                    if (err) {
+                        console.log(err);
+                        newreturn.device = 0;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                });
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "_id": user,
+                            "feed.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$feed"
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "feed.title": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturn.feed = result[0].count;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                    if (err) {
+                        console.log(err);
+                        newreturn.feed = 0;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                });
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            "_id": user,
+                            "share._id": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $unwind: "$share"
+                    },
+                    {
+                        $match: {
+                            "_id": user,
+                            "share._id": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $group: {
+                            _id: user,
+                            count: {
+                                $sum: 1
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            count: 1
+                        }
+                    }
+                ]).toArray(function (err, result) {
+                    if (result != null) {
+                        newreturn.share = result[0].count;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
+                    }
+                    if (err) {
+                        console.log(err);
+                        newreturn.share = 0;
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+                    }
+                });
                 db.collection("user").find({
-                    "_id": sails.ObjectID(data._id)
+                    "_id": user
                 }, {
                     note: 0,
                     folder: 0,
@@ -194,13 +443,14 @@ module.exports = {
                         });
                     }
                     if (data != null) {
-                        for(elem in data)
-                        {
-                            newreturn[elem]=data[elem];
+                        for (elem in data) {
+                            newreturn[elem] = data[elem];
                         }
                         console.log(data);
                         newcallback++;
-                        if (newcallback == 2) {
+                        console.log("count newcallback");
+                        console.log(newcallback);
+                        if (newcallback == 6) {
                             callback(newreturn);
                         }
                     }
@@ -552,5 +802,5 @@ module.exports = {
                 });
             }
         });
-    },
+    }
 };
