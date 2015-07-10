@@ -400,7 +400,7 @@ module.exports = {
         var returns = [];
         var d = new Date(data3.timebomb);
         var exit = 0;
-        var exitdown = 0;
+        var mycall = 0;
         var exitup = 0;
         sails.query(function (err, db) {
             if (err) {
@@ -410,6 +410,7 @@ module.exports = {
                 });
             }
             if (db) {
+                exitup++;
                 db.collection("user").aggregate([
                     {
                         $match: {
@@ -435,7 +436,6 @@ module.exports = {
                     }
                 ]).each(function (err, data2) {
                     if (data2 != null) {
-                        exitup++;
                         returns.push(data2.note._id);
                     } else {
                         exit++;
@@ -446,14 +446,13 @@ module.exports = {
                                 for (var i = 0; i < returns.length; i++) {
                                     var data = {};
                                     data._id = sails.ObjectID(returns[i]);
-                                    console.log(data._id);
                                     var dummy = sails.ObjectID();
                                     data.modifytime = dummy.getTimestamp();
                                     db.collection("user").update({
-                                        "note._id": data._id
+                                        "note._id": sails.ObjectID(returns[i])
                                     }, {
                                         $set: {
-                                            'note.$.folder': ''
+                                            "note.$": data
                                         }
                                     }, function (err, updated) {
                                         if (err) {
@@ -463,10 +462,13 @@ module.exports = {
                                             });
                                         }
                                         if (updated) {
-                                            callback({
-                                                value: true
-                                            });
-                                            console.log("data");
+                                            mycall++;
+                                            if (mycall == returns.length) {
+                                                callback({
+                                                    value: true
+                                                });
+                                                console.log("data");
+                                            }
                                         }
                                     });
                                 }
