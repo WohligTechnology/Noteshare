@@ -54,6 +54,7 @@ module.exports = {
         }
     },
     findlimited: function (data, callback) {
+        console.log(data);
         var newcallback = 0;
         var newreturns = {};
         newreturns.data = [];

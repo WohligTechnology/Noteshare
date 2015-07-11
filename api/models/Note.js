@@ -270,7 +270,7 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
+                    if (result[0]) {
                         newreturns.total = result[0].count;
                         newreturns.totalpages = Math.ceil(result[0].count / data.pagesize);
                         newcallback++;
