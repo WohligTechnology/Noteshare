@@ -116,3 +116,8 @@ npm-debug.log
 nbproject
 .idea
 .node_history
+
+api/models/Dummy.js
+config/bootstrap.js
+config/bootstrap.js
+config/bootstrap.js
