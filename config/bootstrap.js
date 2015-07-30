@@ -20,7 +20,8 @@ module.exports.bootstrap = function (cb) {
         sails.GridStore = require('mongodb').GridStore,
         sails.Grid = require('mongodb').Grid,
         sails.Code = require('mongodb').Code,
-        sails.assert = require('assert');
+        sails.assert = require('assert'),
+        sails.fs = require('fs');
     // Connection URL
     sails.url = 'mongodb://localhost:27017/noteshare';
 
