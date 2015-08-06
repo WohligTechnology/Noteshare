@@ -6,7 +6,6 @@
  */
 module.exports = {
     gridfs: function(req, res) {
-
         sails.MongoClient.connect("mongodb://localhost:27017/dummy", function(err, db) {
             if (err) {
                 console.log(err);
@@ -41,7 +40,6 @@ module.exports = {
         });
     },
     getimage: function(req, res) {
-        var data = {};
         sails.MongoClient.connect("mongodb://localhost:27017/dummy", function(err, db) {
             if (err) {
                 console.log(err);
