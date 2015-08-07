@@ -99,7 +99,7 @@ module.exports = {
                 if (file) {
                     var buffer = new Buffer(file);
                     console.log(buffer, newwidth, newheight);
-                    // resize(buffer, newwidth, newheight);
+                    resize(buffer, newwidth, newheight)
                 }
             });
         }
@@ -107,7 +107,9 @@ module.exports = {
         function resize(newfilepath, width, height) {
             width = parseInt(width);
             height = parseInt(height);
-            lwip.open(newfilepath, function(err, image) {
+            console.log("in resize");
+            console.log(newfilepath);
+            lwip.open(newfilepath, 'jpg', function(err, image) {
                 var dimensions = {};
                 dimensions.width = image.width();
                 dimensions.height = image.height();
@@ -122,13 +124,13 @@ module.exports = {
                 }
                 image.resize(width, height, "lanczos", function(err, image) {
                     console.log(image);
-
+                    upload(image);
                 });
 
             });
         }
 
-        function upload(filepath, unlinkpath) {
+        function upload(filepath) {
             var file = filepath;
             req.file('file').upload({
                 maxBytes: 10000000000000,
