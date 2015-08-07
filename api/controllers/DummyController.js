@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-var lwip = require('lwip');
+// var lwip = require('lwip');
 module.exports = {
     gridfs: function(req, res) {
         sails.MongoClient.connect("mongodb://localhost:27017/dummy", function(err, db) {
@@ -97,28 +97,16 @@ module.exports = {
         function newimage(fd, newwidth, newheight) {
             skipper.read(fd, function(error, file) {
                 if (file) {
-                    var newdate = sails.moment(new Date()).format('YYYY-MM-DDh-mm-ss-SSSSa');
-                    var filepath = './uploads/image' + newdate + '.jpg';
-                    sails.fs.writeFile(filepath, file, function(err) {
-                        if (err) {
-                            console.log(err);
-                            res.json("false");
-                        }
-                        resize(filepath, newwidth, newheight);
-                    });
+                    var buffer = new Buffer(file);
+                    console.log(buffer, newwidth, newheight);
+                    // resize(buffer, newwidth, newheight);
                 }
             });
         }
 
         function resize(newfilepath, width, height) {
-            var unlinkpath = newfilepath;
             width = parseInt(width);
             height = parseInt(height);
-            newfilenamearr = newfilepath.split(".");
-            extension = newfilenamearr.pop();
-            var indexno = newfilepath.search("." + extension);
-            var newfilestart = newfilepath.substr(0, indexno);
-            var newfileend = newfilepath.substr(indexno, newfilepath.length);
             lwip.open(newfilepath, function(err, image) {
                 var dimensions = {};
                 dimensions.width = image.width();
@@ -133,10 +121,7 @@ module.exports = {
                     console.log(err);
                 }
                 image.resize(width, height, "lanczos", function(err, image) {
-                    image.toBuffer(extension, function(err, buffer) {
-                        sails.fs.writeFileSync(newfilename, buffer);
-                        upload(newfilename, unlinkpath);
-                    });
+                    console.log(image);
 
                 });
 
@@ -154,11 +139,6 @@ module.exports = {
                     return res.serverError(err);
                 }
                 if (files) {
-                    sails.fs.unlink(unlinkpath, function(err) {
-                        if (err) {
-                            console.log(err);
-                        }
-                    });
                     return res.json({
                         message: files.length + ' file(s) uploaded successfully!',
                         files: files

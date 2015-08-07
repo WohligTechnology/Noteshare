@@ -116,7 +116,7 @@ npm-debug.log
 nbproject
 .idea
 .node_history
-
+uploads/
 config/bootstrap.js
 package.json
 start.bat
