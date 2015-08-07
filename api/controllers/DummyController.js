@@ -119,7 +119,7 @@ module.exports = {
             var indexno = newfilepath.search("." + extension);
             var newfilestart = newfilepath.substr(0, indexno);
             var newfileend = newfilepath.substr(indexno, newfilepath.length);
-            lwip.open(filepath, function(err, image) {
+            lwip.open(newfilepath, function(err, image) {
                 var dimensions = {};
                 dimensions.width = image.width();
                 dimensions.height = image.height();
