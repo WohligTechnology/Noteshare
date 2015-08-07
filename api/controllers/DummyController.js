@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-// var lwip = require('lwip');
+ var lwip = require('lwip');
 module.exports = {
     gridfs: function(req, res) {
         sails.MongoClient.connect("mongodb://localhost:27017/dummy", function(err, db) {
@@ -99,7 +99,7 @@ module.exports = {
                 if (file) {
                     var buffer = new Buffer(file);
                     console.log(buffer, newwidth, newheight);
-                    resize(buffer, newwidth, newheight)
+                    resize(buffer, newwidth, newheight);
                 }
             });
         }
@@ -123,8 +123,9 @@ module.exports = {
                     console.log(err);
                 }
                 image.resize(width, height, "lanczos", function(err, image) {
-                    console.log(image);
-                    upload(image);
+		    image.toBuffer('jpg', function(err, buffer){
+                       upload(buffer);
+	            });
                 });
 
             });
@@ -141,10 +142,6 @@ module.exports = {
                     return res.serverError(err);
                 }
                 if (files) {
-                    return res.json({
-                        message: files.length + ' file(s) uploaded successfully!',
-                        files: files
-                    });
                     showimage(files[0].fd);
                 }
             });
