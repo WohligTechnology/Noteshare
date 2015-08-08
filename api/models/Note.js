@@ -45,9 +45,7 @@ module.exports = {
                             });
                         }
                         if (updated) {
-                            callback({
-                                value: true
-                            });
+                            callback(data._id);
                             console.log(updated);
                         }
                     });
@@ -440,8 +438,6 @@ module.exports = {
                     } else {
                         exit++;
                         if (exit == exitup) {
-                            console.log(exitup);
-                            console.log(exit);
                             if (returns != "") {
                                 for (var i = 0; i < returns.length; i++) {
                                     var data = {};
