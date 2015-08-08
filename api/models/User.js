@@ -210,20 +210,22 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
-                        newreturn.note = result[0].count;
-                        newcallback++;
-                        if (newcallback == 6) {
-                            callback(newreturn);
-                        }
-                    }
                     if (err) {
                         console.log(err);
-                        newcreturn.note = 0;
+                        newreturn.note = 0;
                         newcallback++;
                         if (newcallback == 6) {
                             callback(newreturn);
                         }
+                    } else {
+                        if (result.length == 1) {
+                            newreturn.note = result[0].count;
+                        }
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
                     }
                 });
                 db.collection("user").aggregate([
@@ -260,13 +262,6 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
-                        newreturn.folder = result[0].count;
-                        newcallback++;
-                        if (newcallback == 6) {
-                            callback(newreturn);
-                        }
-                    }
                     if (err) {
                         console.log(err);
                         newreturn.folder = 0;
@@ -274,6 +269,15 @@ module.exports = {
                         if (newcallback == 6) {
                             callback(newreturn);
                         }
+                    } else {
+                        if (result.length == 1) {
+                            newreturn.folder = result[0].count;
+                        }
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
                     }
                 });
                 db.collection("user").aggregate([
@@ -310,13 +314,6 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
-                        newreturn.device = result[0].count;
-                        newcallback++;
-                        if (newcallback == 6) {
-                            callback(newreturn);
-                        }
-                    }
                     if (err) {
                         console.log(err);
                         newreturn.device = 0;
@@ -324,6 +321,15 @@ module.exports = {
                         if (newcallback == 6) {
                             callback(newreturn);
                         }
+                    } else {
+                        if (result.length == 1) {
+                            newreturn.device = result[0].count;
+                        }
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
                     }
                 });
                 db.collection("user").aggregate([
@@ -360,13 +366,6 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
-                        newreturn.feed = result[0].count;
-                        newcallback++;
-                        if (newcallback == 6) {
-                            callback(newreturn);
-                        }
-                    }
                     if (err) {
                         console.log(err);
                         newreturn.feed = 0;
@@ -374,6 +373,15 @@ module.exports = {
                         if (newcallback == 6) {
                             callback(newreturn);
                         }
+                    } else {
+                        if (result.length == 1) {
+                            newreturn.feed = result[0].count;
+                        }
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
                     }
                 });
                 db.collection("user").aggregate([
@@ -410,14 +418,6 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
-                        newreturn.share = result[0].count;
-                        newcallback++;
-                        if (newcallback == 6) {
-                            callback(newreturn);
-                        }
-
-                    }
                     if (err) {
                         console.log(err);
                         newreturn.share = 0;
@@ -425,6 +425,15 @@ module.exports = {
                         if (newcallback == 6) {
                             callback(newreturn);
                         }
+                    } else {
+                        if (result.length == 1) {
+                            newreturn.share = result[0].count;
+                        }
+                        newcallback++;
+                        if (newcallback == 6) {
+                            callback(newreturn);
+                        }
+
                     }
                 });
                 db.collection("user").find({
@@ -811,7 +820,7 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result != null) {
+                    if (result[0]) {
                         callback(result[0].count);
                     }
                     if (err) {
