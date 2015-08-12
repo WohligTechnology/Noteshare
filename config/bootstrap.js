@@ -22,6 +22,7 @@ module.exports.bootstrap = function (cb) {
         sails.Code = require('mongodb').Code,
         sails.assert = require('assert'),
         sails.moment = require('moment'),
+        sails.mime = require('mime'),
         sails.fs = require('fs');
     // Connection URL
     sails.url = 'mongodb://localhost:27017/noteshare';
