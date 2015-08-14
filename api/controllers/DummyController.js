@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-var lwip = require('lwip');
+//var lwip = require('lwip');
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -152,5 +152,11 @@ module.exports = {
                 });
             });
         }
-    }
+    },
+    find: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Dummy.find(req.body, callback);
+    },
 };
