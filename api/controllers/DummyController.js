@@ -159,4 +159,10 @@ module.exports = {
         };
         Dummy.find(req.body, callback);
     },
+    remove: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Dummy.remove(req.body, callback);
+    }
 };
