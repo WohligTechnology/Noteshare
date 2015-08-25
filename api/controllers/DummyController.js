@@ -67,6 +67,8 @@ module.exports = {
         });
     },
     resize: function (req, res) {
+        var type = '';
+        var filetype = '';
         var file = req.param('file');
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
@@ -88,10 +90,26 @@ module.exports = {
                 if (err) {
                     console.log(err);
                 }
+                sails.query(function (err, db) {
+                    var file = new sails.GridStore(db, fd, "r");
+                    file.open(function (err, file) {
+                        if (err) {
+                            console.log(err);
+                        }
+                        filetype = file.contentType;
+                        if (filetype == 'image/gif') {
+                            type = 'gif';
+                        } else if (filetype == 'image/jpeg') {
+                            type = 'jpg';
+                        } else if (filetype == 'image/png') {
+                            type = 'png';
+                        }
+                    });
+                });
                 sails.GridStore.read(db, fd, function (err, fileData) {
                     width = parseInt(newwidth);
                     height = parseInt(newheight);
-                    lwip.open(fileData, 'jpg', function (err, image) {
+                    lwip.open(fileData, type, function (err, image) {
                         var dimensions = {};
                         dimensions.width = image.width();
                         dimensions.height = image.height();
@@ -107,7 +125,7 @@ module.exports = {
                         image.resize(width, height, "lanczos", function (err, image2) {
                             db.open(function (err, db) {
                                 var fileId = new sails.ObjectID();
-                                var mimetype = "image/jpeg";
+                                var mimetype = filetype;
                                 var gridStore = new sails.GridStore(db, fileId, 'w', {
                                     content_type: mimetype
                                 });
@@ -115,7 +133,7 @@ module.exports = {
                                     if (err) {
                                         console.log(err);
                                     }
-                                    image2.toBuffer("jpg", {}, function (err, imagebuf) {
+                                    image2.toBuffer(type, {}, function (err, imagebuf) {
                                         gridStore.write(imagebuf, function (err, doc) {
                                             if (err) {
                                                 console.log(err);
