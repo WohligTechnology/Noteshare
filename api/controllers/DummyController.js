@@ -4,7 +4,6 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-var lwip = require('lwip');
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -93,7 +92,7 @@ module.exports = {
                 sails.GridStore.read(db, fd, function (err, fileData) {
                     width = parseInt(newwidth);
                     height = parseInt(newheight);
-                    lwip.open(fileData, 'jpg', function (err, image) {
+                    sails.lwip.open(fileData, 'jpg', function (err, image) {
                         console.log("data");
                         var dimensions = {};
                         dimensions.width = image.width();
@@ -126,7 +125,6 @@ module.exports = {
                                             if (doc) {
                                                 gridStore.close(function () {
                                                     showimage(fileId);
-                                                    db.close();
                                                 });
                                             }
                                         });

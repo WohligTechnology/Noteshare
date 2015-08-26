@@ -24,6 +24,7 @@ module.exports.bootstrap = function (cb) {
         sails.moment = require('moment'),
         sails.mime = require('mime'),
         sails.fs = require('fs');
+        sails.lwip = require('lwip');
     // Connection URL
     sails.url = 'mongodb://localhost:27017/noteshare';
 
