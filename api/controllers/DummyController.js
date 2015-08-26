@@ -97,6 +97,7 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                             }
+                            console.log(filetype);
                             filetype = file.contentType;
                             if (filetype == 'image/gif') {
                                 type = 'gif';
