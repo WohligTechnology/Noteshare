@@ -86,6 +86,7 @@ module.exports = {
         }
 
         function findimage(fd, newwidth, newheight) {
+            console.log("my name");
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -97,7 +98,6 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                             }
-                            console.log(filetype);
                             filetype = file.contentType;
                             if (filetype == 'image/gif') {
                                 type = 'gif';
