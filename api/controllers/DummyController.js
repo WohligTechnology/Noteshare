@@ -67,12 +67,12 @@ module.exports = {
         });
     },
     resizeimage: function (req, res) {
+        console.log("data");
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
             }
             if (db) {
-                console.log("data");
                 var file = req.param('file');
                 var fd = sails.ObjectID(file);
                 var newheight = req.param('height');
