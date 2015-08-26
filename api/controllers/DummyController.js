@@ -101,6 +101,7 @@ module.exports = {
                             type = 'gif';
                         } else if (filetype == 'image/jpeg') {
                             type = 'jpg';
+                            console.log(type);
                         } else if (filetype == 'image/png') {
                             type = 'png';
                         }
