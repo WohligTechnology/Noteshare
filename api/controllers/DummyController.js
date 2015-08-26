@@ -5,6 +5,8 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var lwip = require('lwip');
+var type = -1;
+var filetype = '';
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -67,8 +69,6 @@ module.exports = {
         });
     },
     resize: function (req, res) {
-        var type = '';
-        var filetype = '';
         var file = req.param('file');
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
@@ -97,62 +97,63 @@ module.exports = {
                             console.log(err);
                         }
                         filetype = file.contentType;
+                        console.log(filetype);
                         if (filetype == 'image/gif') {
                             type = 'gif';
                         } else if (filetype == 'image/jpeg') {
                             type = 'jpg';
-                            console.log(type);
                         } else if (filetype == 'image/png') {
                             type = 'png';
                         }
-                    });
-                });
-                if (type != "") {
-                    sails.GridStore.read(db, fd, function (err, fileData) {
-                        width = parseInt(newwidth);
-                        height = parseInt(newheight);
-                        lwip.open(fileData, type, function (err, image) {
-                            var dimensions = {};
-                            dimensions.width = image.width();
-                            dimensions.height = image.height();
-                            if (width == 0) {
-                                width = dimensions.width / dimensions.height * height;
-                            }
-                            if (height == 0) {
-                                height = dimensions.height / dimensions.width * width;
-                            }
-                            if (err) {
-                                console.log(err);
-                            }
-                            image.resize(width, height, "lanczos", function (err, image2) {
-                                db.open(function (err, db) {
-                                    var fileId = new sails.ObjectID();
-                                    var mimetype = filetype;
-                                    var gridStore = new sails.GridStore(db, fileId, 'w', {
-                                        content_type: mimetype
-                                    });
-                                    gridStore.open(function (err, gridStore) {
-                                        if (err) {
-                                            console.log(err);
-                                        }
-                                        image2.toBuffer(type, {}, function (err, imagebuf) {
-                                            gridStore.write(imagebuf, function (err, doc) {
+                        if (type != -1) {
+                            console.log(type);
+                            sails.GridStore.read(db, fd, function (err, fileData) {
+                                width = parseInt(newwidth);
+                                height = parseInt(newheight);
+                                lwip.open(fileData, type, function (err, image) {
+                                    var dimensions = {};
+                                    dimensions.width = image.width();
+                                    dimensions.height = image.height();
+                                    if (width == 0) {
+                                        width = dimensions.width / dimensions.height * height;
+                                    }
+                                    if (height == 0) {
+                                        height = dimensions.height / dimensions.width * width;
+                                    }
+                                    if (err) {
+                                        console.log(err);
+                                    }
+                                    image.resize(width, height, "lanczos", function (err, image2) {
+                                        db.open(function (err, db) {
+                                            var fileId = new sails.ObjectID();
+                                            var mimetype = filetype;
+                                            var gridStore = new sails.GridStore(db, fileId, 'w', {
+                                                content_type: mimetype
+                                            });
+                                            gridStore.open(function (err, gridStore) {
                                                 if (err) {
                                                     console.log(err);
                                                 }
-                                                if (doc) {
-                                                    gridStore.close(function () {
-                                                        showimage(fileId);
+                                                image2.toBuffer(type, {}, function (err, imagebuf) {
+                                                    gridStore.write(imagebuf, function (err, doc) {
+                                                        if (err) {
+                                                            console.log(err);
+                                                        }
+                                                        if (doc) {
+                                                            gridStore.close(function () {
+                                                                showimage(fileId);
+                                                            });
+                                                        }
                                                     });
-                                                }
+                                                });
                                             });
                                         });
                                     });
                                 });
                             });
-                        });
+                        }
                     });
-                }
+                });
             });
         }
 
