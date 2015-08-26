@@ -4,9 +4,7 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-var lwip = require('lwip');
-var type = -1;
-var filetype = '';
+//var lwip = require('lwip');
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -69,6 +67,8 @@ module.exports = {
         });
     },
     resize: function (req, res) {
+        var type = -1;
+        var filetype = '';
         var file = req.param('file');
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
@@ -90,23 +90,26 @@ module.exports = {
                 if (err) {
                     console.log(err);
                 }
-                sails.query(function (err, db) {
+                if (db) {
                     var file = new sails.GridStore(db, fd, "r");
                     file.open(function (err, file) {
                         if (err) {
                             console.log(err);
                         }
                         filetype = file.contentType;
-                        console.log(filetype);
                         if (filetype == 'image/gif') {
                             type = 'gif';
                         } else if (filetype == 'image/jpeg') {
                             type = 'jpg';
+                            console.log(type);
                         } else if (filetype == 'image/png') {
                             type = 'png';
                         }
+                        uploadimage();
+                    });
+
+                    function uploadimage() {
                         if (type != -1) {
-                            console.log(type);
                             sails.GridStore.read(db, fd, function (err, fileData) {
                                 width = parseInt(newwidth);
                                 height = parseInt(newheight);
@@ -152,8 +155,8 @@ module.exports = {
                                 });
                             });
                         }
-                    });
-                });
+                    }
+                }
             });
         }
 
