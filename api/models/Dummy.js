@@ -50,8 +50,18 @@ module.exports = {
                         });
                     }
                     if (data) {
-                        callback({
-                            value: true
+                        db.collection("fs.chunks").remove({}, function (err, data) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: false
+                                });
+                            }
+                            if (data) {
+                                callback({
+                                    value: true
+                                });
+                            }
                         });
                     }
                 });
