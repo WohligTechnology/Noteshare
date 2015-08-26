@@ -5,6 +5,7 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var lwip = require('lwip');
+var isnew = 0;
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -72,19 +73,22 @@ module.exports = {
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
         var newwidth = req.param('width');
-        if (!newwidth && !newheight) {
-            showimage(fd);
-        } else if (!newwidth && newheight) {
-            newheight = parseInt(newheight);
-            findimage(fd, 0, newheight);
-        } else if (newwidth && !newheight) {
-            newwidth = parseInt(newwidth);
-            findimage(fd, newwidth, 0);
-        } else {
-            findimage(fd, newwidth, newheight);
+        if (isnew == 0) {
+            if (!newwidth && !newheight) {
+                showimage(fd);
+            } else if (!newwidth && newheight) {
+                newheight = parseInt(newheight);
+                findimage(fd, 0, newheight);
+            } else if (newwidth && !newheight) {
+                newwidth = parseInt(newwidth);
+                findimage(fd, newwidth, 0);
+            } else {
+                findimage(fd, newwidth, newheight);
+            }
         }
 
         function findimage(fd, newwidth, newheight) {
+            isnew++;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -137,6 +141,7 @@ module.exports = {
         }
 
         function showimage(oldfile) {
+            isnew++;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -149,6 +154,7 @@ module.exports = {
                     }
                     res.set('Content-Type', file.contentType);
                     var stream = file.stream();
+                    isnew = 0;
                     stream.pipe(res);
                 });
             });
