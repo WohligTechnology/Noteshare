@@ -67,6 +67,7 @@ module.exports = {
         });
     },
     resizeimage: function (req, res) {
+        console.log("data");
         var file = req.param('file');
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
