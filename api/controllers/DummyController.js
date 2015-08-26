@@ -62,7 +62,6 @@ module.exports = {
                 }
                 res.set('Content-Type', file.contentType);
                 var stream = file.stream();
-                db.close();
                 stream.pipe(res);
             });
         });
@@ -150,8 +149,8 @@ module.exports = {
                     }
                     res.set('Content-Type', file.contentType);
                     var stream = file.stream();
-                    db.close();
                     stream.pipe(res);
+                    db.close();
                 });
             });
         }
