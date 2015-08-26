@@ -33,13 +33,15 @@ module.exports = {
                         gridStore.open(function (err, gridStore) {
                             gridStore.writeFile(filepath, function (err, doc) {
                                 sails.GridStore.read(db, fileId, function (err, fileData) {
-                                    var buffr = fileData;
                                     res.json(fileId);
                                     sails.fs.unlink(filepath, function (err) {
                                         if (err) {
                                             console.log(err);
                                         }
                                     });
+                                    if (doc) {
+                                        gridStore.close(function () {});
+                                    }
                                 });
                             });
                         });
