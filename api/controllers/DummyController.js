@@ -74,14 +74,18 @@ module.exports = {
         var newheight = req.param('height');
         var newwidth = req.param('width');
         if (!newwidth && !newheight) {
+            console.log("if");
             showimage(fd);
         } else if (!newwidth && newheight) {
+            console.log("first elseif");
             newheight = parseInt(newheight);
             findimage(fd, 0, newheight);
         } else if (newwidth && !newheight) {
+            console.log("second elseif");
             newwidth = parseInt(newwidth);
             findimage(fd, newwidth, 0);
         } else {
+            console.log("else");
             findimage(fd, newwidth, newheight);
         }
 
