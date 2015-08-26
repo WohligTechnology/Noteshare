@@ -5,7 +5,6 @@
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
 var lwip = require('lwip');
-var isnew = 0;
 module.exports = {
     gridfs: function (req, res) {
         sails.query(function (err, db) {
@@ -36,6 +35,7 @@ module.exports = {
                                 sails.GridStore.read(db, fileId, function (err, fileData) {
                                     var buffr = fileData;
                                     res.json(fileId);
+                                    db.close();
                                     sails.fs.unlink(filepath, function (err) {
                                         if (err) {
                                             console.log(err);
@@ -63,6 +63,7 @@ module.exports = {
                 }
                 res.set('Content-Type', file.contentType);
                 var stream = file.stream();
+                db.close();
                 stream.pipe(res);
             });
         });
@@ -73,22 +74,19 @@ module.exports = {
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
         var newwidth = req.param('width');
-        if (isnew == 0) {
-            if (!newwidth && !newheight) {
-                showimage(fd);
-            } else if (!newwidth && newheight) {
-                newheight = parseInt(newheight);
-                findimage(fd, 0, newheight);
-            } else if (newwidth && !newheight) {
-                newwidth = parseInt(newwidth);
-                findimage(fd, newwidth, 0);
-            } else {
-                findimage(fd, newwidth, newheight);
-            }
+        if (!newwidth && !newheight) {
+            showimage(fd);
+        } else if (!newwidth && newheight) {
+            newheight = parseInt(newheight);
+            findimage(fd, 0, newheight);
+        } else if (newwidth && !newheight) {
+            newwidth = parseInt(newwidth);
+            findimage(fd, newwidth, 0);
+        } else {
+            findimage(fd, newwidth, newheight);
         }
 
         function findimage(fd, newwidth, newheight) {
-            isnew++;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -128,6 +126,7 @@ module.exports = {
                                             if (doc) {
                                                 gridStore.close(function () {
                                                     showimage(fileId);
+                                                    db.close();
                                                 });
                                             }
                                         });
@@ -141,7 +140,6 @@ module.exports = {
         }
 
         function showimage(oldfile) {
-            isnew++;
             sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
@@ -154,7 +152,7 @@ module.exports = {
                     }
                     res.set('Content-Type', file.contentType);
                     var stream = file.stream();
-                    isnew = 0;
+                    db.close();
                     stream.pipe(res);
                 });
             });
