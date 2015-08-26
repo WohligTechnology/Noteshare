@@ -92,7 +92,6 @@ module.exports = {
                     width = parseInt(newwidth);
                     height = parseInt(newheight);
                     sails.lwip.open(fileData, 'jpg', function (err, image) {
-                        console.log("data");
                         var dimensions = {};
                         dimensions.width = image.width();
                         dimensions.height = image.height();
@@ -150,7 +149,6 @@ module.exports = {
                     res.set('Content-Type', file.contentType);
                     var stream = file.stream();
                     stream.pipe(res);
-                    db.close();
                 });
             });
         }
