@@ -69,7 +69,6 @@ module.exports = {
         });
     },
     resizeimage: function (req, res) {
-        console.log("data");
         var file = req.param('file');
         var fd = sails.ObjectID(file);
         var newheight = req.param('height');
@@ -95,6 +94,7 @@ module.exports = {
                     width = parseInt(newwidth);
                     height = parseInt(newheight);
                     lwip.open(fileData, 'jpg', function (err, image) {
+                        console.log("data");
                         var dimensions = {};
                         dimensions.width = image.width();
                         dimensions.height = image.height();
