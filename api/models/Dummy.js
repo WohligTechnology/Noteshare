@@ -83,6 +83,7 @@ module.exports = {
 
                 function recimage(num) {
                     n = data.image[num];
+                    console.log("n");
                     console.log(n);
                     if (err) {
                         console.log(err);
