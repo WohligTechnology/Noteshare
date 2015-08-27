@@ -6,6 +6,8 @@
  */
 //var lwip = require('lwip');
 var imagedata = '';
+var type = '';
+var filetype = '';
 var newimagedata = '';
 var canvasdata = '';
 var i = 0;
@@ -97,20 +99,38 @@ module.exports = {
                                 if (fd && fd != null) {
 
                                     sails.GridStore.read(db, fd, function (err, fileData) {
-
-                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                            console.log(fileData);
-                                            newimagedata = imagefile;
-                                            console.log(newimagedata);
-                                            //                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                            //                                                imagedata = newimage;
-                                            //                                                canvasdata = newimage;
-                                            //                                                i++;
-                                            //                                                if (i == data.image.length) {
-                                            //                                                    uploadimage();
-                                            //                                                }
-                                            //                                            });
+                                        var file = new sails.GridStore(db, fileId, "r");
+                                        file.open(function (err, file) {
+                                            if (file) {
+                                                filetype = file.contentType;
+                                                if (filetype == 'image/jpeg') {
+                                                    type = 'jpg';
+                                                } else if (filetype == 'image/png') {
+                                                    type = 'png';
+                                                } else if (filetype == 'image/gif') {
+                                                    type = 'gif';
+                                                }
+                                                imagecreate();
+                                            }
                                         });
+
+                                        function imagecreate() {
+                                            if (type != '') {
+                                                sails.lwip.open(fileData, type, function (err, imagefile) {
+                                                    console.log(fileData);
+                                                    newimagedata = imagefile;
+                                                    console.log(newimagedata);
+                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                        imagedata = newimage;
+                                                        canvasdata = newimage;
+                                                        i++;
+                                                        if (i == data.image.length) {
+                                                            uploadimage();
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                        }
                                     });
                                 }
                             }
