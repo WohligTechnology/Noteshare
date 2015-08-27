@@ -10,6 +10,8 @@ var type = '';
 var filetype = '';
 var newimagedata = '';
 var canvasdata = '';
+var canvaswidth = 1024;
+var canvasheight = 768;
 var i = 0;
 module.exports = {
     find: function (data, callback) {
@@ -78,13 +80,11 @@ module.exports = {
     findeach: function (data, callback) {
         sails.query(function (err, db) {
             var returns = data;
-            sails.lwip.create(1024, 768, 'white', function (err, canvas) {
+            sails.lwip.create(canvaswidth, canvasheight, 'white', function (err, canvas) {
                 canvasdata = canvas;
 
                 function recimage(num) {
                     n = data.image[num];
-                    console.log("n");
-                    console.log(n);
                     if (err) {
                         console.log(err);
                     }
@@ -101,7 +101,6 @@ module.exports = {
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-
                                     sails.GridStore.read(db, fd, function (err, fileData) {
                                         var file = new sails.GridStore(db, fd, "r");
                                         file.open(function (err, file) {
@@ -122,19 +121,36 @@ module.exports = {
                                             if (type != '') {
                                                 if (canvasdata != "") {
                                                     sails.lwip.open(fileData, type, function (err, imagefile) {
+
                                                         if (imagefile) {
-                                                            newimagedata = imagefile;
-                                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                                num++;
-                                                                canvasdata = newimage;
-                                                                if (newimage) {
-                                                                    if (num == data.image.length) {
-                                                                        uploadimage(newimage);
-                                                                    } else {
-                                                                        recimage(num);
+
+                                                            var cropRight = canvaswidth - (imagefile.width + n.left);
+                                                            var cropBottom = canvasheight - (imagefile.height + n.top);
+                                                            if (cropRight < 0) {
+                                                                cropRight = 0;
+                                                            }
+                                                            if (cropBottom < 0) {
+                                                                cropBottom = 0;
+                                                            }
+
+                                                            imagefile.crop(0, 0, cropRight, cropBottom, function (err,cropedimage) {
+
+                                                                newimagedata = cropedimage;
+                                                                canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                                    num++;
+                                                                    canvasdata = newimage;
+                                                                    if (newimage) {
+                                                                        if (num == data.image.length) {
+                                                                            uploadimage(newimage);
+                                                                        } else {
+                                                                            recimage(num);
+                                                                        }
                                                                     }
-                                                                }
+                                                                });
+
                                                             });
+
+
                                                         }
                                                     });
                                                 }
