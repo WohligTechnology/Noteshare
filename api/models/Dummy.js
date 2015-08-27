@@ -91,8 +91,9 @@ module.exports = {
                             }
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image.imagefs);
-                                console.log(fd);
                                 if (fd && fd != null) {
+				                                    console.log(fd);
+
                                     sails.GridStore.read(db, fd, function (err, fileData) {
                                         sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
                                             console.log(imagefile);
