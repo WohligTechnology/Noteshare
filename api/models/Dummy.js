@@ -80,8 +80,10 @@ module.exports = {
             var returns = data;
             sails.lwip.create(1024, 768, 'white', function (err, canvas) {
                 canvasdata = canvas;
+
                 function recimage(num) {
                     n = data.image[num];
+                    console.log(n);
                     if (err) {
                         console.log(err);
                     }
@@ -123,14 +125,12 @@ module.exports = {
                                                             newimagedata = imagefile;
                                                             canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                                 num++;
-                                                                canvasdata=newimage;
+                                                                canvasdata = newimage;
                                                                 if (newimage) {
                                                                     if (num == data.image.length) {
                                                                         uploadimage(newimage);
-                                                                    }
-                                                                    else
-                                                                    {
-                                                                        recimage(data.image,num);
+                                                                    } else {
+                                                                        recimage(data.image, num);
                                                                     }
                                                                 }
                                                             });
@@ -147,7 +147,7 @@ module.exports = {
                 }
 
                 recimage(0);
-                
+
                 function uploadimage(imagedata) {
                     var fileId = new sails.ObjectID();
                     var mimetype = 'image/jpeg';
