@@ -5,10 +5,12 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 //var lwip = require('lwip');
+var callfunc = [];
 var imagedata = '';
 var newimagedata = '';
 var canvasdata = '';
 var i = 0;
+var j = 0;
 module.exports = {
     find: function (data, callback) {
         var returns = [];
@@ -95,22 +97,12 @@ module.exports = {
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-                                    
                                     sails.GridStore.read(db, fd, function (err, fileData) {
-                                        
-                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                            console.log(imagefile);
-//                                            newimagedata = imagefile;
-//                                            console.log(newimagedata);
-//                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-//                                                imagedata = newimage;
-//                                                canvasdata = newimage;
-//                                                i++;
-//                                                if (i == data.image.length) {
-//                                                    uploadimage();
-//                                                }
-//                                            });
-                                        });
+                                        callfunc.push(fileData);
+                                        i++;
+                                        if (i == data.image.length) {
+                                            makecanvas(callfunc, data.image);
+                                        }
                                     });
                                 }
                             }
@@ -140,6 +132,25 @@ module.exports = {
                                 }
                             });
                         });
+                    });
+                }
+
+                function makecanvas(filedata, mydata) {
+                    var x = 0;
+                    _.each(filedata, function (m) {
+                        sails.lwip.open(m, 'jpg', function (err, imagefile) {
+                            console.log(imagefile);
+                            newimagedata = imagefile;
+                            canvasdata.paste(mydata[x].left, mydata[x].top, newimagedata, function (err, newimage) {
+                                imagedata = newimage;
+                                canvasdata = newimage;
+                                j++;
+                                if (j == filedata.length) {
+                                    uploadimage();
+                                }
+                            });
+                        });
+                        x++;
                     });
                 }
             });
