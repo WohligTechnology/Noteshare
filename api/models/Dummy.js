@@ -143,15 +143,15 @@ module.exports = {
                             console.log(imagefile);
                             newimagedata = imagefile;
                             canvasdata.paste(mydata[x].left, mydata[x].top, newimagedata, function (err, newimage) {
+                                x++;
                                 imagedata = newimage;
                                 canvasdata = newimage;
                                 j++;
                                 if (j == filedata.length) {
-//                                    uploadimage();
+                                    //                                    uploadimage();
                                 }
                             });
                         });
-                        x++;
                     });
                 }
             });
