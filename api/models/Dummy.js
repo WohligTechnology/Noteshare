@@ -97,8 +97,9 @@ module.exports = {
                                 if (fd && fd != null) {
                                     
                                     sails.GridStore.read(db, fd, function (err, fileData) {
-                                        console.log(fileData);
-//                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
+                                        
+                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
+                                            console.log(imagefile);
 //                                            newimagedata = imagefile;
 //                                            console.log(newimagedata);
 //                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
@@ -109,7 +110,7 @@ module.exports = {
 //                                                    uploadimage();
 //                                                }
 //                                            });
-//                                        });
+                                        });
                                     });
                                 }
                             }
