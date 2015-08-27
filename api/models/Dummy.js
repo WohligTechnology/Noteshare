@@ -117,17 +117,16 @@ module.exports = {
                                         function imagecreate() {
                                             if (type != '') {
                                                 sails.lwip.open(fileData, type, function (err, imagefile) {
-                                                    console.log(fileData);
                                                     newimagedata = imagefile;
                                                     console.log(newimagedata);
-//                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-//                                                        imagedata = newimage;
-//                                                        canvasdata = newimage;
-//                                                        i++;
-//                                                        if (i == data.image.length) {
-//                                                            uploadimage();
-//                                                        }
-//                                                    });
+                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                        imagedata = newimage;
+                                                        canvasdata = newimage;
+                                                        i++;
+                                                        if (i == data.image.length) {
+                                                            uploadimage();
+                                                        }
+                                                    });
                                                 });
                                             }
                                         }
