@@ -132,8 +132,9 @@ module.exports = {
                                                             if (cropBottom < 0) {
                                                                 cropBottom = 0;
                                                             }
-
-                                                            imagefile.crop(0, 0, cropRight, cropBottom, function (err,cropedimage) {
+                                                            console.log(cropRight);
+                                                            console.log(cropBottom);
+                                                            imagefile.crop(0, 0, cropRight, cropBottom, function (err, cropedimage) {
 
                                                                 newimagedata = cropedimage;
                                                                 canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
