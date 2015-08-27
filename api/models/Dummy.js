@@ -137,6 +137,7 @@ module.exports = {
 
                 function makecanvas(filedata, mydata) {
                     var x = 0;
+                    console.log(mydata.length);
                     _.each(filedata, function (m) {
                         sails.lwip.open(m, 'jpg', function (err, imagefile) {
                             console.log(imagefile);
@@ -146,7 +147,7 @@ module.exports = {
                                 canvasdata = newimage;
                                 j++;
                                 if (j == filedata.length) {
-                                    uploadimage();
+//                                    uploadimage();
                                 }
                             });
                         });
