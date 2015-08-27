@@ -80,91 +80,91 @@ module.exports = {
             var returns = data;
             sails.lwip.create(1024, 768, 'white', function (err, canvas) {
                 canvasdata = canvas;
-                _.each(data.image, function (n) {
-                    if (err) {
-                        console.log(err);
-                    }
-                    if (db) {
-                        db.collection('image').find({
-                            "id": n.id
-                        }).toArray(function (err, image) {
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: false
-                                });
-                            }
-                            if (image && image != null) {
-                                var fd = sails.ObjectID(image[0].imagefs);
-                                if (fd && fd != null) {
-
-                                    sails.GridStore.read(db, fd, function (err, fileData) {
-                                        var file = new sails.GridStore(db, fd, "r");
-                                        file.open(function (err, file) {
-                                            if (file) {
-                                                filetype = file.contentType;
-                                                if (filetype == 'image/jpeg') {
-                                                    type = 'jpg';
-                                                } else if (filetype == 'image/png') {
-                                                    type = 'png';
-                                                } else if (filetype == 'image/gif') {
-                                                    type = 'gif';
-                                                }
-                                                imagecreate();
-                                            }
-                                        });
-
-                                        function imagecreate() {
-                                            if (type != '') {
-                                                if (canvasdata != "") {
-                                                    sails.lwip.open(fileData, type, function (err, imagefile) {
-                                                        newimagedata = imagefile;
-                                                        canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                            if (newimage) {
-                                                                imagedata = newimage;
-                                                                canvasdata = newimage;
-                                                                i++;
-                                                                if (i == data.image.length) {
-                                                                    uploadimage();
-                                                                }
-                                                            }
-                                                        });
-                                                    });
-                                                }
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                        });
-                    }
-                });
-
-                function uploadimage() {
-                    var fileId = new sails.ObjectID();
-                    var mimetype = 'image/jpeg';
-                    var gridStore = new sails.GridStore(db, fileId, 'w', {
-                        content_type: mimetype
-                    });
-                    gridStore.open(function (err, gridStore) {
+            });
+            _.each(data.image, function (n) {
+                if (err) {
+                    console.log(err);
+                }
+                if (db) {
+                    db.collection('image').find({
+                        "id": n.id
+                    }).toArray(function (err, image) {
                         if (err) {
                             console.log(err);
-                        }
-                        imagedata.toBuffer('jpg', {}, function (err, imagebuf) {
-                            gridStore.write(imagebuf, function (err, doc) {
-                                if (err) {
-                                    console.log(err);
-                                }
-                                if (doc) {
-                                    gridStore.close(function () {
-                                        console.log(fileId);
-                                    });
-                                }
+                            callback({
+                                value: false
                             });
-                        });
+                        }
+                        if (image && image != null) {
+                            var fd = sails.ObjectID(image[0].imagefs);
+                            if (fd && fd != null) {
+
+                                sails.GridStore.read(db, fd, function (err, fileData) {
+                                    var file = new sails.GridStore(db, fd, "r");
+                                    file.open(function (err, file) {
+                                        if (file) {
+                                            filetype = file.contentType;
+                                            if (filetype == 'image/jpeg') {
+                                                type = 'jpg';
+                                            } else if (filetype == 'image/png') {
+                                                type = 'png';
+                                            } else if (filetype == 'image/gif') {
+                                                type = 'gif';
+                                            }
+                                            imagecreate();
+                                        }
+                                    });
+
+                                    function imagecreate() {
+                                        if (type != '') {
+                                            if (canvasdata != "") {
+                                                sails.lwip.open(fileData, type, function (err, imagefile) {
+                                                    newimagedata = imagefile;
+                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                        if (newimage) {
+                                                            imagedata = newimage;
+                                                            canvasdata = newimage;
+                                                            i++;
+                                                            if (i == data.image.length) {
+                                                                uploadimage();
+                                                            }
+                                                        }
+                                                    });
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                            }
+                        }
                     });
                 }
             });
+
+            function uploadimage() {
+                var fileId = new sails.ObjectID();
+                var mimetype = 'image/jpeg';
+                var gridStore = new sails.GridStore(db, fileId, 'w', {
+                    content_type: mimetype
+                });
+                gridStore.open(function (err, gridStore) {
+                    if (err) {
+                        console.log(err);
+                    }
+                    imagedata.toBuffer('jpg', {}, function (err, imagebuf) {
+                        gridStore.write(imagebuf, function (err, doc) {
+                            if (err) {
+                                console.log(err);
+                            }
+                            if (doc) {
+                                gridStore.close(function () {
+                                    console.log(fileId);
+                                });
+                            }
+                        });
+                    });
+                });
+            }
         });
     }
 };
