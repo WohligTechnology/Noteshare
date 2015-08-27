@@ -99,7 +99,7 @@ module.exports = {
                                 if (fd && fd != null) {
 
                                     sails.GridStore.read(db, fd, function (err, fileData) {
-                                        var file = new sails.GridStore(db, fileId, "r");
+                                        var file = new sails.GridStore(db, fd, "r");
                                         file.open(function (err, file) {
                                             if (file) {
                                                 filetype = file.contentType;
