@@ -6,6 +6,8 @@
  */
 //var lwip = require('lwip');
 var imagedata = '';
+var newimagedata = '';
+var canvasdata = '';
 var i = 0;
 module.exports = {
     find: function (data, callback) {
@@ -75,6 +77,7 @@ module.exports = {
         sails.query(function (err, db) {
             var returns = data;
             sails.lwip.create(900, 600, 'white', function (err, canvas) {
+                canvasdata = canvas;
                 _.each(data.image, function (n) {
                     if (err) {
                         console.log(err);
@@ -95,8 +98,8 @@ module.exports = {
                                     console.log(fd);
                                     sails.GridStore.read(db, fd, function (err, fileData) {
                                         sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                            var newimagedata = imagefile;
-                                            canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                            newimagedata = imagefile;
+                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                 imagedata = newimage;
                                                 i++;
                                                 if (i == data.image.length) {
