@@ -101,6 +101,7 @@ module.exports = {
                                             newimagedata = imagefile;
                                             canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                 imagedata = newimage;
+                                                canvasdata = newimage;
                                                 i++;
                                                 if (i == data.image.length) {
                                                     uploadimage();
