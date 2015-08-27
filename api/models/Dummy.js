@@ -95,8 +95,9 @@ module.exports = {
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-                                    console.log(fd);
-//                                    sails.GridStore.read(db, fd, function (err, fileData) {
+                                    
+                                    sails.GridStore.read(db, fd, function (err, fileData) {
+                                        console.log(fileData);
 //                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
 //                                            newimagedata = imagefile;
 //                                            console.log(newimagedata);
@@ -109,7 +110,7 @@ module.exports = {
 //                                                }
 //                                            });
 //                                        });
-//                                    });
+                                    });
                                 }
                             }
                         });
