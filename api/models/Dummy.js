@@ -95,20 +95,21 @@ module.exports = {
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-                                    sails.GridStore.read(db, fd, function (err, fileData) {
-                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                            newimagedata = imagefile;
-                                            console.log(newimagedata);
-                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                imagedata = newimage;
-                                                canvasdata = newimage;
-                                                i++;
-                                                if (i == data.image.length) {
-                                                    uploadimage();
-                                                }
-                                            });
-                                        });
-                                    });
+                                    console.log(fd);
+//                                    sails.GridStore.read(db, fd, function (err, fileData) {
+//                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
+//                                            newimagedata = imagefile;
+//                                            console.log(newimagedata);
+//                                            canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+//                                                imagedata = newimage;
+//                                                canvasdata = newimage;
+//                                                i++;
+//                                                if (i == data.image.length) {
+//                                                    uploadimage();
+//                                                }
+//                                            });
+//                                        });
+//                                    });
                                 }
                             }
                         });
