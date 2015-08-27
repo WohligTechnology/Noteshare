@@ -165,5 +165,11 @@ module.exports = {
             res.json(data);
         };
         Dummy.remove(req.body, callback);
+    },
+    findeach: function (req, res) {
+        function callback(data) {
+            res.json(data);
+        };
+        Dummy.findeach(req.body, callback);
     }
 };
