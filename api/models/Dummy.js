@@ -116,19 +116,21 @@ module.exports = {
 
                                         function imagecreate() {
                                             if (type != '') {
-                                                sails.lwip.open(fileData, type, function (err, imagefile) {
-                                                    newimagedata = imagefile;
-                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                        if (newimage) {
-                                                            imagedata = newimage;
-                                                            canvasdata = newimage;
-                                                            i++;
-                                                            if (i == data.image.length) {
-                                                                uploadimage();
+                                                if (canvasdata != "") {
+                                                    sails.lwip.open(fileData, type, function (err, imagefile) {
+                                                        newimagedata = imagefile;
+                                                        canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                            if (newimage) {
+                                                                imagedata = newimage;
+                                                                canvasdata = newimage;
+                                                                i++;
+                                                                if (i == data.image.length) {
+                                                                    uploadimage();
+                                                                }
                                                             }
-                                                        }
+                                                        });
                                                     });
-                                                });
+                                                }
                                             }
                                         }
                                     });
