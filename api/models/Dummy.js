@@ -82,7 +82,7 @@ module.exports = {
                     if (db) {
                         db.collection('image').find({
                             "id": n.id
-                        }).each(function (err, image) {
+                        }).toArray(function (err, image) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -90,13 +90,11 @@ module.exports = {
                                 });
                             }
                             if (image && image != null) {
-                                var fd = sails.ObjectID(image.imagefs);
+                                var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-				                                    console.log(fd);
-
+                                    console.log(fd);
                                     sails.GridStore.read(db, fd, function (err, fileData) {
                                         sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                            console.log(imagefile);
                                             var newimagedata = imagefile;
                                             canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                 imagedata = newimage;
