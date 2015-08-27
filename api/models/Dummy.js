@@ -4,7 +4,7 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
-var lwip = require('lwip');
+//var lwip = require('lwip');
 var imagedata = '';
 var i = 0;
 module.exports = {
@@ -74,7 +74,7 @@ module.exports = {
     findeach: function (data, callback) {
         sails.query(function (err, db) {
             var returns = data;
-            lwip.create(900, 600, 'white', function (err, canvas) {
+            sails.lwip.create(900, 600, 'white', function (err, canvas) {
                 _.each(data.image, function (n) {
                     if (err) {
                         console.log(err);
@@ -91,8 +91,9 @@ module.exports = {
                             }
                             if (image != null) {
                                 var fd = sails.ObjectID(image.imagefs);
+                                console.log(fd);
                                 sails.GridStore.read(db, fd, function (err, fileData) {
-                                    lwip.open(fileData, 'jpg', function (err, imagefile) {
+                                    sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
                                         console.log(imagefile);
                                         var newimagedata = imagefile;
                                         canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
