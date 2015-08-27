@@ -123,18 +123,18 @@ module.exports = {
                                                     sails.lwip.open(fileData, type, function (err, imagefile) {
 
                                                         if (imagefile) {
-                                                            var cropRight = (parseInt(imagefile.width()) + parseInt(n.left)) - canvaswidth;
-                                                            var cropBottom = (parseInt(imagefile.height()) + parseInt(n.top)) - canvasheight;
-                                                            if (cropRight < 0) {
-                                                                cropRight = 0;
-                                                            }
-                                                            if (cropBottom < 0) {
-                                                                cropBottom = 0;
-                                                            }
-                                                            console.log(cropRight);
-                                                            console.log(cropBottom);
-                                                            imagefile.crop(0, 0, cropRight, cropBottom, function (err, cropedimage) {
-
+//                                                            var cropRight = (parseInt(imagefile.width()) + parseInt(n.left)) - canvaswidth;
+//                                                            var cropBottom = (parseInt(imagefile.height()) + parseInt(n.top)) - canvasheight;
+//                                                            if (cropRight < 0) {
+//                                                                cropRight = 0;
+//                                                            }
+//                                                            if (cropBottom < 0) {
+//                                                                cropBottom = 0;
+//                                                            }
+//                                                            console.log(cropRight);
+//                                                            console.log(cropBottom);
+                                                            
+                                                            imagefile.crop(0, 0, canvaswidth-n.left, canvasheight-n.top, function (err, cropedimage) {
                                                                 newimagedata = cropedimage;
                                                                 canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                                     num++;
