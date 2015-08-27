@@ -124,8 +124,8 @@ module.exports = {
 
                                                         if (imagefile) {
 
-                                                            var cropRight = canvaswidth - (imagefile.width + n.left);
-                                                            var cropBottom = canvasheight - (imagefile.height + n.top);
+                                                            var cropRight = canvaswidth - (parseInt(imagefile.width) + parseInt(n.left));
+                                                            var cropBottom = canvasheight - (parseInt(imagefile.height) + parseInt(n.top));
                                                             if (cropRight < 0) {
                                                                 cropRight = 0;
                                                             }
