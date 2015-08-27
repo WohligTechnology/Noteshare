@@ -123,9 +123,8 @@ module.exports = {
                                                     sails.lwip.open(fileData, type, function (err, imagefile) {
 
                                                         if (imagefile) {
-
-                                                            var cropRight = canvaswidth - (parseInt(imagefile.width) + parseInt(n.left));
-                                                            var cropBottom = canvasheight - (parseInt(imagefile.height) + parseInt(n.top));
+                                                            var cropRight = canvaswidth - (parseInt(imagefile.width()) + parseInt(n.left));
+                                                            var cropBottom = canvasheight - (parseInt(imagefile.height()) + parseInt(n.top));
                                                             if (cropRight < 0) {
                                                                 cropRight = 0;
                                                             }
