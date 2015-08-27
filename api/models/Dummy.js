@@ -118,7 +118,7 @@ module.exports = {
                                             if (type != '') {
                                                 sails.lwip.open(fileData, type, function (err, imagefile) {
                                                     newimagedata = imagefile;
-                                                    canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                    canvasdata.prototype.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                         if (newimage) {
                                                             imagedata = newimage;
                                                             canvasdata = newimage;
