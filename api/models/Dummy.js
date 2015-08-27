@@ -89,22 +89,24 @@ module.exports = {
                                     value: false
                                 });
                             }
-                            if (image != null) {
+                            if (image && image != null) {
                                 var fd = sails.ObjectID(image.imagefs);
                                 console.log(fd);
-                                sails.GridStore.read(db, fd, function (err, fileData) {
-                                    sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                        console.log(imagefile);
-                                        var newimagedata = imagefile;
-                                        canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                            imagedata = newimage;
-                                            i++;
-                                            if (i == data.image.length) {
-                                                uploadimage();
-                                            }
+                                if (fd && fd != null) {
+                                    sails.GridStore.read(db, fd, function (err, fileData) {
+                                        sails.lwip.open(fileData, 'jpg', function (err, imagefile) {
+                                            console.log(imagefile);
+                                            var newimagedata = imagefile;
+                                            canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                imagedata = newimage;
+                                                i++;
+                                                if (i == data.image.length) {
+                                                    uploadimage();
+                                                }
+                                            });
                                         });
                                     });
-                                });
+                                }
                             }
                         });
                     }
