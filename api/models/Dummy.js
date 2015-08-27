@@ -80,7 +80,9 @@ module.exports = {
             var returns = data;
             sails.lwip.create(1024, 768, 'white', function (err, canvas) {
                 canvasdata = canvas;
-                _.each(data.image, function (n) {
+
+                function recimage(data.image, num) {
+                    n = data.image[num]
                     if (err) {
                         console.log(err);
                     }
@@ -121,12 +123,15 @@ module.exports = {
                                                         if (imagefile) {
                                                             newimagedata = imagefile;
                                                             canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                                num++;
+                                                                canvasdata=newimage;
                                                                 if (newimage) {
-                                                                    imagedata = newimage;
-                                                                    canvasdata = newimage;
-                                                                    i++;
-                                                                    if (i == data.image.length) {
-                                                                        uploadimage();
+                                                                    if (num == data.image.length) {
+                                                                        uploadimage(newimage);
+                                                                    }
+                                                                    else
+                                                                    {
+                                                                        recimage(data.image,num);
                                                                     }
                                                                 }
                                                             });
@@ -140,9 +145,9 @@ module.exports = {
                             }
                         });
                     }
-                });
+                };
 
-                function uploadimage() {
+                function uploadimage(imagedata) {
                     var fileId = new sails.ObjectID();
                     var mimetype = 'image/jpeg';
                     var gridStore = new sails.GridStore(db, fileId, 'w', {
