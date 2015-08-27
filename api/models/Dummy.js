@@ -144,7 +144,7 @@ module.exports = {
                             }
                         });
                     }
-                };
+                }
 
                 recimage(0);
                 
