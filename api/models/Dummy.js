@@ -90,12 +90,10 @@ module.exports = {
                                 });
                             }
                             if (image != null) {
-                                console.log(image.imagefs);
                                 var fd = sails.ObjectID(image.imagefs);
                                 sails.GridStore.read(db, fd, function (err, fileData) {
-                                    console.log(fileData);
-                                    lwip.open(fileData, 'jpg', function (err, image) {
-                                        canvas.paste(n.left, n.top, image, function (err, newimage) {
+                                    lwip.open(fileData, 'jpg', function (err, imagefile) {
+                                        canvas.paste(n.left, n.top, imagefile, function (err, newimage) {
                                             imagedata = newimage;
                                             i++;
                                             if (i == data.image.length) {
