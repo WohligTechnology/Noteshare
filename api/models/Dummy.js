@@ -131,7 +131,7 @@ module.exports = {
                                                                     if (num == data.image.length) {
                                                                         uploadimage(newimage);
                                                                     } else {
-                                                                        recimage(data.image, num);
+                                                                        recimage(num);
                                                                     }
                                                                 }
                                                             });
