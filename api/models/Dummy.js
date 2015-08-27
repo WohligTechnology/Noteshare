@@ -93,7 +93,9 @@ module.exports = {
                                 var fd = sails.ObjectID(image.imagefs);
                                 sails.GridStore.read(db, fd, function (err, fileData) {
                                     lwip.open(fileData, 'jpg', function (err, imagefile) {
-                                        canvas.paste(n.left, n.top, imagefile, function (err, newimage) {
+                                        console.log(imagefile);
+                                        var newimagedata = imagefile;
+                                        canvas.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                             imagedata = newimage;
                                             i++;
                                             if (i == data.image.length) {
