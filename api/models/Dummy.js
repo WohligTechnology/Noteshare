@@ -78,7 +78,7 @@ module.exports = {
     findeach: function (data, callback) {
         sails.query(function (err, db) {
             var returns = data;
-            sails.lwip.create(900, 600, 'white', function (err, canvas) {
+            sails.lwip.create(1024, 768, 'white', function (err, canvas) {
                 canvasdata = canvas;
                 _.each(data.image, function (n) {
                     if (err) {
@@ -120,11 +120,13 @@ module.exports = {
                                                     newimagedata = imagefile;
                                                     console.log(newimagedata);
                                                     canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                        imagedata = newimage;
-                                                        canvasdata = newimage;
-                                                        i++;
-                                                        if (i == data.image.length) {
-                                                            uploadimage();
+                                                        if (newimage) {
+                                                            imagedata = newimage;
+                                                            canvasdata = newimage;
+                                                            i++;
+                                                            if (i == data.image.length) {
+                                                                uploadimage();
+                                                            }
                                                         }
                                                     });
                                                 });
