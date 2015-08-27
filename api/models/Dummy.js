@@ -100,7 +100,6 @@ module.exports = {
                                             newimagedata = imagefile;
                                             console.log(newimagedata);
                                             canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
-                                                console.log(newimage);
                                                 imagedata = newimage;
                                                 canvasdata = newimage;
                                                 i++;
