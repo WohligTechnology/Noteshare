@@ -123,17 +123,11 @@ module.exports = {
                                                     sails.lwip.open(fileData, type, function (err, imagefile) {
 
                                                         if (imagefile) {
-                                                            var cropRight = canvaswidth-n.left-1;
-                                                            var cropBottom = canvasheight-n.top-1;
-//                                                            if (cropRight < 0) {
-//                                                                cropRight = 0;
-//                                                            }
-//                                                            if (cropBottom < 0) {
-//                                                                cropBottom = 0;
-//                                                            }
+                                                            var cropRight = canvaswidth - n.left - 1;
+                                                            var cropBottom = canvasheight - n.top - 1;
                                                             console.log(cropRight);
                                                             console.log(cropBottom);
-                                                            
+
                                                             imagefile.crop(0, 0, cropRight, cropBottom, function (err, cropedimage) {
                                                                 newimagedata = cropedimage;
                                                                 canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
@@ -147,7 +141,6 @@ module.exports = {
                                                                         }
                                                                     }
                                                                 });
-
                                                             });
                                                         }
                                                     });
@@ -180,7 +173,8 @@ module.exports = {
                                 }
                                 if (doc) {
                                     gridStore.close(function () {
-                                        console.log(fileId);
+                                        returns.imagefnal = fileId;
+                                        callback(returns);
                                     });
                                 }
                             });

@@ -167,9 +167,10 @@ module.exports = {
         Dummy.remove(req.body, callback);
     },
     findeach: function (req, res) {
-        function callback(data) {
-            res.json(data);
-        };
-        Dummy.findeach(req.body, callback);
+        Dummy.findeach(req.body, function (data) {
+            Gallery.save(data, function (result) {
+                res.json(result);
+            });
+        });
     }
 };
