@@ -80,10 +80,14 @@ module.exports = {
     findeach: function (data, callback) {
         sails.query(function (err, db) {
             var returns = data;
+            console.log(returns);
             sails.lwip.create(canvaswidth, canvasheight, 'white', function (err, canvas) {
+                console.log("in canvas");
                 canvasdata = canvas;
+
                 function recimage(num) {
                     n = data.image[num];
+                    console.log(n);
                     if (err) {
                         console.log(err);
                     }
@@ -98,6 +102,7 @@ module.exports = {
                                 });
                             }
                             if (image && image != null) {
+                                console.log("in type");
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
                                     sails.GridStore.read(db, fd, function (err, fileData) {
@@ -119,15 +124,19 @@ module.exports = {
                                         function imagecreate() {
                                             if (type != '') {
                                                 if (canvasdata != "") {
+                                                    console.log("in imagecreate");
                                                     sails.lwip.open(fileData, type, function (err, imagefile) {
 
                                                         if (imagefile) {
+                                                            console.log("in imagefile");
+                                                            console.log(canvaswidth);
+                                                            console.log(canvasheight);
                                                             var cropRight = canvaswidth - n.left - 1;
                                                             var cropBottom = canvasheight - n.top - 1;
                                                             console.log(cropRight);
                                                             console.log(cropBottom);
-
                                                             imagefile.crop(0, 0, cropRight, cropBottom, function (err, cropedimage) {
+                                                                console.log("in crop");
                                                                 newimagedata = cropedimage;
                                                                 canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
                                                                     num++;
