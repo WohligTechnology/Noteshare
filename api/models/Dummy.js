@@ -82,7 +82,6 @@ module.exports = {
             var returns = data;
             sails.lwip.create(canvaswidth, canvasheight, 'white', function (err, canvas) {
                 canvasdata = canvas;
-                console.log(data);
                 function recimage(num) {
                     n = data.image[num];
                     if (err) {
@@ -174,6 +173,7 @@ module.exports = {
                                 if (doc) {
                                     gridStore.close(function () {
                                         returns.imagefnal = fileId;
+                                        console.log(returns);
                                         callback(returns);
                                     });
                                 }
