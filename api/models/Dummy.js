@@ -82,7 +82,7 @@ module.exports = {
             var returns = data;
             sails.lwip.create(canvaswidth, canvasheight, 'white', function (err, canvas) {
                 canvasdata = canvas;
-
+                console.log(data);
                 function recimage(num) {
                     n = data.image[num];
                     if (err) {
