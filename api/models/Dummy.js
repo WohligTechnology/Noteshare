@@ -134,6 +134,7 @@ module.exports = {
                                                                     canvasdata = newimage;
                                                                     if (newimage) {
                                                                         if (num == data.image.length) {
+                                                                            console.log(returns);
                                                                             uploadimage(newimage);
                                                                         } else {
                                                                             recimage(num);
