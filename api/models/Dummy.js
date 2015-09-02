@@ -157,7 +157,7 @@ module.exports = {
 
                 function uploadimage(imagedata) {
                     var fileId = new sails.ObjectID();
-                    var mimetype = 'image/gif';
+                    var mimetype = 'image/jpeg';
                     var gridStore = new sails.GridStore(db, fileId, 'w', {
                         content_type: mimetype
                     });
@@ -165,7 +165,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                         }
-                        imagedata.toBuffer('gif', {}, function (err, imagebuf) {
+                        imagedata.toBuffer('jpeg', {}, function (err, imagebuf) {
                             gridStore.write(imagebuf, function (err, doc) {
                                 if (err) {
                                     console.log(err);
