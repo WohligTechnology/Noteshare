@@ -31,7 +31,8 @@ module.exports = {
                             db.close();
                         } else if (created) {
                             callback({
-                                value: "true"
+                                value: "true",
+                                _id: data._id
                             });
                             db.close();
                         } else {
@@ -566,6 +567,7 @@ module.exports = {
                         email: data.email,
                         password: data.password
                     }, {
+                        "_id":1,
                         "firstname": 1,
                         "lastname": 1,
                         "fbid": 1,
@@ -608,6 +610,7 @@ module.exports = {
                                 email: data.email,
                                 forgotpassword: data.password
                             }, {
+                                "_id":1,
                                 "firstname": 1,
                                 "lastname": 1,
                                 "fbid": 1,
@@ -659,7 +662,6 @@ module.exports = {
                     db.collection("user").find({
                         "fbid": data.fbid
                     }, {
-                        password: 0,
                         forgotpassword: 0
                     }).toArray(function (err, data2) {
                         if (err) {
@@ -683,7 +685,6 @@ module.exports = {
                     db.collection("user").find({
                         "gid": data.gid
                     }, {
-                        password: 0,
                         forgotpassword: 0
                     }).toArray(function (err, data2) {
                         if (err) {

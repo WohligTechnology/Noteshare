@@ -34,7 +34,7 @@ module.exports = {
                             gridStore.writeFile(filepath, function (err, doc) {
                                 sails.GridStore.read(db, fileId, function (err, fileData) {
                                     var buffr = fileData;
-                                    res.json(fileId);
+                                    res.json({fileid:fileId});
                                     db.close();
                                     sails.fs.unlink(filepath, function (err) {
                                         if (err) {
