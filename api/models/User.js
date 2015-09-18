@@ -20,6 +20,7 @@ module.exports = {
                     data.password = md5(data.password);
                 }
                 if (!data._id) {
+                    console.log("in create");
                     data._id = sails.ObjectID();
 
                     db.collection('user').insert(data, function (err, created) {
@@ -44,6 +45,7 @@ module.exports = {
                         }
                     });
                 } else {
+                    console.log("in edit");
                     var user = sails.ObjectID(data._id);
                     delete data._id;
                     db.collection('user').update({
