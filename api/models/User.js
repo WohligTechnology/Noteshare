@@ -9,6 +9,9 @@ var mandrill = require('mandrill-api/mandrill');
 mandrill_client = new mandrill.Mandrill('dzbY2mySNE_Zsqr3hsK70A');
 module.exports = {
     save: function (data, callback) {
+        if (data.password) {
+            data.password = md5(data.password);
+        }
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -16,34 +19,48 @@ module.exports = {
                     value: "false"
                 });
             } else if (db) {
-                if (data.password) {
-                    data.password = md5(data.password);
-                }
-                if (!data._id) {
-                    data._id = sails.ObjectID();
-
-                    db.collection('user').insert(data, function (err, created) {
+                if (!data._id && data.email && data.email != "") {
+                    db.collection("user").find({
+                        "email": data.email
+                    }).toArray(function (err, data2) {
                         if (err) {
                             console.log(err);
                             callback({
                                 value: "false"
                             });
                             db.close();
-                        } else if (created) {
+                        } else if (data2 && data2[0]) {
                             callback({
-                                value: "true",
-                                _id: data._id
+                                value: "false",
+                                comment: "User already Exists"
                             });
                             db.close();
                         } else {
-                            callback({
-                                value: "false",
-                                comment: "User Not created"
+                            data._id = sails.ObjectID();
+                            db.collection('user').insert(data, function (err, created) {
+                                if (err) {
+                                    console.log(err);
+                                    callback({
+                                        value: "false"
+                                    });
+                                    db.close();
+                                } else if (created) {
+                                    callback({
+                                        value: "true",
+                                        _id: data._id
+                                    });
+                                    db.close();
+                                } else {
+                                    callback({
+                                        value: "false",
+                                        comment: "User Not created"
+                                    });
+                                    db.close();
+                                }
                             });
-                            db.close();
                         }
                     });
-                } else {
+                } else if (data._id && data._id != "") {
                     var user = sails.ObjectID(data._id);
                     delete data._id;
                     db.collection('user').update({
@@ -70,6 +87,12 @@ module.exports = {
                             db.close();
                         }
                     });
+                } else {
+                    callback({
+                        value: "false",
+                        comment: "Please provide proper data"
+                    });
+                    db.close();
                 }
             }
         });
@@ -160,14 +183,8 @@ module.exports = {
             }
             if (db) {
                 db.collection("user").find({}, {
-                    "firstname": 1,
-                    "lastname": 1,
-                    "fbid": 1,
-                    "email": 1,
-                    "gid": 1,
-                    "passcode": 1,
-                    "profilepic": 1,
-                    "username": 1
+                    password: 0,
+                    forgotpassword: 0
                 }).toArray(function (err, found) {
                     if (err) {
                         callback({
@@ -561,21 +578,17 @@ module.exports = {
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
+                callback({
+                    value: false
+                });
             } else if (db) {
-                if (data.email) {
+                if (data.email && data.email != "" && data.password && data.password != "") {
                     db.collection('user').find({
                         email: data.email,
                         password: data.password
                     }, {
-                        "_id":1,
-                        "firstname": 1,
-                        "lastname": 1,
-                        "fbid": 1,
-                        "email": 1,
-                        "gid": 1,
-                        "passcode": 1,
-                        "profilepic": 1,
-                        "username": 1
+                        password: 0,
+                        forgotpassword: 0
                     }).each(function (err, found) {
                         exitup++;
                         if (err) {
@@ -598,8 +611,7 @@ module.exports = {
                                         callback({
                                             value: "false"
                                         });
-                                    }
-                                    if (updated) {
+                                    } else if (updated) {
                                         console.log("updated");
                                     }
                                 });
@@ -610,15 +622,8 @@ module.exports = {
                                 email: data.email,
                                 forgotpassword: data.password
                             }, {
-                                "_id":1,
-                                "firstname": 1,
-                                "lastname": 1,
-                                "fbid": 1,
-                                "email": 1,
-                                "gid": 1,
-                                "passcode": 1,
-                                "profilepic": 1,
-                                "username": 1
+                                password: 0,
+                                forgotpassword: 0
                             }).each(function (err, found) {
                                 exit++;
                                 if (err) {
@@ -627,7 +632,6 @@ module.exports = {
                                     });
                                     console.log(err);
                                 } else if (found != null) {
-                                    callback(found);
                                     sails.ObjectID(data._id);
                                     db.collection('user').update({
                                         email: data.email
@@ -642,16 +646,17 @@ module.exports = {
                                             callback({
                                                 value: "false"
                                             });
-                                        }
-                                        if (updated) {
+                                        } else if (updated) {
                                             console.log("updated");
                                         }
                                     });
+                                    callback(found);
                                 } else {
                                     exitdown++;
                                     if (exit == exitup == exitdown) {
                                         callback({
-                                            value: "false"
+                                            value: "false",
+                                            comment: "Email and Password Incorrect"
                                         });
                                     }
                                 }
@@ -661,8 +666,6 @@ module.exports = {
                 } else if (data.fbid && data.fbid != "") {
                     db.collection("user").find({
                         "fbid": data.fbid
-                    }, {
-                        forgotpassword: 0
                     }).toArray(function (err, data2) {
                         if (err) {
                             console.log(err);
@@ -681,11 +684,9 @@ module.exports = {
                             db.close();
                         }
                     });
-                } else if (data.gid && data.gid != "") {
+                } else if (data.googleid && data.googleid != "") {
                     db.collection("user").find({
-                        "gid": data.gid
-                    }, {
-                        forgotpassword: 0
+                        "googleid": data.googleid
                     }).toArray(function (err, data2) {
                         if (err) {
                             console.log(err);
@@ -707,7 +708,7 @@ module.exports = {
                 } else {
                     callback({
                         value: "false",
-                        comment: "Please provide fbid,gid or email and password"
+                        comment: "Please provide fbid or googleid or email and password"
                     });
                     db.close();
                 }
