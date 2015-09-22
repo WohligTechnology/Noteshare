@@ -891,10 +891,12 @@ module.exports = {
                         }
                     }
                 ]).toArray(function (err, result) {
-                    if (result[0]) {
+                    if (result && result[0]) {
                         callback(result[0].count);
-                    }
-                    if (err) {
+                    } else if (!result[0]) {
+                        callback(0);
+                        db.close();
+                    } else if (err) {
                         console.log(err);
                         callback({
                             value: "false"
