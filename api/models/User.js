@@ -9,9 +9,6 @@ var mandrill = require('mandrill-api/mandrill');
 mandrill_client = new mandrill.Mandrill('dzbY2mySNE_Zsqr3hsK70A');
 module.exports = {
     save: function (data, callback) {
-        var matchobj = {
-            email: data.email
-        };
         if (data.password) {
             data.password = md5(data.password);
         }
@@ -23,7 +20,9 @@ module.exports = {
                 });
             } else if (db) {
                 if (!data._id && data.email && data.email != "") {
-                    db.collection("user").find(matchobj).toArray(function (err, data2) {
+                    db.collection("user").find({
+                        email: data.email
+                    }).toArray(function (err, data2) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -520,7 +519,7 @@ module.exports = {
             if (db) {
                 exit++;
                 db.collection("user").find({
-                    "email": data.email
+                    email: data.email
                 }).each(function (err, data) {
                     if (err) {
                         console.log(err);
