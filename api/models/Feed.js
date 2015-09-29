@@ -17,8 +17,7 @@ module.exports = {
                     callback({
                         value: false
                     });
-                }
-                if (db) {
+                } else if (db) {
                     data.timestamp = data._id.getTimestamp().toString();
                     db.collection("user").update({
                         _id: user
@@ -29,12 +28,23 @@ module.exports = {
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
-                        }
-                        if (updated) {
                             callback({
-                                value: true
+                                value: false,
+                                comment: "Error"
                             });
-                            console.log(updated);
+                            db.close();
+                        } else if (updated) {
+                            callback({
+                                value: true,
+                                id: data._id
+                            });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not created"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -62,12 +72,22 @@ module.exports = {
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
-                        }
-                        if (updated) {
+                            callback({
+                                value: false,
+                                comment: "Error"
+                            });
+                            db.close();
+                        } else if (updated) {
                             callback({
                                 value: true
                             });
-                            console.log(updated);
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not updated"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -76,7 +96,6 @@ module.exports = {
     },
     delete: function (data, callback) {
         var user = sails.ObjectID(data.user);
-
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -97,12 +116,22 @@ module.exports = {
                 }, function (err, updated) {
                     if (err) {
                         console.log(err);
-                    }
-                    if (updated) {
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (updated) {
                         callback({
                             value: true
                         });
-                        console.log(updated);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "Not deleted"
+                        });
+                        db.close();
                     }
                 });
             }
@@ -123,10 +152,22 @@ module.exports = {
                     "feed._id": sails.ObjectID(data._id)
                 }, {
                     "feed.$": 1
-                }).each(function (err, data2) {
-                    if (data2 != null) {
-                        callback(data2.feed[0]);
-                        console.log("feed findone");
+                }).toArray(function (err, data2) {
+                    if (data2 && data2[0] && data2[0].feed && data2[0].feed[0]) {
+                        callback(data2[0].feed[0]);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such feed."
+                        });
+                        db.close();
                     }
                 });
             }
@@ -142,12 +183,42 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    "_id": user
-                }).each(function (err, data) {
-                    if (data != null) {
-                        callback(data.feed);
-                        console.log("feed find");
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user,
+                        "feed.title": {
+                            $exists: true
+                        }
+                    }
+        }, {
+                    $unwind: "$feed"
+        }, {
+                    $match: {
+                        "feed.title": {
+                            $exists: true
+                        }
+                    }
+        }, {
+                    $project: {
+                        feed: 1
+                    }
+        }]).toArray(function (err, data2) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No data found"
+                        });
+                        db.close();
                     }
                 });
             }

@@ -33,11 +33,22 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: false,
+                                comment: "Error"
                             });
-                        }
-                        if (updated) {
-                            callback(data._id);
+                            db.close();
+                        } else if (updated) {
+                            callback({
+                                value: true,
+                                id: data._id
+                            });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not created"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -70,13 +81,21 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: false,
+                                comment: "Error"
                             });
-                        }
-                        if (updated) {
+                            db.close();
+                        } else if (updated) {
                             callback({
                                 value: true
                             });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not updated"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -112,7 +131,6 @@ module.exports = {
                         });
                     }
                     if (updated) {
-                        console.log(data._id);
                         db.collection("user").update({
                             "_id": user,
                             "note.folder": data._id
@@ -120,18 +138,25 @@ module.exports = {
                             $set: {
                                 "note.folder": " "
                             }
-                        }, function (err, data2) {
-                            if (data2) {
-                                console.log("data");
-                                callback({
-                                    value: true
-                                });
-                            }
+                        }, function (err, updated) {
                             if (err) {
                                 console.log(err);
                                 callback({
-                                    value: false
+                                    value: false,
+                                    comment: "Error"
                                 });
+                                db.close();
+                            } else if (updated) {
+                                callback({
+                                    value: true
+                                });
+                                db.close();
+                            } else {
+                                callback({
+                                    value: false,
+                                    comment: "Not deleted"
+                                });
+                                db.close();
                             }
                         });
                     }
@@ -154,16 +179,22 @@ module.exports = {
                     "folder._id": sails.ObjectID(data._id)
                 }, {
                     "folder.$": 1
-                }).each(function (err, data2) {
-                    if (data2 != null) {
-                        callback(data2.folder[0]);
-                        console.log("folder findone");
-                    }
-                    if (err) {
+                }).toArray(function (err, data2) {
+                    if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
+                        callback(data2[0].folder[0]);
+                        db.close();
+                    } else if (err) {
                         console.log(err);
                         callback({
                             value: false
                         });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such Folder."
+                        });
+                        db.close();
                     }
                 });
             }
@@ -203,19 +234,25 @@ module.exports = {
                             folder: 1
                         }
                     }
-                ]).toArray(
-                    function (err, data) {
-                        if (data != null) {
-                            callback(data);
-                            console.log(data);
-                        }
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: false
-                            });
-                        }
-                    });
+                ]).toArray(function (err, data2) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
             }
         });
     },
@@ -267,19 +304,25 @@ module.exports = {
                             folder: 1
                         }
                     }
-                ]).toArray(
-                    function (err, data) {
-                        if (data != null) {
-                            callback(data);
-                            console.log(data);
-                        }
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: false
-                            });
-                        }
-                    });
+                ]).toArray(function (err, data2) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
             }
         });
     }

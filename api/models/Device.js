@@ -7,7 +7,6 @@
 
 module.exports = {
     save: function (data, callback) {
-        
         var user = sails.ObjectID(data.user);
         delete data.user;
         if (!data._id) {
@@ -30,12 +29,23 @@ module.exports = {
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
-                        }
-                        if (updated) {
                             callback({
-                                value: true
+                                value: false,
+                                comment: "Error"
                             });
-                            console.log(updated);
+                            db.close();
+                        } else if (updated) {
+                            callback({
+                                value: true,
+                                id: data._id
+                            });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not created"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -64,12 +74,22 @@ module.exports = {
                     }, function (err, updated) {
                         if (err) {
                             console.log(err);
-                        }
-                        if (updated) {
+                            callback({
+                                value: false,
+                                comment: "Error"
+                            });
+                            db.close();
+                        } else if (updated) {
                             callback({
                                 value: true
                             });
-                            console.log(updated);
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Not updated"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -78,7 +98,6 @@ module.exports = {
     },
     delete: function (data, callback) {
         var user = sails.ObjectID(data.user);
-
         sails.query(function (err, db) {
             if (err) {
                 console.log(err);
@@ -100,12 +119,22 @@ module.exports = {
                 }, function (err, updated) {
                     if (err) {
                         console.log(err);
-                    }
-                    if (updated) {
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (updated) {
                         callback({
                             value: true
                         });
-                        console.log(updated);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "Not deleted"
+                        });
+                        db.close();
                     }
                 });
             }
@@ -126,10 +155,22 @@ module.exports = {
                     "device._id": sails.ObjectID(data._id)
                 }, {
                     "device.$": 1
-                }).each(function (err, data2) {
-                    if (data2 != null) {
-                        callback(data2.device[0]);
-                        console.log("device findone");
+                }).toArray(function (err, data2) {
+                    if (data2 && data2[0] && data2[0].device && data2[0].device[0]) {
+                        callback(data2[0].device[0]);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such device."
+                        });
+                        db.close();
                     }
                 });
             }
@@ -145,15 +186,47 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    "_id": user
-                }).each(function (err, data) {
-                    if (data != null) {
-                        callback(data.device);
-                        console.log("device find");
+                db.collection("user").aggregate([
+                    {
+                        $match: {
+                            _id: user
+                        }
+                    },
+                    {
+                        $unwind: "$device"
+                    },
+                    {
+                        $match: {
+                            "device.OS": {
+                                $exists: true
+                            }
+                        }
+                    },
+                    {
+                        $project: {
+                            device: 1
+                        }
+                    }
+                ]).toArray(function (err, data2) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: false,
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No data found"
+                        });
+                        db.close();
                     }
                 });
             }
         });
-    }
+    },
 };

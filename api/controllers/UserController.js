@@ -34,7 +34,9 @@ module.exports = {
                             gridStore.writeFile(filepath, function (err, doc) {
                                 sails.GridStore.read(db, fileId, function (err, fileData) {
                                     var buffr = fileData;
-                                    res.json({fileid:fileId});
+                                    res.json({
+                                        fileid: fileId
+                                    });
                                     db.close();
                                     sails.fs.unlink(filepath, function (err) {
                                         if (err) {
@@ -83,6 +85,12 @@ module.exports = {
         }
         User.save(req.body, print);
     },
+    saveuser: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.saveuser(req.body, print);
+    },
     find: function (req, res) {
         var print = function (data) {
             res.json(data);
@@ -101,6 +109,12 @@ module.exports = {
         }
         User.findone(req.body, print);
     },
+    findoneuser: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.findoneuser(req.body, print);
+    },
     searchmail: function (req, res) {
         var print = function (data) {
             res.json(data);
@@ -112,6 +126,12 @@ module.exports = {
             res.json(data);
         }
         User.delete(req.body, print);
+    },
+    deletealluser: function (req, res) {
+        var print = function (data) {
+            res.json(data);
+        }
+        User.deletealluser(req.body, print);
     },
     login: function (req, res) {
         var print = function (data) {

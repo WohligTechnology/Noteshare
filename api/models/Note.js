@@ -15,7 +15,6 @@ module.exports = {
         if (data.timebomb) {
             data.timebomb = new Date(data.timebomb);
         }
-        console.log(data.timebomb);
         delete data.user;
         if (!data._id) {
             data._id = sails.ObjectID();
@@ -43,10 +42,19 @@ module.exports = {
                             callback({
                                 value: false
                             });
-                        }
-                        if (updated) {
-                            callback(data._id);
-                            console.log(updated);
+                            db.close();
+                        } else if (updated) {
+                            callback({
+                                value: true,
+                                id: data._id
+                            });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Note not created"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -71,7 +79,6 @@ module.exports = {
                     });
                 }
                 if (db) {
-
                     db.collection("user").update({
                         "_id": user,
                         "note._id": data._id
@@ -83,12 +90,18 @@ module.exports = {
                             callback({
                                 value: false
                             });
-                        }
-                        if (updated) {
+                            db.close();
+                        } else if (updated) {
                             callback({
                                 value: true
                             });
-                            console.log(updated);
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "Note not updated"
+                            });
+                            db.close();
                         }
                     });
                 }
@@ -122,12 +135,18 @@ module.exports = {
                         callback({
                             value: false
                         });
-                    }
-                    if (updated) {
+                        db.close();
+                    } else if (updated) {
                         callback({
                             value: true
                         });
-                        console.log(updated);
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "Note not deleted"
+                        });
+                        db.close();
                     }
                 });
             }
@@ -148,16 +167,22 @@ module.exports = {
                     "note._id": sails.ObjectID(data._id)
                 }, {
                     "note.$": 1
-                }).each(function (err, data2) {
-                    if (data2 != null) {
-                        callback(data2.note[0]);
-                        console.log("note findone");
-                    }
-                    if (err) {
+                }).toArray(function (err, data2) {
+                    if (data2 && data2[0] && data2[0].note && data2[0].note[0]) {
+                        callback(data2[0].note[0]);
+                        db.close();
+                    } else if (err) {
                         console.log(err);
                         callback({
                             value: false
                         });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such note."
+                        });
+                        db.close();
                     }
                 });
             }
@@ -176,10 +201,7 @@ module.exports = {
                 db.collection("user").aggregate([
                     {
                         $match: {
-                            _id: user,
-                            "note.title": {
-                                $exists: true
-                            }
+                            _id: user
                         }
                     },
                     {
@@ -197,24 +219,28 @@ module.exports = {
                             note: 1
                         }
                     }
-                ]).toArray(
-                    function (err, data) {
-                        if (data != null) {
-                            callback(data);
-                            console.log(data);
-                        }
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: false
-                            });
-                        }
-                    });
+                ]).toArray(function (err, data2) {
+                    if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such note."
+                        });
+                        db.close();
+                    }
+                });
             }
         });
     },
     findlimited: function (data, callback) {
-        var newcallback = 0;
         var newreturns = {};
         newreturns.data = [];
         var check = new RegExp(data.search, "i");
@@ -232,13 +258,7 @@ module.exports = {
                 db.collection("user").aggregate([
                     {
                         $match: {
-                            _id: user,
-                            "note.title": {
-                                $exists: true
-                            },
-                            "note.title": {
-                                $regex: check
-                            }
+                            _id: user
                         }
                     },
                     {
@@ -271,62 +291,67 @@ module.exports = {
                     if (result[0]) {
                         newreturns.total = result[0].count;
                         newreturns.totalpages = Math.ceil(result[0].count / data.pagesize);
-                        newcallback++;
-                    }
-                    if (err) {
+                        callbackfunc();
+                    } else if (err) {
                         console.log(err);
                         callback({
                             value: false
                         });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "Count of null"
+                        });
+                        db.close();
                     }
                 });
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            _id: user,
-                            "note.title": {
-                                $exists: true
-                            },
-                            "note.title": {
-                                $regex: check
-                            },
-                            "note.title": {
-                                $regex: check
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$note"
-                    },
-                    {
-                        $match: {
-                            "note.title": {
-                                $exists: true
-                            },
-                            "note.title": {
-                                $regex: check
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            note: 1
-                        }
-                    }
-                ]).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(
-                    function (err, found) {
-                        if (data != null) {
-                            newreturns.data.push(found);
-                            callback(newreturns);
 
-                        }
-                        if (err) {
+                function callbackfunc() {
+                    db.collection("user").aggregate([
+                        {
+                            $match: {
+                                _id: user
+                            }
+                    },
+                        {
+                            $unwind: "$note"
+                    },
+                        {
+                            $match: {
+                                "note.title": {
+                                    $exists: true
+                                },
+                                "note.title": {
+                                    $regex: check
+                                }
+                            }
+                    },
+                        {
+                            $project: {
+                                note: 1
+                            }
+                    }
+                ]).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function (err, found) {
+                        if (found && found[0]) {
+                            newreturns.data = found;
+                            callback(newreturns);
+                            db.close();
+                        } else if (err) {
                             console.log(err);
                             callback({
                                 value: false
                             });
+                            db.close();
+                        } else {
+                            callback({
+                                value: false,
+                                comment: "No data found"
+                            });
+                            db.close();
                         }
                     });
+                }
             }
         });
     },
@@ -342,9 +367,7 @@ module.exports = {
         }
     },
     servertolocal: function (data, callback) {
-        console.log(data.modifytime);
         var d = new Date(data.modifytime);
-        console.log(d);
         var user = sails.ObjectID(data.user);
         sails.query(function (err, db) {
             if (err) {
@@ -378,19 +401,24 @@ module.exports = {
                             note: 1
                         }
                     }
-                ]).toArray(
-                    function (err, data) {
-                        if (data != null) {
-                            callback(data);
-                            console.log(data);
-                        }
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: false
-                            });
-                        }
-                    });
+                ]).toArray(function (err, data2) {
+                    if (data2 && data2[0]) {
+                        callback(data2);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: false
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: false,
+                            comment: "No Such note."
+                        });
+                        db.close();
+                    }
+                });
             }
         });
     },
@@ -456,14 +484,12 @@ module.exports = {
                                             callback({
                                                 value: false
                                             });
-                                        }
-                                        if (updated) {
+                                        } else if (updated) {
                                             mycall++;
                                             if (mycall == returns.length) {
                                                 callback({
                                                     value: true
                                                 });
-                                                console.log("data");
                                             }
                                         }
                                     });
@@ -476,7 +502,6 @@ module.exports = {
                     }
                     if (data2 == null) {
                         if (exit != exitup) {
-                            console.log("No Timebombs.");
                             callback("No Timebombs.")
                         }
                     }
