@@ -20,14 +20,14 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
                 db.collection("fs.files").find({}, {}).each(function (err, found) {
                     if (err) {
                         console.log({
-                            value: false
+                            value: "false"
                         });
                     }
                     if (found != null) {
@@ -46,7 +46,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -54,7 +54,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                     }
                     if (data) {
@@ -62,12 +62,12 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                                 callback({
-                                    value: false
+                                    value: "false"
                                 });
                             }
                             if (data) {
                                 callback({
-                                    value: true
+                                    value: "true"
                                 });
                             }
                         });
@@ -95,7 +95,7 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                                 callback({
-                                    value: false
+                                    value: "false"
                                 });
                             }
                             if (image && image != null) {

@@ -22,7 +22,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -40,18 +40,18 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: "false"
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: true,
+                                value: "true",
                                 id: data._id
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Note not created"
                             });
                             db.close();
@@ -75,7 +75,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -88,17 +88,17 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: "false"
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: true
+                                value: "true"
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Note not updated"
                             });
                             db.close();
@@ -116,7 +116,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -133,17 +133,17 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else if (updated) {
                         callback({
-                            value: true
+                            value: "true"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Note not deleted"
                         });
                         db.close();
@@ -158,7 +158,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -174,12 +174,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No Such note."
                         });
                         db.close();
@@ -194,7 +194,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -210,7 +210,7 @@ module.exports = {
                     {
                         $match: {
                             "note.title": {
-                                $exists: true
+                                $exists: "true"
                             }
                         }
                     },
@@ -226,12 +226,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No Such note."
                         });
                         db.close();
@@ -251,7 +251,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -267,7 +267,7 @@ module.exports = {
                     {
                         $match: {
                             "note.title": {
-                                $exists: true
+                                $exists: "true"
                             },
                             "note.title": {
                                 $regex: check
@@ -295,12 +295,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Count of null"
                         });
                         db.close();
@@ -320,7 +320,7 @@ module.exports = {
                         {
                             $match: {
                                 "note.title": {
-                                    $exists: true
+                                    $exists: "true"
                                 },
                                 "note.title": {
                                     $regex: check
@@ -340,12 +340,12 @@ module.exports = {
                         } else if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: "false"
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "No data found"
                             });
                             db.close();
@@ -360,7 +360,7 @@ module.exports = {
             Note.save(data, callback);
         } else if (!data._id && !data.creationtime) {
             callback({
-                value: false
+                value: "false"
             });
         } else if (data.id && !data.creationtime) {
             Note.delete(data, callback)
@@ -373,7 +373,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -408,12 +408,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No Such note."
                         });
                         db.close();
@@ -432,7 +432,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -482,13 +482,13 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                             callback({
-                                                value: false
+                                                value: "false"
                                             });
                                         } else if (updated) {
                                             mycall++;
                                             if (mycall == returns.length) {
                                                 callback({
-                                                    value: true
+                                                    value: "true"
                                                 });
                                             }
                                         }
@@ -508,7 +508,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                     }
                 });

@@ -19,7 +19,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -33,7 +33,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: "false"
                             });
                         } else if (updated) {
                             data._id = data.note;
@@ -48,13 +48,13 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                             callback({
-                                                value: false
+                                                value: "false"
                                             });
                                             db.close();
                                         } else if (data2 && data2[0]) {
                                             response.user = data2[0]._id;
                                             Note.save(response, function (noterespo) {
-                                                if (noterespo.value == true) {
+                                                if (noterespo.value == "true") {
                                                     var userdata = {};
                                                     userdata._id = user;
                                                     User.findoneuser(userdata, function (userrespo) {
@@ -85,7 +85,7 @@ module.exports = {
                                                                 "message": message
                                                             }, function (result) {
                                                                 callback({
-                                                                    value: true,
+                                                                    value: "true",
                                                                     comment: "Mail Sent"
                                                                 });
                                                                 db.close();
@@ -100,10 +100,10 @@ module.exports = {
                                             var newdata = {};
                                             newdata.email = data.email;
                                             User.saveuser(newdata, function (newrespo) {
-                                                if (newrespo.value && newrespo.value == true) {
+                                                if (newrespo.value && newrespo.value == "true") {
                                                     response.user = newrespo._id;
                                                     Note.save(response, function (noterespo) {
-                                                        if (noterespo.value == true) {
+                                                        if (noterespo.value == "true") {
                                                             var userdata = {};
                                                             userdata._id = user;
                                                             User.findoneuser(userdata, function (userrespo) {
@@ -134,7 +134,7 @@ module.exports = {
                                                                         "message": message
                                                                     }, function (result) {
                                                                         callback({
-                                                                            value: true,
+                                                                            value: "true",
                                                                             comment: "Mail Sent"
                                                                         });
                                                                         db.close();
@@ -170,7 +170,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -183,17 +183,17 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false
+                                value: "false"
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: true
+                                value: "true"
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Not updated"
                             });
                             db.close();
@@ -209,7 +209,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -225,17 +225,17 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else if (updated) {
                         callback({
-                            value: true
+                            value: "true"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Not deleted"
                         });
                         db.close();
@@ -250,7 +250,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -263,7 +263,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else if (data2 && data2[0] && data2[0].share && data2[0].share[0]) {
@@ -271,7 +271,7 @@ module.exports = {
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Not found"
                         });
                         db.close();
@@ -286,7 +286,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -299,7 +299,7 @@ module.exports = {
                 }, {
                     $match: {
                         "share.email": {
-                            $exists: true
+                            $exists: "true"
                         }
                     }
                 }, {
@@ -313,12 +313,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No Such share."
                         });
                         db.close();

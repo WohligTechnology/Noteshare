@@ -15,7 +15,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -33,19 +33,19 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Error"
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: true,
+                                value: "true",
                                 id: data._id
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Not created"
                             });
                             db.close();
@@ -68,7 +68,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: false
+                        value: "false"
                     });
                 }
                 if (db) {
@@ -81,18 +81,18 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Error"
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: true
+                                value: "true"
                             });
                             db.close();
                         } else {
                             callback({
-                                value: false,
+                                value: "false",
                                 comment: "Not updated"
                             });
                             db.close();
@@ -110,7 +110,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -127,7 +127,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                     }
                     if (updated) {
@@ -142,18 +142,18 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                                 callback({
-                                    value: false,
+                                    value: "false",
                                     comment: "Error"
                                 });
                                 db.close();
                             } else if (updated) {
                                 callback({
-                                    value: true
+                                    value: "true"
                                 });
                                 db.close();
                             } else {
                                 callback({
-                                    value: false,
+                                    value: "false",
                                     comment: "Not deleted"
                                 });
                                 db.close();
@@ -170,7 +170,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -186,12 +186,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: false
+                            value: "false"
                         });
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No Such Folder."
                         });
                         db.close();
@@ -206,7 +206,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -215,7 +215,7 @@ module.exports = {
                         $match: {
                             _id: user,
                             "folder.name": {
-                                $exists: true
+                                $exists: "true"
                             }
                         }
                     },
@@ -225,7 +225,7 @@ module.exports = {
                     {
                         $match: {
                             "folder.name": {
-                                $exists: true
+                                $exists: "true"
                             }
                         }
                     },
@@ -238,7 +238,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Error"
                         });
                         db.close();
@@ -247,7 +247,7 @@ module.exports = {
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No data found"
                         });
                         db.close();
@@ -261,7 +261,7 @@ module.exports = {
             Folder.save(data, callback);
         } else if (!data._id && !data.creationtime) {
             callback({
-                value: false
+                value: "false"
             });
         } else if (data.id && !data.creationtime) {
             Folder.delete(data, callback)
@@ -276,7 +276,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: false
+                    value: "false"
                 });
             }
             if (db) {
@@ -308,7 +308,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "Error"
                         });
                         db.close();
@@ -317,7 +317,7 @@ module.exports = {
                         db.close();
                     } else {
                         callback({
-                            value: false,
+                            value: "false",
                             comment: "No data found"
                         });
                         db.close();
