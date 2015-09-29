@@ -16,7 +16,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             } else if (db) {
                 if (!data._id && data.email && data.email != "") {
@@ -27,7 +27,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: "false"
+                                value: false
                             });
                             db.close();
                         } else if (data2 && data2[0]) {
@@ -56,7 +56,7 @@ module.exports = {
                     edituser();
                 } else {
                     callback({
-                        value: "false",
+                        value: false,
                         comment: "Please provide proper data"
                     });
                     db.close();
@@ -69,18 +69,18 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: "false"
+                                value: false
                             });
                             db.close();
                         } else if (created) {
                             callback({
-                                value: "true",
+                                value: true,
                                 _id: data._id
                             });
                             db.close();
                         } else {
                             callback({
-                                value: "false",
+                                value: false,
                                 comment: "User Not created"
                             });
                             db.close();
@@ -99,17 +99,17 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: "false"
+                                value: false
                             });
                             db.close();
                         } else if (updated) {
                             callback({
-                                value: "true"
+                                value: true
                             });
                             db.close();
                         } else {
                             callback({
-                                value: "false",
+                                value: false,
                                 comment: "No such user found"
                             });
                             db.close();
@@ -130,7 +130,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -182,7 +182,7 @@ module.exports = {
                     }).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function (err, found) {
                         if (err) {
                             console.log({
-                                value: "false"
+                                value: false
                             });
                             db.close();
                         } else if (found && found[0]) {
@@ -207,7 +207,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -217,7 +217,7 @@ module.exports = {
                 }).toArray(function (err, found) {
                     if (err) {
                         callback({
-                            value: "false"
+                            value: false
                         });
                         db.close();
                     } else if (found && found[0]) {
@@ -225,7 +225,7 @@ module.exports = {
                         db.close();
                     } else {
                         callback({
-                            value: "false",
+                            value: false,
                             comment: "No User found"
                         });
                         db.close();
@@ -242,7 +242,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -498,7 +498,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: "false"
+                            value: false
                         });
                     }
                     if (data != null) {
@@ -553,7 +553,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -563,7 +563,7 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: "false"
+                            value: false
                         });
                         db.close();
                     } else if (data2 && data2[0]) {
@@ -573,7 +573,7 @@ module.exports = {
                         db.close();
                     } else {
                         callback({
-                            value: "false",
+                            value: false,
                             comment: "No user found"
                         });
                         db.close();
@@ -587,7 +587,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             db.collection('user').remove({
@@ -601,7 +601,7 @@ module.exports = {
                 } else if (err) {
                     console.log(err);
                     callback({
-                        value: "false"
+                        value: false
                     });
                     db.close();
                 } else {
@@ -619,7 +619,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             db.collection('user').remove({}, function (err, deleted) {
@@ -631,7 +631,7 @@ module.exports = {
                 } else if (err) {
                     console.log(err);
                     callback({
-                        value: "false"
+                        value: false
                     });
                     db.close();
                 } else {
@@ -669,7 +669,7 @@ module.exports = {
                         exitup++;
                         if (err) {
                             callback({
-                                value: "false"
+                                value: false
                             });
                             console.log(err);
                         } else if (found != null) {
@@ -685,7 +685,7 @@ module.exports = {
                                     if (err) {
                                         console.log(err);
                                         callback({
-                                            value: "false"
+                                            value: false
                                         });
                                     } else if (updated) {
                                         console.log("updated");
@@ -704,7 +704,7 @@ module.exports = {
                                 exit++;
                                 if (err) {
                                     callback({
-                                        value: "false"
+                                        value: false
                                     });
                                     console.log(err);
                                 } else if (found != null) {
@@ -720,7 +720,7 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                             callback({
-                                                value: "false"
+                                                value: false
                                             });
                                         } else if (updated) {
                                             console.log("updated");
@@ -731,7 +731,7 @@ module.exports = {
                                     exitdown++;
                                     if (exit == exitup == exitdown) {
                                         callback({
-                                            value: "false",
+                                            value: false,
                                             comment: "Email and Password Incorrect"
                                         });
                                     }
@@ -783,7 +783,7 @@ module.exports = {
                     });
                 } else {
                     callback({
-                        value: "false",
+                        value: false,
                         comment: "Please provide fbid or googleid or email and password"
                     });
                     db.close();
@@ -799,12 +799,12 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             } else if (db) {
                 if (data.editpassword == "") {
                     callback({
-                        value: "false",
+                        value: false,
                         comment: "Edit password cannot be empty"
                     });
                 } else {
@@ -820,7 +820,7 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: "false"
+                                value: false
                             });
                             db.close();
                         } else if (updated) {
@@ -837,7 +837,7 @@ module.exports = {
                             }
                         } else {
                             callback({
-                                value: "false",
+                                value: false,
                                 comment: "Not edited"
                             });
                             db.close();
@@ -855,7 +855,7 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: "false"
+                        value: false
                     });
                     db.close();
                 } else if (data2 && data2[0]) {
@@ -877,7 +877,7 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                                 callback({
-                                    value: "false"
+                                    value: false
                                 });
                                 db.close();
                             } else if (updated) {
@@ -936,7 +936,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -967,7 +967,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             }
             if (db) {
@@ -1012,7 +1012,7 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: "false"
+                            value: false
                         });
                         db.close();
                     } else {
@@ -1031,7 +1031,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             } else if (db) {
                 db.collection('fs.files').remove({
@@ -1049,12 +1049,12 @@ module.exports = {
                             } else if (err) {
                                 console.log(err);
                                 callback({
-                                    value: "false"
+                                    value: false
                                 });
                                 db.close();
                             } else {
                                 callback({
-                                    value: "false",
+                                    value: false,
                                     comment: "No Such Data"
                                 });
                                 db.close();
@@ -1063,12 +1063,12 @@ module.exports = {
                     } else if (err) {
                         console.log(err);
                         callback({
-                            value: "false"
+                            value: false
                         });
                         db.close();
                     } else {
                         callback({
-                            value: "false",
+                            value: false,
                             comment: "No Such Data"
                         });
                         db.close();
@@ -1085,7 +1085,7 @@ module.exports = {
             if (err) {
                 console.log(err);
                 callback({
-                    value: "false"
+                    value: false
                 });
             } else if (db) {
                 data._id = sails.ObjectID();
@@ -1094,18 +1094,18 @@ module.exports = {
                     if (err) {
                         console.log(err);
                         callback({
-                            value: "false"
+                            value: false
                         });
                         db.close();
                     } else if (created) {
                         callback({
-                            value: "true",
+                            value: true,
                             _id: data._id
                         });
                         db.close();
                     } else {
                         callback({
-                            value: "false",
+                            value: false,
                             comment: "User Not created"
                         });
                         db.close();

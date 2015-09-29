@@ -48,7 +48,7 @@ module.exports = {
                                         if (err) {
                                             console.log(err);
                                             callback({
-                                                value: "false"
+                                                value: false
                                             });
                                             db.close();
                                         } else if (data2 && data2[0]) {
