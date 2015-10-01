@@ -19,8 +19,7 @@ module.exports = {
             } else if (db) {
                 if (!data._id && data.email && data.email != "") {
                     db.collection("user").find({
-                        email: data.email,
-                        isreg: "true"
+                        email: data.email
                     }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
@@ -856,7 +855,7 @@ module.exports = {
                                 }]
                                 var message = {
                                     "from_email": "vigneshkasthuri2009@gmail.com",
-                                    "from_name": "Wohlig",
+                                    "from_name": "Noteshare",
                                     "to": [{
                                         "email": data.email,
                                         "type": "to"

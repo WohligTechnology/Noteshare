@@ -62,8 +62,8 @@ module.exports = {
                                                                 "content": "share"
                                                             }]
                                                             var message = {
-                                                                "from_email": userrespo.email,
-                                                                "from_name": userrespo.firstname,
+                                                                "from_email": "vigneshkasthuri2009@gmail.com",
+                                                                "from_name": "Noteshare",
                                                                 "to": [{
                                                                     "email": data.email,
                                                                     "type": "to"
@@ -111,8 +111,8 @@ module.exports = {
                                                                         "content": "newnote"
                                                                     }]
                                                                     var message = {
-                                                                        "from_email": userrespo.email,
-                                                                        "from_name": userrespo.firstname,
+                                                                        "from_email": "vigneshkasthuri2009@gmail.com",
+                                                                        "from_name": "Noteshare",
                                                                         "to": [{
                                                                             "email": data.email,
                                                                             "type": "to"
