@@ -4,15 +4,13 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
-var md5 = require('MD5');
-var mandrill = require('mandrill-api/mandrill');
-mandrill_client = new mandrill.Mandrill('dzbY2mySNE_Zsqr3hsK70A');
+
 module.exports = {
-    save: function (data, callback) {
+    save: function(data, callback) {
         if (data.password) {
-            data.password = md5(data.password);
+            data.password = sails.md5(data.password);
         }
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -23,7 +21,7 @@ module.exports = {
                     db.collection("user").find({
                         email: data.email,
                         isreg: "true"
-                    }).toArray(function (err, data2) {
+                    }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -65,7 +63,7 @@ module.exports = {
                 function createuser() {
                     data._id = sails.ObjectID();
                     data.isreg = "true";
-                    db.collection('user').insert(data, function (err, created) {
+                    db.collection('user').insert(data, function(err, created) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -95,7 +93,7 @@ module.exports = {
                         _id: user
                     }, {
                         $set: data
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -119,14 +117,14 @@ module.exports = {
             }
         });
     },
-    findlimited: function (data, callback) {
+    findlimited: function(data, callback) {
         var newcallback = 0;
         var newreturns = {};
         newreturns.data = [];
         var check = new RegExp(data.search, "i");
         var pagesize = data.pagesize;
         var pagenumber = data.pagenumber;
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -139,12 +137,12 @@ module.exports = {
                         username: {
                             '$regex': check
                         }
-                }, {
+                    }, {
                         email: {
                             '$regex': check
                         }
-                }]
-                }, function (err, number) {
+                    }]
+                }, function(err, number) {
                     if (number) {
                         newreturns.total = number;
                         newreturns.totalpages = Math.ceil(number / data.pagesize);
@@ -171,15 +169,15 @@ module.exports = {
                             username: {
                                 '$regex': check
                             }
-                }, {
+                        }, {
                             email: {
                                 '$regex': check
                             }
-                }]
+                        }]
                     }, {
                         password: 0,
                         forgotpassword: 0
-                    }).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function (err, found) {
+                    }).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function(err, found) {
                         if (err) {
                             console.log({
                                 value: "false"
@@ -201,9 +199,9 @@ module.exports = {
             }
         });
     },
-    find: function (data, callback) {
+    find: function(data, callback) {
         var returns = [];
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -214,7 +212,7 @@ module.exports = {
                 db.collection("user").find({}, {
                     password: 0,
                     forgotpassword: 0
-                }).toArray(function (err, found) {
+                }).toArray(function(err, found) {
                     if (err) {
                         callback({
                             value: "false"
@@ -234,11 +232,11 @@ module.exports = {
             }
         });
     },
-    findone: function (data, callback) {
+    findone: function(data, callback) {
         var user = sails.ObjectID(data._id)
         var newreturn = {};
         var newcallback = 0;
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -246,36 +244,30 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "_id": user
-                        }
-                    },
-                    {
-                        $unwind: "$note"
-                    },
-                    {
-                        $match: {
-                            "note.title": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "_id": user
+                    }
+                }, {
+                    $unwind: "$note"
+                }, {
+                    $match: {
+                        "note.title": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (err) {
                         console.log(err);
                         newreturn.note = 0;
@@ -293,36 +285,30 @@ module.exports = {
                         }
                     }
                 });
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "_id": user
-                        }
-                    },
-                    {
-                        $unwind: "$folder"
-                    },
-                    {
-                        $match: {
-                            "folder.name": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "_id": user
+                    }
+                }, {
+                    $unwind: "$folder"
+                }, {
+                    $match: {
+                        "folder.name": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (err) {
                         console.log(err);
                         newreturn.folder = 0;
@@ -341,36 +327,30 @@ module.exports = {
 
                     }
                 });
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "_id": user
-                        }
-                    },
-                    {
-                        $unwind: "$device"
-                    },
-                    {
-                        $match: {
-                            "device.OS": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "_id": user
+                    }
+                }, {
+                    $unwind: "$device"
+                }, {
+                    $match: {
+                        "device.OS": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (err) {
                         console.log(err);
                         newreturn.device = 0;
@@ -389,36 +369,30 @@ module.exports = {
 
                     }
                 });
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "_id": user
-                        }
-                    },
-                    {
-                        $unwind: "$feed"
-                    },
-                    {
-                        $match: {
-                            "feed.title": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "_id": user
+                    }
+                }, {
+                    $unwind: "$feed"
+                }, {
+                    $match: {
+                        "feed.title": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (err) {
                         console.log(err);
                         newreturn.feed = 0;
@@ -437,36 +411,30 @@ module.exports = {
 
                     }
                 });
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "_id": user
-                        }
-                    },
-                    {
-                        $unwind: "$share"
-                    },
-                    {
-                        $match: {
-                            "share._id": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "_id": user
+                    }
+                }, {
+                    $unwind: "$share"
+                }, {
+                    $match: {
+                        "share._id": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (err) {
                         console.log(err);
                         newreturn.share = 0;
@@ -494,7 +462,7 @@ module.exports = {
                     feed: 0,
                     share: 0,
                     password: 0
-                }).each(function (err, data) {
+                }).each(function(err, data) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -514,9 +482,9 @@ module.exports = {
             }
         });
     },
-    findoneuser: function (data, callback) {
+    findoneuser: function(data, callback) {
         var user = sails.ObjectID(data._id);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -526,7 +494,7 @@ module.exports = {
             } else if (db) {
                 db.collection("user").find({
                     _id: user
-                }).toArray(function (err, data2) {
+                }).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -548,8 +516,8 @@ module.exports = {
             }
         });
     },
-    searchmail: function (data, callback) {
-        sails.query(function (err, db) {
+    searchmail: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -559,7 +527,7 @@ module.exports = {
             if (db) {
                 db.collection("user").find({
                     email: data.email
-                }).toArray(function (err, data2) {
+                }).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -582,8 +550,8 @@ module.exports = {
             }
         });
     },
-    delete: function (data, callback) {
-        sails.query(function (err, db) {
+    delete: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -592,7 +560,7 @@ module.exports = {
             }
             db.collection('user').remove({
                 _id: sails.ObjectID(data._id)
-            }, function (err, deleted) {
+            }, function(err, deleted) {
                 if (deleted) {
                     callback({
                         value: "true"
@@ -614,15 +582,15 @@ module.exports = {
             });
         });
     },
-    deletealluser: function (data, callback) {
-        sails.query(function (err, db) {
+    deletealluser: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
                     value: "false"
                 });
             }
-            db.collection('user').remove({}, function (err, deleted) {
+            db.collection('user').remove({}, function(err, deleted) {
                 if (deleted) {
                     callback({
                         value: "true"
@@ -644,14 +612,14 @@ module.exports = {
             });
         });
     },
-    login: function (data, callback) {
+    login: function(data, callback) {
         var exitup = 0;
         var exit = 0;
         var exitdown = 0;
         if (data.password) {
-            data.password = md5(data.password);
+            data.password = sails.md5(data.password);
         }
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -665,7 +633,7 @@ module.exports = {
                     }, {
                         password: 0,
                         forgotpassword: 0
-                    }).each(function (err, found) {
+                    }).each(function(err, found) {
                         exitup++;
                         if (err) {
                             callback({
@@ -681,7 +649,7 @@ module.exports = {
                                     $set: {
                                         forgotpassword: ""
                                     }
-                                }, function (err, updated) {
+                                }, function(err, updated) {
                                     if (err) {
                                         console.log(err);
                                         callback({
@@ -700,7 +668,7 @@ module.exports = {
                             }, {
                                 password: 0,
                                 forgotpassword: 0
-                            }).each(function (err, found) {
+                            }).each(function(err, found) {
                                 exit++;
                                 if (err) {
                                     callback({
@@ -716,7 +684,7 @@ module.exports = {
                                             forgotpassword: "",
                                             password: data.password
                                         }
-                                    }, function (err, updated) {
+                                    }, function(err, updated) {
                                         if (err) {
                                             console.log(err);
                                             callback({
@@ -742,7 +710,7 @@ module.exports = {
                 } else if (data.fbid && data.fbid != "") {
                     db.collection("user").find({
                         "fbid": data.fbid
-                    }).toArray(function (err, data2) {
+                    }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -763,7 +731,7 @@ module.exports = {
                 } else if (data.googleid && data.googleid != "") {
                     db.collection("user").find({
                         "googleid": data.googleid
-                    }).toArray(function (err, data2) {
+                    }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -791,11 +759,11 @@ module.exports = {
             }
         });
     },
-    changepassword: function (data, callback) {
-        data.password = md5(data.password);
+    changepassword: function(data, callback) {
+        data.password = sails.md5(data.password);
         var user = sails.ObjectID(data._id);
-        var newpass = md5(data.editpassword);
-        sails.query(function (err, db) {
+        var newpass = sails.md5(data.editpassword);
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -816,7 +784,7 @@ module.exports = {
                         $set: {
                             "password": newpass
                         }
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -847,11 +815,11 @@ module.exports = {
             }
         });
     },
-    forgotpassword: function (data, callback) {
-        sails.query(function (err, db) {
+    forgotpassword: function(data, callback) {
+        sails.query(function(err, db) {
             db.collection('user').find({
                 email: data.email
-            }).toArray(function (err, data2) {
+            }).toArray(function(err, data2) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -864,8 +832,8 @@ module.exports = {
                     for (var i = 0; i < 8; i++) {
                         text += possible.charAt(Math.floor(Math.random() * possible.length));
                     }
-                    var encrypttext = md5(text);
-                    sails.query(function (err, db) {
+                    var encrypttext = sails.md5(text);
+                    sails.query(function(err, db) {
                         var user = sails.ObjectID(data._id);
                         db.collection('user').update({
                             email: data.email
@@ -873,7 +841,7 @@ module.exports = {
                             $set: {
                                 forgotpassword: encrypttext
                             }
-                        }, function (err, updated) {
+                        }, function(err, updated) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -885,7 +853,7 @@ module.exports = {
                                 var template_content = [{
                                     "name": "noteshare",
                                     "content": "noteshare"
-                                    }]
+                                }]
                                 var message = {
                                     "from_email": "vigneshkasthuri2009@gmail.com",
                                     "from_name": "Wohlig",
@@ -893,23 +861,22 @@ module.exports = {
                                         "email": data.email,
                                         "type": "to"
                                     }],
-                                    "global_merge_vars": [
-                                        {
-                                            "name": "password",
-                                            "content": text
-                                        }]
+                                    "global_merge_vars": [{
+                                        "name": "password",
+                                        "content": text
+                                    }]
                                 };
-                                mandrill_client.messages.sendTemplate({
+                                sails.mandrill_client.messages.sendTemplate({
                                     "template_name": template_name,
                                     "template_content": template_content,
                                     "message": message
-                                }, function (result) {
+                                }, function(result) {
                                     callback({
                                         value: "true",
                                         comment: "Mail Sent"
                                     });
                                     db.close();
-                                }, function (e) {
+                                }, function(e) {
                                     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                                 });
                             } else {
@@ -931,8 +898,8 @@ module.exports = {
             });
         });
     },
-    countusers: function (data, callback) {
-        sails.query(function (err, db) {
+    countusers: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -940,7 +907,7 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").count({}, function (err, number) {
+                db.collection("user").count({}, function(err, number) {
                     if (number != null) {
                         callback(number);
                         db.close();
@@ -961,9 +928,9 @@ module.exports = {
             }
         });
     },
-    countnotes: function (data, callback) {
+    countnotes: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -971,38 +938,32 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            "note.title": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$note"
-                    },
-                    {
-                        $match: {
-                            "note.title": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $group: {
-                            _id: user,
-                            count: {
-                                $sum: 1
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            count: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        "note.title": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, result) {
+                }, {
+                    $unwind: "$note"
+                }, {
+                    $match: {
+                        "note.title": {
+                            $exists: "true"
+                        }
+                    }
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        count: 1
+                    }
+                }]).toArray(function(err, result) {
                     if (result && result[0]) {
                         callback(result[0].count);
                         db.close();
@@ -1026,8 +987,8 @@ module.exports = {
             }
         });
     },
-    deleteupload: function (data, callback) {
-        sails.query(function (err, db) {
+    deleteupload: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -1036,11 +997,11 @@ module.exports = {
             } else if (db) {
                 db.collection('fs.files').remove({
                     _id: sails.ObjectID(data._id)
-                }, function (err, deleted) {
+                }, function(err, deleted) {
                     if (deleted) {
                         db.collection('fs.chunks').remove({
                             files_id: sails.ObjectID(data._id)
-                        }, function (err, deleted) {
+                        }, function(err, deleted) {
                             if (deleted) {
                                 callback({
                                     value: "true"
@@ -1077,11 +1038,8 @@ module.exports = {
             }
         });
     },
-    saveuser: function (data, callback) {
-        if (data.password) {
-            data.password = md5(data.password);
-        }
-        sails.query(function (err, db) {
+    saveuser: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -1090,7 +1048,7 @@ module.exports = {
             } else if (db) {
                 data._id = sails.ObjectID();
                 data.isreg = "false";
-                db.collection('user').insert(data, function (err, created) {
+                db.collection('user').insert(data, function(err, created) {
                     if (err) {
                         console.log(err);
                         callback({
