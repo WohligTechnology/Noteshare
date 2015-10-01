@@ -6,12 +6,16 @@
  */
 module.exports = {
     save: function(data, callback) {
-        if (data.userfrom && data.userfrom != "" && data.email && data.email != "" && data.note && data.note != "") {
+        if (data.userfrom) {
             var user = sails.ObjectID(data.userfrom);
             data.userfrom = sails.ObjectID(data.userfrom);
+        }
+        if (data.note) {
             data.note = sails.ObjectID(data.note);
-            delete data.user;
-            if (!data._id) {
+        }
+        delete data.user;
+        if (!data._id) {
+            if (data.userfrom && data.userfrom != "" && data.email && data.email != "" && data.note && data.note != "") {
                 data._id = sails.ObjectID();
                 sails.query(function(err, db) {
                     if (err) {
@@ -166,56 +170,53 @@ module.exports = {
                     }
                 });
             } else {
-                data._id = sails.ObjectID(data._id);
-                data.userto = sails.ObjectID(data.userto);
-                data.userfrom = sails.ObjectID(data.userfrom);
-                data.note = sails.ObjectID(data.note);
-                var tobechanged = {};
-                var attribute = "share.$.";
-                _.forIn(data, function(value, key) {
-                    tobechanged[attribute + key] = value;
-                });
-
-                sails.query(function(err, db) {
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: "false"
-                        });
-                    }
-                    if (db) {
-                        db.collection("user").update({
-                            "_id": user,
-                            "share._id": data._id
-                        }, {
-                            $set: tobechanged
-                        }, function(err, updated) {
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: "false"
-                                });
-                                db.close();
-                            } else if (updated) {
-                                callback({
-                                    value: "true"
-                                });
-                                db.close();
-                            } else {
-                                callback({
-                                    value: "false",
-                                    comment: "No data found"
-                                });
-                                db.close();
-                            }
-                        });
-                    }
+                callback({
+                    value: "false",
+                    comment: "Please provide sufficient data"
                 });
             }
         } else {
-            callback({
-                value: "false",
-                comment: "Please provide sufficient data"
+            data._id = sails.ObjectID(data._id);
+            var tobechanged = {};
+            var attribute = "share.$.";
+            _.forIn(data, function(value, key) {
+                tobechanged[attribute + key] = value;
+            });
+
+            sails.query(function(err, db) {
+                if (err) {
+                    console.log(err);
+                    callback({
+                        value: "false"
+                    });
+                }
+                if (db) {
+                    db.collection("user").update({
+                        "_id": user,
+                        "share._id": data._id
+                    }, {
+                        $set: tobechanged
+                    }, function(err, updated) {
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: "false"
+                            });
+                            db.close();
+                        } else if (updated) {
+                            callback({
+                                value: "true"
+                            });
+                            db.close();
+                        } else {
+                            callback({
+                                value: "false",
+                                comment: "No data found"
+                            });
+                            db.close();
+                        }
+                    });
+                }
             });
         }
     },
