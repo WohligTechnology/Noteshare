@@ -6,12 +6,12 @@
  */
 
 module.exports = {
-    save: function (data, callback) {
+    save: function(data, callback) {
         var user = sails.ObjectID(data.user);
         delete data.user;
         if (!data._id) {
             data._id = sails.ObjectID();
-            sails.query(function (err, db) {
+            sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -25,7 +25,7 @@ module.exports = {
                         $push: {
                             feed: data
                         }
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -53,10 +53,10 @@ module.exports = {
             data._id = sails.ObjectID(data._id);
             var tobechanged = {};
             var attribute = "feed.$.";
-            _.forIn(data, function (value, key) {
+            _.forIn(data, function(value, key) {
                 tobechanged[attribute + key] = value;
             });
-            sails.query(function (err, db) {
+            sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -69,7 +69,7 @@ module.exports = {
                         "feed._id": data._id
                     }, {
                         $set: tobechanged
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -77,15 +77,21 @@ module.exports = {
                                 comment: "Error"
                             });
                             db.close();
-                        } else if (updated) {
+                        } else if (updated.result.nModified != 0 && updated.result.n != 0) {
                             callback({
                                 value: "true"
+                            });
+                            db.close();
+                        } else if (updated.result.nModified == 0 && updated.result.n != 0) {
+                            callback({
+                                value: "true",
+                                comment: "Data already updated"
                             });
                             db.close();
                         } else {
                             callback({
                                 value: "false",
-                                comment: "Not updated"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -94,9 +100,9 @@ module.exports = {
             });
         }
     },
-    delete: function (data, callback) {
+    delete: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -113,7 +119,7 @@ module.exports = {
                             "_id": sails.ObjectID(data._id)
                         }
                     }
-                }, function (err, updated) {
+                }, function(err, updated) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -129,7 +135,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "Not deleted"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -137,9 +143,9 @@ module.exports = {
             }
         });
     },
-    findone: function (data, callback) {
+    findone: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -152,7 +158,7 @@ module.exports = {
                     "feed._id": sails.ObjectID(data._id)
                 }, {
                     "feed.$": 1
-                }).toArray(function (err, data2) {
+                }).toArray(function(err, data2) {
                     if (data2 && data2[0] && data2[0].feed && data2[0].feed[0]) {
                         callback(data2[0].feed[0]);
                         db.close();
@@ -165,7 +171,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such feed."
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -173,9 +179,9 @@ module.exports = {
             }
         });
     },
-    find: function (data, callback) {
+    find: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -190,19 +196,19 @@ module.exports = {
                             $exists: "true"
                         }
                     }
-        }, {
+                }, {
                     $unwind: "$feed"
-        }, {
+                }, {
                     $match: {
                         "feed.title": {
                             $exists: "true"
                         }
                     }
-        }, {
+                }, {
                     $project: {
                         feed: 1
                     }
-        }]).toArray(function (err, data2) {
+                }]).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({

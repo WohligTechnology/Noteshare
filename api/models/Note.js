@@ -54,7 +54,7 @@ module.exports = {
                         } else {
                             callback({
                                 value: "false",
-                                comment: "Note not created"
+                                comment: "Not created"
                             });
                             db.close();
                         }
@@ -93,15 +93,21 @@ module.exports = {
                                 value: "false"
                             });
                             db.close();
-                        } else if (updated) {
+                        } else if (updated.result.nModified != 0 && updated.result.n != 0) {
                             callback({
                                 value: "true"
+                            });
+                            db.close();
+                        } else if (updated.result.nModified == 0 && updated.result.n != 0) {
+                            callback({
+                                value: "true",
+                                comment: "Data already updated"
                             });
                             db.close();
                         } else {
                             callback({
                                 value: "false",
-                                comment: "Note not updated"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -146,7 +152,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "Note not deleted"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -182,7 +188,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such note."
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -229,7 +235,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such note."
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -395,7 +401,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such note."
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -472,13 +478,19 @@ module.exports = {
                                 }
                             }
                             if (returns == "") {
-                                callback("No timebombs.");
+                                callback({
+                                    value: "false",
+                                    comment: "No data found"
+                                });
                             }
                         }
                     }
                     if (data2 == null) {
                         if (exit != exitup) {
-                            callback("No Timebombs.")
+                            callback({
+                                value: "false",
+                                comment: "No data found"
+                            });
                         }
                     }
                     if (err) {

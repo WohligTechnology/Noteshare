@@ -78,7 +78,7 @@ module.exports = {
                         } else {
                             callback({
                                 value: "false",
-                                comment: "User Not created"
+                                comment: "Not created"
                             });
                             db.close();
                         }
@@ -99,15 +99,21 @@ module.exports = {
                                 value: "false"
                             });
                             db.close();
-                        } else if (updated) {
+                        } else if (updated.result.nModified != 0 && updated.result.n != 0) {
                             callback({
                                 value: "true"
+                            });
+                            db.close();
+                        } else if (updated.result.nModified == 0 && updated.result.n != 0) {
+                            callback({
+                                value: "true",
+                                comment: "Data already updated"
                             });
                             db.close();
                         } else {
                             callback({
                                 value: "false",
-                                comment: "No such user found"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -223,7 +229,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No User found"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -507,7 +513,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No user found"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -535,7 +541,8 @@ module.exports = {
                         db.close();
                     } else if (data2 && data2[0]) {
                         callback({
-                            value: "true"
+                            value: "true",
+                            comment:"User found"
                         });
                         db.close();
                     } else {
@@ -574,7 +581,7 @@ module.exports = {
                 } else {
                     callback({
                         value: "false",
-                        comment: "Not deleted"
+                        comment: "No data found"
                     });
                     db.close();
                 }
@@ -604,7 +611,7 @@ module.exports = {
                 } else {
                     callback({
                         value: "false",
-                        comment: "Not deleted"
+                        comment: "No data found"
                     });
                     db.close();
                 }
@@ -722,7 +729,7 @@ module.exports = {
                         } else {
                             callback({
                                 value: "false",
-                                comment: "User not found"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -743,7 +750,7 @@ module.exports = {
                         } else {
                             callback({
                                 value: "false",
-                                comment: "User not found"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -805,7 +812,7 @@ module.exports = {
                         } else {
                             callback({
                                 value: "false",
-                                comment: "Not edited"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -881,7 +888,7 @@ module.exports = {
                             } else {
                                 callback({
                                     value: "false",
-                                    comment: "No updated"
+                                    comment: "No data found"
                                 });
                                 db.close();
                             }
@@ -890,7 +897,7 @@ module.exports = {
                 } else {
                     callback({
                         value: "false",
-                        comment: "No user found"
+                        comment: "No data found"
                     });
                     db.close();
                 }
@@ -919,7 +926,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "Not found"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -978,7 +985,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No count"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -1015,7 +1022,7 @@ module.exports = {
                             } else {
                                 callback({
                                     value: "false",
-                                    comment: "No Such Data"
+                                    comment: "No data found"
                                 });
                                 db.close();
                             }
@@ -1029,7 +1036,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such Data"
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -1063,7 +1070,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "User Not created"
+                            comment: "Not created"
                         });
                         db.close();
                     }

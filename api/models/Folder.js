@@ -6,12 +6,12 @@
  */
 
 module.exports = {
-    save: function (data, callback) {
+    save: function(data, callback) {
         var user = sails.ObjectID(data.user);
         delete data.user;
         if (!data._id) {
             data._id = sails.ObjectID();
-            sails.query(function (err, db) {
+            sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -29,7 +29,7 @@ module.exports = {
                         $push: {
                             folder: data
                         }
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -61,10 +61,10 @@ module.exports = {
             }
             var tobechanged = {};
             var attribute = "folder.$.";
-            _.forIn(data, function (value, key) {
+            _.forIn(data, function(value, key) {
                 tobechanged[attribute + key] = value;
             });
-            sails.query(function (err, db) {
+            sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -77,7 +77,7 @@ module.exports = {
                         "folder._id": data._id
                     }, {
                         $set: tobechanged
-                    }, function (err, updated) {
+                    }, function(err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -85,15 +85,21 @@ module.exports = {
                                 comment: "Error"
                             });
                             db.close();
-                        } else if (updated) {
+                        } else if (updated.result.nModified != 0 && updated.result.n != 0) {
                             callback({
                                 value: "true"
+                            });
+                            db.close();
+                        } else if (updated.result.nModified == 0 && updated.result.n != 0) {
+                            callback({
+                                value: "true",
+                                comment: "Data already updated"
                             });
                             db.close();
                         } else {
                             callback({
                                 value: "false",
-                                comment: "Not updated"
+                                comment: "No data found"
                             });
                             db.close();
                         }
@@ -102,11 +108,11 @@ module.exports = {
             });
         }
     },
-    delete: function (data, callback) {
+    delete: function(data, callback) {
         var user = sails.ObjectID(data.user);
         delete data.user;
         data._id = sails.ObjectID(data._id);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -123,7 +129,7 @@ module.exports = {
                     $set: {
                         "folder.$": data
                     }
-                }, function (err, updated) {
+                }, function(err, updated) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -138,7 +144,7 @@ module.exports = {
                             $set: {
                                 "note.folder": " "
                             }
-                        }, function (err, updated) {
+                        }, function(err, updated) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -154,7 +160,7 @@ module.exports = {
                             } else {
                                 callback({
                                     value: "false",
-                                    comment: "Not deleted"
+                                    comment: "No data found"
                                 });
                                 db.close();
                             }
@@ -164,9 +170,9 @@ module.exports = {
             }
         });
     },
-    findOne: function (data, callback) {
+    findOne: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -179,7 +185,7 @@ module.exports = {
                     "folder._id": sails.ObjectID(data._id)
                 }, {
                     "folder.$": 1
-                }).toArray(function (err, data2) {
+                }).toArray(function(err, data2) {
                     if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
                         callback(data2[0].folder[0]);
                         db.close();
@@ -192,7 +198,7 @@ module.exports = {
                     } else {
                         callback({
                             value: "false",
-                            comment: "No Such Folder."
+                            comment: "No data found"
                         });
                         db.close();
                     }
@@ -200,9 +206,9 @@ module.exports = {
             }
         });
     },
-    find: function (data, callback) {
+    find: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -210,31 +216,26 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            _id: user,
-                            "folder.name": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$folder"
-                    },
-                    {
-                        $match: {
-                            "folder.name": {
-                                $exists: "true"
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            folder: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user,
+                        "folder.name": {
+                            $exists: "true"
                         }
                     }
-                ]).toArray(function (err, data2) {
+                }, {
+                    $unwind: "$folder"
+                }, {
+                    $match: {
+                        "folder.name": {
+                            $exists: "true"
+                        }
+                    }
+                }, {
+                    $project: {
+                        folder: 1
+                    }
+                }]).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -256,7 +257,7 @@ module.exports = {
             }
         });
     },
-    localtoserver: function (data, callback) {
+    localtoserver: function(data, callback) {
         if (data.creationtime) {
             Folder.save(data, callback);
         } else if (!data._id && !data.creationtime) {
@@ -267,12 +268,12 @@ module.exports = {
             Folder.delete(data, callback)
         }
     },
-    servertolocal: function (data, callback) {
+    servertolocal: function(data, callback) {
         console.log(data.modifytime);
         var d = new Date(data.modifytime);
         console.log(d);
         var user = sails.ObjectID(data.user);
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -280,31 +281,26 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([
-                    {
-                        $match: {
-                            _id: user,
-                            "folder.modifytime": {
-                                $gt: d
-                            }
-                        }
-                    },
-                    {
-                        $unwind: "$folder"
-                    },
-                    {
-                        $match: {
-                            "folder.modifytime": {
-                                $gt: d
-                            }
-                        }
-                    },
-                    {
-                        $project: {
-                            folder: 1
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user,
+                        "folder.modifytime": {
+                            $gt: d
                         }
                     }
-                ]).toArray(function (err, data2) {
+                }, {
+                    $unwind: "$folder"
+                }, {
+                    $match: {
+                        "folder.modifytime": {
+                            $gt: d
+                        }
+                    }
+                }, {
+                    $project: {
+                        folder: 1
+                    }
+                }]).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
