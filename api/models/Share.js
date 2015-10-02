@@ -67,8 +67,8 @@ module.exports = {
                                                                     "content": "share"
                                                                 }]
                                                                 var message = {
-                                                                    "from_email": "vigneshkasthuri2009@gmail.com",
-                                                                    "from_name": "Noteshare",
+                                                                    "from_email": sails.fromEmail,
+                                                                    "from_name": sails.fromName,
                                                                     "to": [{
                                                                         "email": data.email,
                                                                         "type": "to"
@@ -116,8 +116,8 @@ module.exports = {
                                                                             "content": "newnote"
                                                                         }]
                                                                         var message = {
-                                                                            "from_email": "vigneshkasthuri2009@gmail.com",
-                                                                            "from_name": "Noteshare",
+                                                                            "from_email": sails.fromEmail,
+                                                                            "from_name": sails.fromName,
                                                                             "to": [{
                                                                                 "email": data.email,
                                                                                 "type": "to"

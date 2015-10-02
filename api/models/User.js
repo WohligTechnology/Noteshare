@@ -849,14 +849,14 @@ module.exports = {
                                 });
                                 db.close();
                             } else if (updated) {
-                                var template_name = "Noteshare";
+                                var template_name = "noteshare";
                                 var template_content = [{
                                     "name": "noteshare",
                                     "content": "noteshare"
                                 }]
                                 var message = {
-                                    "from_email": "vigneshkasthuri2009@gmail.com",
-                                    "from_name": "Noteshare",
+                                    "from_email": sails.fromEmail,
+                                    "from_name": sails.fromName,
                                     "to": [{
                                         "email": data.email,
                                         "type": "to"
