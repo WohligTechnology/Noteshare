@@ -760,22 +760,17 @@ module.exports = {
         });
     },
     changepassword: function(data, callback) {
-        data.password = sails.md5(data.password);
-        var user = sails.ObjectID(data._id);
-        var newpass = sails.md5(data.editpassword);
-        sails.query(function(err, db) {
-            if (err) {
-                console.log(err);
-                callback({
-                    value: "false"
-                });
-            } else if (db) {
-                if (data.editpassword == "") {
+        if (data.password && data.password != "" && data.editpassword && data.editpassword != "" && data.email && data.email != "") {
+            data.password = sails.md5(data.password);
+            var user = sails.ObjectID(data._id);
+            var newpass = sails.md5(data.editpassword);
+            sails.query(function(err, db) {
+                if (err) {
+                    console.log(err);
                     callback({
-                        value: "false",
-                        comment: "Edit password cannot be empty"
+                        value: "false"
                     });
-                } else {
+                } else if (db) {
                     db.collection('user').update({
                         "_id": user,
                         "email": data.email,
@@ -791,18 +786,17 @@ module.exports = {
                                 value: "false"
                             });
                             db.close();
-                        } else if (updated) {
-                            if (updated.result.nModified == 1) {
-                                callback({
-                                    value: "true"
-                                });
-                                db.close();
-                            } else {
-                                callback({
-                                    value: "true"
-                                });
-                                db.close();
-                            }
+                        } else if (updated.result.nModified == 1 && updated.result.n == 1) {
+                            callback({
+                                value: "true"
+                            });
+                            db.close();
+                        } else if (updated.result.nModified != 1 && updated.result.n == 1) {
+                            callback({
+                                value: "false",
+                                comment: "Same password. Please try different password"
+                            });
+                            db.close();
                         } else {
                             callback({
                                 value: "false",
@@ -812,8 +806,13 @@ module.exports = {
                         }
                     });
                 }
-            }
-        });
+            });
+        } else {
+            callback({
+                value: "false",
+                comment: "Please provide all parameters"
+            });
+        }
     },
     forgotpassword: function(data, callback) {
         sails.query(function(err, db) {
