@@ -41,7 +41,7 @@ module.exports = {
                                 data._id = data.note;
                                 data.user = data.userfrom;
                                 delete data.note;
-                                Note.findOne(data, function(response) {
+                                Note.findone(data, function(response) {
                                     if (!response.value) {
                                         delete response._id;
                                         db.collection("user").find({

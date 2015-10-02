@@ -38,12 +38,6 @@ module.exports = {
                                 data._id = data2[0]._id;
                                 data.isreg = "true";
                                 edituser();
-                            } else {
-                                callback({
-                                    value: "false",
-                                    comment: "User to be deleted"
-                                });
-                                db.close();
                             }
                         } else {
                             createuser();
@@ -542,7 +536,7 @@ module.exports = {
                     } else if (data2 && data2[0]) {
                         callback({
                             value: "true",
-                            comment:"User found"
+                            comment: "User found"
                         });
                         db.close();
                     } else {
