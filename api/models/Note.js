@@ -354,7 +354,7 @@ module.exports = {
             callback({
                 value: "false"
             });
-        } else if (data.id && !data.creationtime) {
+        } else if (data._id && !data.creationtime) {
             Note.delete(data, callback)
         }
     },

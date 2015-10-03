@@ -28,6 +28,7 @@
     "moment": "^2.10.6",
     "mongodb": "^2.0.35",
     "nodemon": "^1.4.0",
+    "pushwoosh-client": "^1.1.1",
     "rc": "~0.5.0",
     "sails": "~0.11.0",
     "sails-disk": "~0.10.0",

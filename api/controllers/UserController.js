@@ -69,10 +69,40 @@ module.exports = {
                                                         if (err) {
                                                             console.log(err);
                                                         }
-                                                        res.json({
-                                                            fileid: fileId
+                                                        var userid = req.param('user');
+                                                        var user = sails.ObjectID(userid);
+                                                        db.collection('user').update({
+                                                            _id: user
+                                                        }, {
+                                                            $set: {
+                                                                profilepic: fileId
+                                                            }
+                                                        }, function(err, updated) {
+                                                            if (err) {
+                                                                console.log(err);
+                                                                res.json({
+                                                                    value: "false"
+                                                                });
+                                                                db.close();
+                                                            } else if (updated.result.nModified != 0 && updated.result.n != 0) {
+                                                                res.json({
+                                                                    fileId: fileId
+                                                                });
+                                                                db.close();
+                                                            } else if (updated.result.nModified == 0 && updated.result.n != 0) {
+                                                                res.json({
+                                                                    value: "true",
+                                                                    comment: "Data already updated"
+                                                                });
+                                                                db.close();
+                                                            } else {
+                                                                res.json({
+                                                                    value: "false",
+                                                                    comment: "No data found"
+                                                                });
+                                                                db.close();
+                                                            }
                                                         });
-                                                        db.close();
                                                     });
                                                 }
                                             });
@@ -270,5 +300,15 @@ module.exports = {
             res.json(data);
         }
         User.countnotes(req.body, print);
+    },
+    dataDisplay: function(req, res) {
+        var dataToDisplay = req.query("data");
+        res.view("data", dataToDisplay);
+    },
+    pushWoosh: function(req, res) {
+        var print = function(data) {
+            res.json(data);
+        }
+        User.pushWoosh(req.body, print);
     }
 };
