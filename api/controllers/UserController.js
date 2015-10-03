@@ -69,6 +69,7 @@ module.exports = {
                                                         if (err) {
                                                             console.log(err);
                                                         }
+                                                        console.log(req.param('user'));
                                                         var userid = req.param('user');
                                                         var user = sails.ObjectID(userid);
                                                         db.collection('user').update({
@@ -306,9 +307,6 @@ module.exports = {
         res.view("data", dataToDisplay);
     },
     pushWoosh: function(req, res) {
-        var print = function(data) {
-            res.json(data);
-        }
-        User.pushWoosh(req.body, print);
+        User.pushWoosh(req.body);
     }
 };
