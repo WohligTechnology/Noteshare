@@ -4,20 +4,19 @@
  * @description :: Server-side logic for managing dummies
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-var topdf = require('topdf');
 module.exports = {
-    gridfs: function(req, res) {
-        sails.query(function(err, db) {
+    gridfs: function (req, res) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
             }
             req.file("file").upload({
                 maxBytes: 100000000
-            }, function(err, uploadedFiles) {
+            }, function (err, uploadedFiles) {
                 if (err) {
                     return res.send(500, err);
                 }
-                _.each(uploadedFiles, function(n) {
+                _.each(uploadedFiles, function (n) {
                     var filepath = n.fd;
                     var newfilepath = n.fd;
                     var newfilenamearr = newfilepath.split(".");
@@ -25,18 +24,18 @@ module.exports = {
                     var mimetype = sails.mime.lookup(n.fd);
                     var newdate = sails.moment(new Date()).format('YYYY-MM-DDh-mm-ss-SSSSa');
                     var filename = 'image' + newdate + '.' + extension;
-                    db.open(function(err, db) {
+                    db.open(function (err, db) {
                         var fileId = new sails.ObjectID();
                         var gridStore = new sails.GridStore(db, fileId, filename, 'w', {
                             content_type: mimetype
                         });
-                        gridStore.open(function(err, gridStore) {
-                            gridStore.writeFile(filepath, function(err, doc) {
-                                sails.GridStore.read(db, fileId, function(err, fileData) {
+                        gridStore.open(function (err, gridStore) {
+                            gridStore.writeFile(filepath, function (err, doc) {
+                                sails.GridStore.read(db, fileId, function (err, fileData) {
                                     var buffr = fileData;
                                     res.json(fileId);
                                     db.close();
-                                    sails.fs.unlink(filepath, function(err) {
+                                    sails.fs.unlink(filepath, function (err) {
                                         if (err) {
                                             console.log(err);
                                         }
@@ -49,15 +48,15 @@ module.exports = {
             });
         });
     },
-    getimage: function(req, res) {
-        sails.query(function(err, db) {
+    getimage: function (req, res) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
             }
             var filename = req.query.file;
             var fileId = sails.ObjectID(filename);
             var file = new sails.GridStore(db, fileId, "r");
-            file.open(function(err, file) {
+            file.open(function (err, file) {
                 if (err) {
                     console.log(err);
                 }
@@ -67,9 +66,9 @@ module.exports = {
             });
         });
     },
-    resizeimage: function(req, res) {
+    resizeimage: function (req, res) {
         console.log("data");
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
             }
@@ -91,10 +90,10 @@ module.exports = {
                 }
 
                 function findimage(fd, newwidth, newheight) {
-                    sails.GridStore.read(db, fd, function(err, fileData) {
+                    sails.GridStore.read(db, fd, function (err, fileData) {
                         width = parseInt(newwidth);
                         height = parseInt(newheight);
-                        sails.lwip.open(fileData, 'jpg', function(err, image) {
+                        sails.lwip.open(fileData, 'jpg', function (err, image) {
                             var dimensions = {};
                             dimensions.width = image.width();
                             dimensions.height = image.height();
@@ -107,24 +106,24 @@ module.exports = {
                             if (err) {
                                 console.log(err);
                             }
-                            image.resize(width, height, "lanczos", function(err, image2) {
-                                db.open(function(err, db) {
+                            image.resize(width, height, "lanczos", function (err, image2) {
+                                db.open(function (err, db) {
                                     var fileId = new sails.ObjectID();
                                     var mimetype = 'image/jpeg';
                                     var gridStore = new sails.GridStore(db, fileId, 'w', {
                                         content_type: mimetype
                                     });
-                                    gridStore.open(function(err, gridStore) {
+                                    gridStore.open(function (err, gridStore) {
                                         if (err) {
                                             console.log(err);
                                         }
-                                        image2.toBuffer('jpg', {}, function(err, imagebuf) {
-                                            gridStore.write(imagebuf, function(err, doc) {
+                                        image2.toBuffer('jpg', {}, function (err, imagebuf) {
+                                            gridStore.write(imagebuf, function (err, doc) {
                                                 if (err) {
                                                     console.log(err);
                                                 }
                                                 if (doc) {
-                                                    gridStore.close(function() {
+                                                    gridStore.close(function () {
                                                         showimage(fileId);
                                                     });
                                                 }
@@ -143,7 +142,7 @@ module.exports = {
                     }
                     var filename = oldfile;
                     var file = new sails.GridStore(db, filename, "r");
-                    file.open(function(err, file) {
+                    file.open(function (err, file) {
                         if (err) {
                             console.log(err);
                         }
@@ -155,38 +154,23 @@ module.exports = {
             }
         });
     },
-    find: function(req, res) {
+    find: function (req, res) {
         function callback(data) {
             res.json(data);
         };
         Dummy.find(req.body, callback);
     },
-    remove: function(req, res) {
+    remove: function (req, res) {
         function callback(data) {
             res.json(data);
         };
         Dummy.remove(req.body, callback);
     },
-    findeach: function(req, res) {
-        Dummy.findeach(req.body, function(data) {
-            Gallery.save(data, function(result) {
+    findeach: function (req, res) {
+        Dummy.findeach(req.body, function (data) {
+            Gallery.save(data, function (result) {
                 res.json(result);
             });
-        });
-    },
-    pdfgene: function(req, res) {
-        var options = [];
-        topdf.convert('./Artworkdata.xlsx', './demo.pdf', options, function(err, success) {
-            if (err) {
-                console.log(err);
-                res.json({
-                    value: "ERROR"
-                });
-            } else if (success) {
-                res.json({
-                    value: "Created"
-                });
-            }
         });
     }
 };
