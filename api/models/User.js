@@ -710,6 +710,9 @@ module.exports = {
                 } else if (data.fbid && data.fbid != "") {
                     db.collection("user").find({
                         "fbid": data.fbid
+                    }, {
+                        password: 0,
+                        forgotpassword: 0
                     }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
@@ -731,6 +734,9 @@ module.exports = {
                 } else if (data.googleid && data.googleid != "") {
                     db.collection("user").find({
                         "googleid": data.googleid
+                    }, {
+                        password: 0,
+                        forgotpassword: 0
                     }).toArray(function(err, data2) {
                         if (err) {
                             console.log(err);
