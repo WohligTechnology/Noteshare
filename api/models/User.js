@@ -755,7 +755,31 @@ module.exports = {
                             db.close();
                         }
                     });
-                } else {
+                } else if (data.tweetid && data.tweetid != "") {
+                    db.collection("user").find({
+                        "tweetid": data.tweetid
+                    }, {
+                        password: 0,
+                        forgotpassword: 0
+                    }).toArray(function(err, data2) {
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: "false"
+                            });
+                            db.close();
+                        } else if (data2 && data2[0]) {
+                            callback(data2[0]);
+                            db.close();
+                        } else {
+                            callback({
+                                value: "false",
+                                comment: "No data found"
+                            });
+                            db.close();
+                        }
+                    });
+                }else {
                     callback({
                         value: "false",
                         comment: "Please provide fbid or googleid or email and password"
