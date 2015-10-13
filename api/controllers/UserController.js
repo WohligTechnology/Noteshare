@@ -310,6 +310,6 @@ module.exports = {
         User.pushWoosh(req.body);
     },
     currentTime: function(req, res) {
-        res.json(sails.moment().format('DD-MM-YYYY h-mm-ss-SSSSa'));
+        res.json(new Date());
     }
 };
