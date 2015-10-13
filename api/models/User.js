@@ -5,8 +5,6 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 
-var Pushwoosh = require('pushwoosh-client');
-var client = new Pushwoosh("AppCode", "AuthToken");
 module.exports = {
     save: function(data, callback) {
         if (data.password) {
@@ -232,7 +230,7 @@ module.exports = {
                 });
             }
         });
-    },        
+    },
     findone: function(data, callback) {
         var user = sails.ObjectID(data._id)
         var newreturn = {};
@@ -594,29 +592,10 @@ module.exports = {
             }
             db.collection('user').remove({}, function(err, deleted) {
                 if (deleted) {
-                    db.collection("fs.files").remove({}, function(err, data) {
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: "false"
-                            });
-                        }
-                        if (data) {
-                            db.collection("fs.chunks").remove({}, function(err, data2) {
-                                if (err) {
-                                    console.log(err);
-                                    callback({
-                                        value: "false"
-                                    });
-                                }
-                                if (data2) {
-                                    callback({
-                                        value: "true"
-                                    });
-                                }
-                            });
-                        }
+                    callback({
+                        value: "true"
                     });
+                    db.close();
                 } else if (err) {
                     console.log(err);
                     callback({
@@ -800,7 +779,7 @@ module.exports = {
                             db.close();
                         }
                     });
-                } else {
+                }else {
                     callback({
                         value: "false",
                         comment: "Please provide fbid or googleid or email and password"
@@ -1116,35 +1095,6 @@ module.exports = {
                             value: "false",
                             comment: "Not created"
                         });
-                        db.close();
-                    }
-                });
-            }
-        });
-    },
-    pushWoosh: function(data) {
-        sails.query(function(err, db) {
-            if (err) {
-                console.log(err);
-            } else if (db) {
-                db.collection("user").find({
-                    email: data.email
-                }).toArray(function(err, data2) {
-                    if (err) {
-                        console.log(err);
-                        db.close();
-                    } else if (data2 && data2[0]) {
-                        var deviceToken = data2[0].devicetoken;
-                        client.sendMessage('Noteshare Notification', deviceToken, function(err, response) {
-                            if (err) {
-                                console.log(err);
-                                db.close();
-                            } else if (response) {
-                                console.log("User has been notified");
-                                db.close();
-                            }
-                        });
-                    } else {
                         db.close();
                     }
                 });

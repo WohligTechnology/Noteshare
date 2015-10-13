@@ -96,7 +96,6 @@ module.exports = {
                                                                 });
                                                             }
                                                         });
-                                                        User.pushWoosh(data);
                                                     }
                                                 });
                                             } else {
