@@ -308,9 +308,5 @@ module.exports = {
     },
     pushWoosh: function(req, res) {
         User.pushWoosh(req.body);
-    },
-    ,
-    currentTime: function(req, res) {
-        res.json(sails.moment().format('DD-MM-YYYY h-mm-ss-SSSSa'));
     }
 };
