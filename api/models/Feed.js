@@ -192,7 +192,7 @@ module.exports = {
                 db.collection("user").aggregate([{
                     $match: {
                         _id: user,
-                        "feed.title": {
+                        "feed.text": {
                             $exists: "true"
                         }
                     }
@@ -200,7 +200,7 @@ module.exports = {
                     $unwind: "$feed"
                 }, {
                     $match: {
-                        "feed.title": {
+                        "feed.text": {
                             $exists: "true"
                         }
                     }
