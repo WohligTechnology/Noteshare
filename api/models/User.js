@@ -4,7 +4,6 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
-
 module.exports = {
     save: function(data, callback) {
         if (data.password) {
@@ -779,7 +778,7 @@ module.exports = {
                             db.close();
                         }
                     });
-                }else {
+                } else {
                     callback({
                         value: "false",
                         comment: "Please provide fbid or googleid or email and password"

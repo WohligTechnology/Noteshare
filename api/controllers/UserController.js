@@ -216,10 +216,17 @@ module.exports = {
         User.find(req.body, print);
     },
     findlimited: function(req, res) {
-        var print = function(data) {
-            res.json(data);
+        if (req.body.pagesize && req.body.pagesize != "" && req.body.pagenumber && req.body.paenumber != "") {
+            var print = function(data) {
+                res.json(data);
+            }
+            User.findlimited(req.body, print);
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
         }
-        User.findlimited(req.body, print);
     },
     findone: function(req, res) {
         if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
@@ -241,10 +248,17 @@ module.exports = {
         User.findoneuser(req.body, print);
     },
     searchmail: function(req, res) {
-        var print = function(data) {
-            res.json(data);
+        if (req.body.email && req.body.email != "") {
+            var print = function(data) {
+                res.json(data);
+            }
+            User.searchmail(req.body, print);
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please providde email-ID"
+            });
         }
-        User.searchmail(req.body, print);
     },
     delete: function(req, res) {
         if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
@@ -266,10 +280,17 @@ module.exports = {
         User.deletealluser(req.body, print);
     },
     login: function(req, res) {
-        var print = function(data) {
-            res.json(data);
+        if (req.body.email && req.body.email != "" && req.body.password && req.body.password != "") {
+            var print = function(data) {
+                res.json(data);
+            }
+            User.login(req.body, print);
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
         }
-        User.login(req.body, print);
     },
     changepassword: function(req, res) {
         if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
@@ -285,10 +306,17 @@ module.exports = {
         }
     },
     forgotpassword: function(req, res) {
-        var print = function(data) {
-            res.json(data);
+        if (req.body.email && req.body.email != "") {
+            var print = function(data) {
+                res.json(data);
+            }
+            User.forgotpassword(req.body, print);
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please providde email-ID"
+            });
         }
-        User.forgotpassword(req.body, print);
     },
     countusers: function(req, res) {
         var print = function(data) {
@@ -305,9 +333,6 @@ module.exports = {
     dataDisplay: function(req, res) {
         var dataToDisplay = req.query("data");
         res.view("data", dataToDisplay);
-    },
-    pushWoosh: function(req, res) {
-        User.pushWoosh(req.body);
     },
     currentTime: function(req, res) {
         res.json(new Date());
