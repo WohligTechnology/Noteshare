@@ -247,15 +247,22 @@ module.exports = {
         }
     },
     deleteupload: function(req, res) {
-        if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.deleteupload(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Upload-id is incorrect"
+                });
             }
-            User.deleteupload(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "Upload-id is incorrect"
+                comment: "Please provide parameters"
             });
         }
     },
@@ -293,11 +300,18 @@ module.exports = {
         User.find(req.body, print);
     },
     findlimited: function(req, res) {
-        if (req.body.pagesize && req.body.pagesize != "" && req.body.pagenumber && req.body.paenumber != "") {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body.pagesize && req.body.pagesize != "" && req.body.pagenumber && req.body.paenumber != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.findlimited(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Please provide parameters"
+                });
             }
-            User.findlimited(req.body, print);
         } else {
             res.json({
                 value: "false",
@@ -306,15 +320,22 @@ module.exports = {
         }
     },
     findone: function(req, res) {
-        if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.findone(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
             }
-            User.findone(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "User-id is incorrect"
+                comment: "Please provide parameters"
             });
         }
     },
@@ -325,28 +346,42 @@ module.exports = {
         User.findoneuser(req.body, print);
     },
     searchmail: function(req, res) {
-        if (req.body.email && req.body.email != "") {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body.email && req.body.email != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.searchmail(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Please providde email-ID"
+                });
             }
-            User.searchmail(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "Please providde email-ID"
+                comment: "Please provide parameters"
             });
         }
     },
     delete: function(req, res) {
-        if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.delete(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
             }
-            User.delete(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "User-id is incorrect"
+                comment: "Please provide parameters"
             });
         }
     },
@@ -390,28 +425,42 @@ module.exports = {
         }
     },
     changepassword: function(req, res) {
-        if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.changepassword(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
             }
-            User.changepassword(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "User-id is incorrect"
+                comment: "Please provide parameters"
             });
         }
     },
     forgotpassword: function(req, res) {
-        if (req.body.email && req.body.email != "") {
-            var print = function(data) {
-                res.json(data);
+        if (req.body) {
+            if (req.body.email && req.body.email != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.forgotpassword(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Please providde email-ID"
+                });
             }
-            User.forgotpassword(req.body, print);
         } else {
             res.json({
                 value: "false",
-                comment: "Please providde email-ID"
+                comment: "Please provide parameters"
             });
         }
     },
