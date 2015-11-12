@@ -4,8 +4,85 @@
  * @description :: Server-side logic for managing User
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
+var passport = require('passport'),
+    GoogleStrategy = require('passport-google-oauth').OAuth2Strategy;
+
+passport.use(new GoogleStrategy({
+        clientID: "1037714210694-1hha4c8pbfr3v3922u1o9rq9ahqe58qe.apps.googleusercontent.com",
+        clientSecret: "evdpiycmTSRae_mk2vQVWBzZ",
+        callbackURL: "callbackg"
+    },
+    function(token, tokenSecret, profile, done) {
+        profile.token = token;
+        profile.tokenSecret = tokenSecret;
+        profile.provider = "Google";
+        User.googlelogin(profile, done);
+    }
+));
+
+passport.serializeUser(function(user, done) {
+    done(null, user);
+});
+
+passport.deserializeUser(function(id, done) {
+    done(null, id);
+});
 
 module.exports = {
+    // logingoogle: function(req, res) {
+    //     var user = req.param("user");
+    //     passport.use(new GoogleStrategy({
+    //             clientID: "1037714210694-1hha4c8pbfr3v3922u1o9rq9ahqe58qe.apps.googleusercontent.com",
+    //             clientSecret: "evdpiycmTSRae_mk2vQVWBzZ",
+    //             callbackURL: "callbackg"
+    //         },
+    //         function(token, tokenSecret, profile, done) {
+    //             profile.token = token;
+    //             profile.tokenSecret = tokenSecret;
+    //             profile.provider = "Google";
+    //             User.googlelogin(profile, done);
+    //         }
+    //     ));
+    //     var loginid = req.param("loginid");
+    //     req.session.loginid = loginid;
+    //     passport.authenticate('google', {
+    //         scope: "https://www.googleapis.com/auth/plus.login email"
+    //     })(req, res);
+    // },
+    // callbackg: passport.authenticate('google', {
+    //     successRedirect: '/user/success',
+    //     failureRedirect: '/user/fail'
+    // }),
+    // success: function(req, res, data) {
+    //     if (req.session.passport) {
+    //         sails.sockets.blast("login", {
+    //             loginid: req.session.loginid,
+    //             status: "success",
+    //             user: req.session.passport.user
+    //         });
+    //     }
+    //     res.view("success");
+    // },
+    // fail: function(req, res) {
+    //     sails.sockets.blast("login", {
+    //         loginid: req.session.loginid,
+    //         status: "fail"
+    //     });
+    //     res.view("fail");
+    // },
+    // profile: function(req, res) {
+    //     if (req.session.passport) {
+    //         res.json(req.session.passport.user);
+    //     } else {
+    //         res.json({});
+    //     }
+    // },
+    // logout: function(req, res) {
+    //     req.session.destroy(function(err) {
+    //         res.send(req.session);
+    //     });
+    // },
+
     uploadfile: function(req, res) {
         sails.query(function(err, db) {
             if (err) {
@@ -182,27 +259,27 @@ module.exports = {
             });
         }
     },
-    save: function(req, res) {
-        if (req.body._id) {
-            if (req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                user();
-            } else {
-                res.json({
-                    value: "false",
-                    comment: "User-id is incorrect"
-                });
-            }
-        } else {
-            user();
-        }
+    // save: function(req, res) {
+    //     if (req.body._id) {
+    //         if (req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+    //             user();
+    //         } else {
+    //             res.json({
+    //                 value: "false",
+    //                 comment: "User-id is incorrect"
+    //             });
+    //         }
+    //     } else {
+    //         user();
+    //     }
 
-        function user() {
-            var print = function(data) {
-                res.json(data);
-            }
-            User.save(req.body, print);
-        }
-    },
+    //     function user() {
+    //         var print = function(data) {
+    //             res.json(data);
+    //         }
+    //         User.save(req.body, print);
+    //     }
+    // },
     saveuser: function(req, res) {
         var print = function(data) {
             res.json(data);
@@ -279,12 +356,32 @@ module.exports = {
         }
         User.deletealluser(req.body, print);
     },
-    login: function(req, res) {
-        if (req.body.email && req.body.email != "" && req.body.password && req.body.password != "") {
-            var print = function(data) {
-                res.json(data);
+    // login: function(req, res) {
+    //     if (req.body.email && req.body.email != "" && req.body.password && req.body.password != "") {
+    //         var print = function(data) {
+    //             res.json(data);
+    //         }
+    //         User.login(req.body, print);
+    //     } else {
+    //         res.json({
+    //             value: "false",
+    //             comment: "Please provide parameters"
+    //         });
+    //     }
+    // },
+    sociallogin: function(req, res) {
+        if (req.body) {
+            if (req.body.email && req.body.email != "" && req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.sociallogin(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Please provide parameters"
+                });
             }
-            User.login(req.body, print);
         } else {
             res.json({
                 value: "false",
