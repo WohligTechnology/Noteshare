@@ -1,5 +1,5 @@
 /**
- * DeviceController
+ * FeedController
  *
  * @description :: Server-side logic for managing devices
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
@@ -15,7 +15,7 @@ module.exports = {
                     } else {
                         res.json({
                             value: "false",
-                            comment: "Device-id is incorrect"
+                            comment: "Feed-id is incorrect"
                         });
                     }
                 } else {
@@ -26,7 +26,7 @@ module.exports = {
                     var print = function(data) {
                         res.json(data);
                     }
-                    Device.save(req.body, print);
+                    Feed.save(req.body, print);
                 }
             } else {
                 res.json({
@@ -48,11 +48,11 @@ module.exports = {
                     var print = function(data) {
                         res.json(data);
                     }
-                    Device.delete(req.body, print);
+                    Feed.delete(req.body, print);
                 } else {
                     res.json({
                         value: "false",
-                        comment: "Device-id is incorrect"
+                        comment: "Feed-id is incorrect"
                     });
                 }
             } else {
@@ -74,7 +74,7 @@ module.exports = {
                 function callback(data) {
                     res.json(data);
                 };
-                Device.find(req.body, callback);
+                Feed.find(req.body, callback);
             } else {
                 res.json({
                     value: "false",
@@ -95,11 +95,11 @@ module.exports = {
                     var print = function(data) {
                         res.json(data);
                     }
-                    Device.findone(req.body, print);
+                    Feed.findone(req.body, print);
                 } else {
                     res.json({
                         value: "false",
-                        comment: "Device-id is incorrect"
+                        comment: "Feed-id is incorrect"
                     });
                 }
             } else {

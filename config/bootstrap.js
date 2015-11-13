@@ -26,10 +26,9 @@ module.exports.bootstrap = function(cb) {
         sails.fs = require('fs'),
         sails.md5 = require('MD5'),
         sails.mandrill = require('mandrill-api/mandrill'),
-        sails.mandrill_client = new sails.mandrill.Mandrill('dzbY2mySNE_Zsqr3hsK70A'),
+        sails.mandrill_client = new sails.mandrill.Mandrill('hdnIx9rKBDfrucrJWO1OAw'),
         sails.fromName = "Noteshare",
-        sails.fromEmail = "vigneshkasthuri2009@gmail.com",
-        sails.myurl = "http://vignesh.com:1337/",
+        sails.fromEmail = "notesharemobile@gmail.com",
         sails.lwip = require('lwip');
         // Connection URL
         sails.url = 'mongodb://localhost:27017/noteshare';

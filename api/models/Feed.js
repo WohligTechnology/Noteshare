@@ -34,11 +34,56 @@ module.exports = {
                             });
                             db.close();
                         } else if (updated) {
-                            callback({
-                                value: "true",
-                                id: data._id
+                            var userdata = {};
+                            userdata._id = user;
+                            User.findoneuser(userdata, function(userrespo) {
+                                if (!userrespo.value) {
+                                    var template_name = "feed";
+                                    var template_content = [{
+                                        "name": "feed",
+                                        "content": "feed"
+                                    }]
+                                    var message = {
+                                        "from_email": userrespo.email,
+                                        "from_name": userrespo.name,
+                                        "to": [{
+                                            "email": sails.fromEmail,
+                                            "type": "to"
+                                        }],
+                                        "global_merge_vars": [{
+                                            "name": "name",
+                                            "content": userrespo.name
+                                        }, {
+                                            "name": "text",
+                                            "content": data.text
+                                        }]
+                                    };
+                                    sails.mandrill_client.messages.sendTemplate({
+                                        "template_name": template_name,
+                                        "template_content": template_content,
+                                        "message": message
+                                    }, function(result) {
+                                        callback({
+                                            value: "true",
+                                            comment: "Mail Sent"
+                                        });
+                                        db.close();
+                                    }, function(e) {
+                                        console.log('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                        callback({
+                                            value: "false",
+                                            comment: "Some Error"
+                                        });
+                                        db.close();
+                                    });
+                                } else {
+                                    callback({
+                                        value: "false",
+                                        comment: "No data found"
+                                    });
+                                    db.close();
+                                }
                             });
-                            db.close();
                         } else {
                             callback({
                                 value: "false",
