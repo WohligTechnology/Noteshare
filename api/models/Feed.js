@@ -15,7 +15,8 @@ module.exports = {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: "false"
+                        value: "false",
+                        comment:"Error"
                     });
                 } else if (db) {
                     data.timestamp = data._id.getTimestamp().toString();

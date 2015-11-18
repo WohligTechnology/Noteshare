@@ -95,6 +95,17 @@ module.exports = {
     // },
     sociallogin: function(data, callback) {
         data.num = 0;
+        if (data.fbid) {
+            var matchobj = {
+                fbid: data.fbid,
+                num: 0
+            };
+        } else {
+            var matchobj = {
+                googleid: data.googleid,
+                num: 0
+            };
+        }
         sails.query(function(err, db) {
             if (err) {
                 console.log(err);
@@ -103,10 +114,7 @@ module.exports = {
                     comment: "Error"
                 });
             } else if (db) {
-                db.collection('user').find({
-                    email: data.email,
-                    num: 0
-                }).toArray(function(err, data2) {
+                db.collection('user').find(matchobj).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -114,32 +122,65 @@ module.exports = {
                         });
                         db.close();
                     } else if (data2 && data2[0]) {
-                        console.log(data);
-                        db.collection('user').update({
-                                _id: sails.ObjectID(data2[0]._id)
-                            }, {
-                                $set: data
-                            },
-                            function(err, updated) {
-                                if (err) {
-                                    console.log(err);
-                                    callback({
-                                        value: "false"
-                                    });
-                                    db.close();
-                                } else if (updated) {
-                                    data._id=data2[0]._id;
-                                    delete data.num;
-                                    callback(data);
-                                    db.close();
-                                } else {
-                                    callback({
-                                        value: "false",
-                                        comment: "No data found"
-                                    });
-                                    db.close();
-                                }
-                            });
+                        if (data2[0].profilepic.indexOf("/") != -1) {
+                            db.collection('user').update({
+                                    _id: sails.ObjectID(data2[0]._id)
+                                }, {
+                                    $set: data
+                                },
+                                function(err, updated) {
+                                    if (err) {
+                                        console.log(err);
+                                        callback({
+                                            value: "false"
+                                        });
+                                        db.close();
+                                    } else if (updated) {
+                                        data._id = data2[0]._id;
+                                        delete data.num;
+                                        callback(data);
+                                        db.close();
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "No data found"
+                                        });
+                                        db.close();
+                                    }
+                                });
+                        } else if (data2[0].name != data.name || data2[0].email != data.email) {
+                            delete data.profilepic;
+                            db.collection('user').update({
+                                    _id: sails.ObjectID(data2[0]._id)
+                                }, {
+                                    $set: data
+                                },
+                                function(err, updated) {
+                                    if (err) {
+                                        console.log(err);
+                                        callback({
+                                            value: "false"
+                                        });
+                                        db.close();
+                                    } else if (updated) {
+                                        data._id = data2[0]._id;
+                                        data.profilepic = data2[0].profilepic;
+                                        delete data.num;
+                                        callback(data);
+                                        db.close();
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "No data found"
+                                        });
+                                        db.close();
+                                    }
+                                });
+                        } else {
+                            delete data2[0].num;
+                            callback(data2[0]);
+                            db.close();
+                        }
                     } else {
                         data._id = sails.ObjectID();
                         db.collection('user').insert(data, function(err, created) {

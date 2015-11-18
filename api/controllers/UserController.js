@@ -406,7 +406,7 @@ module.exports = {
     // },
     sociallogin: function(req, res) {
         if (req.body) {
-            if (req.body.email && req.body.email != "" && req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "") {
+            if (req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "" && (req.body.fbid && req.body.fbid != "" || req.body.googleid && req.body.googleid != "")) {
                 var print = function(data) {
                     res.json(data);
                 }
