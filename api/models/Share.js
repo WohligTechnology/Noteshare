@@ -37,7 +37,7 @@ module.exports = {
                                 callback({
                                     value: "false"
                                 });
-                            } else if (updated.result.nModified != 0 && updated.result.n != 0) {
+                            } else if (updated) {
                                 data._id = data.note;
                                 data.user = data.userfrom;
                                 delete data.note;
@@ -153,12 +153,6 @@ module.exports = {
                                         });
                                     }
                                 });
-                            } else if (updated.result.nModified == 0 && updated.result.n != 0) {
-                                callback({
-                                    value: "true",
-                                    comment: "Data already updated"
-                                });
-                                db.close();
                             } else {
                                 callback({
                                     value: "false",

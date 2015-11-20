@@ -17,6 +17,12 @@ module.exports = {
         if (data.timebomb) {
             data.timebomb = new Date(data.timebomb);
         }
+        if (data.creationtime) {
+            data.creationtime = new Date(data.creationtime);
+        }
+        if (data.modifytime) {
+            data.modifytime = new Date(data.modifytime);
+        }
         delete data.user;
         if (!data._id || data._id == "") {
             data._id = sails.ObjectID();
@@ -29,10 +35,6 @@ module.exports = {
                     });
                 }
                 if (db) {
-                    if (!data.creationtime) {
-                        data.creationtime = data._id.getTimestamp();
-                    }
-                    data.modifytime = data.creationtime;
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -65,10 +67,6 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
-            if (!data.modifytime) {
-                var dummy = sails.ObjectID();
-                data.modifytime = dummy.getTimestamp();
-            }
             var tobechanged = {};
             var attribute = "note.$.";
             _.forIn(data, function(value, key) {
@@ -103,7 +101,7 @@ module.exports = {
                         } else if (updated.result.nModified == 0 && updated.result.n != 0) {
                             callback({
                                 value: "true",
-                                comment: "Data already updated"
+                                comment: "Data updated"
                             });
                             db.close();
                         } else {
@@ -122,6 +120,9 @@ module.exports = {
         var user = sails.ObjectID(data.user);
         delete data.user;
         data._id = sails.ObjectID(data._id);
+        if (data.modifytime) {
+            data.modifytime = new Date(data.modifytime);
+        }
         sails.query(function(err, db) {
             if (err) {
                 console.log(err);
@@ -135,13 +136,11 @@ module.exports = {
                 newdata._id = data._id;
                 Note.findone(newdata, function(noterespo) {
                     if (!noterespo.value) {
-                        var dummy = sails.ObjectID();
                         data.num = 0;
                         if (noterespo.noteelements) {
                             data.noteelements = noterespo.noteelements;
                         }
-                        data.modifytime = dummy.getTimestamp();
-                        // Note.save(data);
+                        Note.save(data, callback);
                     } else {
                         callback({
                             value: "false",
@@ -402,100 +401,100 @@ module.exports = {
             }
         });
     },
-    timebomb: function(data3, callback) {
-        var returns = [];
-        var d = new Date(data3.timebomb);
-        var exit = 0;
-        var mycall = 0;
-        var exitup = 0;
-        sails.query(function(err, db) {
-            if (err) {
-                console.log(err);
-                callback({
-                    value: "false"
-                });
-            }
-            if (db) {
-                exitup++;
-                db.collection("user").aggregate([{
-                    $match: {
-                        "note.timebomb": {
-                            $lte: d
-                        }
-                    }
-                }, {
-                    $unwind: "$note"
-                }, {
-                    $match: {
-                        "note.timebomb": {
-                            $lte: d
-                        }
-                    }
-                }, {
-                    $project: {
-                        note: 1
-                    }
-                }]).each(function(err, data2) {
-                    if (data2 != null) {
-                        returns.push(data2.note._id);
-                    } else {
-                        exit++;
-                        if (exit == exitup) {
-                            if (returns != "") {
-                                for (var i = 0; i < returns.length; i++) {
-                                    var data = {};
-                                    data._id = sails.ObjectID(returns[i]);
-                                    var dummy = sails.ObjectID();
-                                    data.modifytime = dummy.getTimestamp();
-                                    db.collection("user").update({
-                                        "note._id": sails.ObjectID(returns[i])
-                                    }, {
-                                        $set: {
-                                            "note.$": data
-                                        }
-                                    }, function(err, updated) {
-                                        if (err) {
-                                            console.log(err);
-                                            callback({
-                                                value: "false"
-                                            });
-                                        } else if (updated) {
-                                            mycall++;
-                                            if (mycall == returns.length) {
-                                                callback({
-                                                    value: "true"
-                                                });
-                                            }
-                                        }
-                                    });
-                                }
-                            }
-                            if (returns == "") {
-                                callback({
-                                    value: "false",
-                                    comment: "No data found"
-                                });
-                            }
-                        }
-                    }
-                    if (data2 == null) {
-                        if (exit != exitup) {
-                            callback({
-                                value: "false",
-                                comment: "No data found"
-                            });
-                        }
-                    }
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: "false"
-                        });
-                    }
-                });
-            }
-        });
-    },
+    // timebomb: function(data3, callback) {
+    //     var returns = [];
+    //     var d = new Date(data3.timebomb);
+    //     var exit = 0;
+    //     var mycall = 0;
+    //     var exitup = 0;
+    //     sails.query(function(err, db) {
+    //         if (err) {
+    //             console.log(err);
+    //             callback({
+    //                 value: "false"
+    //             });
+    //         }
+    //         if (db) {
+    //             exitup++;
+    //             db.collection("user").aggregate([{
+    //                 $match: {
+    //                     "note.timebomb": {
+    //                         $lte: d
+    //                     }
+    //                 }
+    //             }, {
+    //                 $unwind: "$note"
+    //             }, {
+    //                 $match: {
+    //                     "note.timebomb": {
+    //                         $lte: d
+    //                     }
+    //                 }
+    //             }, {
+    //                 $project: {
+    //                     note: 1
+    //                 }
+    //             }]).each(function(err, data2) {
+    //                 if (data2 != null) {
+    //                     returns.push(data2.note._id);
+    //                 } else {
+    //                     exit++;
+    //                     if (exit == exitup) {
+    //                         if (returns != "") {
+    //                             for (var i = 0; i < returns.length; i++) {
+    //                                 var data = {};
+    //                                 data._id = sails.ObjectID(returns[i]);
+    //                                 var dummy = sails.ObjectID();
+    //                                 data.modifytime = dummy.getTimestamp();
+    //                                 db.collection("user").update({
+    //                                     "note._id": sails.ObjectID(returns[i])
+    //                                 }, {
+    //                                     $set: {
+    //                                         "note.$": data
+    //                                     }
+    //                                 }, function(err, updated) {
+    //                                     if (err) {
+    //                                         console.log(err);
+    //                                         callback({
+    //                                             value: "false"
+    //                                         });
+    //                                     } else if (updated) {
+    //                                         mycall++;
+    //                                         if (mycall == returns.length) {
+    //                                             callback({
+    //                                                 value: "true"
+    //                                             });
+    //                                         }
+    //                                     }
+    //                                 });
+    //                             }
+    //                         }
+    //                         if (returns == "") {
+    //                             callback({
+    //                                 value: "false",
+    //                                 comment: "No data found"
+    //                             });
+    //                         }
+    //                     }
+    //                 }
+    //                 if (data2 == null) {
+    //                     if (exit != exitup) {
+    //                         callback({
+    //                             value: "false",
+    //                             comment: "No data found"
+    //                         });
+    //                     }
+    //                 }
+    //                 if (err) {
+    //                     console.log(err);
+    //                     callback({
+    //                         value: "false"
+    //                     });
+    //                 }
+    //             });
+    //         }
+    //     });
+    // },
     deletemedia: function(data, callback) {
         var i = 0;
         sails.query(function(err, db) {

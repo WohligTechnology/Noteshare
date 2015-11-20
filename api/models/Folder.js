@@ -7,6 +7,12 @@
 
 module.exports = {
     save: function(data, callback) {
+        if (data.creationtime) {
+            data.creationtime = new Date(data.creationtime);
+        }
+        if (data.modifytime) {
+            data.modifytime = new Date(data.modifytime);
+        }
         var user = sails.ObjectID(data.user);
         delete data.user;
         if (!data._id || data._id == "") {
@@ -19,10 +25,6 @@ module.exports = {
                     });
                 }
                 if (db) {
-                    if (!data.creationtime) {
-                        data.creationtime = data._id.getTimestamp();
-                    }
-                    data.modifytime = data.creationtime;
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -55,10 +57,6 @@ module.exports = {
             });
         } else {
             data._id = sails.ObjectID(data._id);
-            if (!data.modifytime) {
-                var dummy = sails.ObjectID();
-                data.modifytime = dummy.getTimestamp();
-            }
             var tobechanged = {};
             var attribute = "folder.$.";
             _.forIn(data, function(value, key) {
@@ -93,7 +91,7 @@ module.exports = {
                         } else if (updated.result.nModified == 0 && updated.result.n != 0) {
                             callback({
                                 value: "true",
-                                comment: "Data already updated"
+                                comment: "Data updated"
                             });
                             db.close();
                         } else {
@@ -109,6 +107,13 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
+        console.log(data);
+        if (data.creationtime) {
+            data.creationtime = new Date(data.creationtime);
+        }
+        if (data.modifytime) {
+            data.modifytime = new Date(data.modifytime);
+        }
         var user = sails.ObjectID(data.user);
         delete data.user;
         data._id = sails.ObjectID(data._id);
@@ -120,8 +125,6 @@ module.exports = {
                 });
             }
             if (db) {
-                var dummy = sails.ObjectID();
-                data.modifytime = dummy.getTimestamp();
                 db.collection("user").update({
                     "_id": user,
                     "folder._id": data._id

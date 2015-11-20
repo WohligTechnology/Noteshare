@@ -131,7 +131,7 @@ module.exports = {
                         } else if (updated.result.nModified == 0 && updated.result.n != 0) {
                             callback({
                                 value: "true",
-                                comment: "Data already updated"
+                                comment: "Data updated"
                             });
                             db.close();
                         } else {
