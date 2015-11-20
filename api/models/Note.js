@@ -18,13 +18,14 @@ module.exports = {
             data.timebomb = new Date(data.timebomb);
         }
         delete data.user;
-        if (!data._id) {
+        if (!data._id || data._id == "") {
             data._id = sails.ObjectID();
             sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
                     callback({
-                        value: "false"
+                        value: "false",
+                        comment: "Error"
                     });
                 }
                 if (db) {
@@ -42,7 +43,8 @@ module.exports = {
                         if (err) {
                             console.log(err);
                             callback({
-                                value: "false"
+                                value: "false",
+                                comment: "Error"
                             });
                             db.close();
                         } else if (updated) {
@@ -128,31 +130,22 @@ module.exports = {
                 });
             }
             if (db) {
-                var dummy = sails.ObjectID();
-                data.modifytime = dummy.getTimestamp();
-                db.collection("user").update({
-                    "_id": user,
-                    "note._id": data._id
-                }, {
-                    $set: {
-                        "note.$": data
-                    }
-                }, function(err, updated) {
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: "false"
-                        });
-                        db.close();
-                    } else if (updated) {
-                        callback({
-                            value: "true"
-                        });
-                        db.close();
+                var newdata = {};
+                newdata.user = user;
+                newdata._id = data._id;
+                Note.findone(newdata, function(noterespo) {
+                    if (!noterespo.value) {
+                        var dummy = sails.ObjectID();
+                        data.num = 0;
+                        if (noterespo.noteelements) {
+                            data.noteelements = noterespo.noteelements;
+                        }
+                        data.modifytime = dummy.getTimestamp();
+                        // Note.save(data);
                     } else {
                         callback({
                             value: "false",
-                            comment: "No data found"
+                            comment: "Id is incorrect"
                         });
                         db.close();
                     }
@@ -497,6 +490,89 @@ module.exports = {
                         console.log(err);
                         callback({
                             value: "false"
+                        });
+                    }
+                });
+            }
+        });
+    },
+    deletemedia: function(data, callback) {
+        var i = 0;
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+
+            }
+            if (db) {
+                db.collection("user").aggregate([{
+                    $unwind: "$note"
+                }, {
+                    $match: {
+                        "note.num": 0,
+                        "note.noteelements": {
+                            $exists: true
+                        }
+                    }
+                }, {
+                    $group: {
+                        _id: "$_id",
+                        noteElem: {
+                            $addToSet: "$note.noteelements"
+                        }
+                    }
+                }, {
+                    $unwind: "$noteElem"
+                }, {
+                    $unwind: "$noteElem"
+                }, {
+                    $match: {
+                        $or: [{
+                            "noteElem.type": "image"
+                        }, {
+                            "noteElem.type": "audio"
+                        }, {
+                            "noteElem.type": "scribble"
+                        }]
+                    }
+                }, {
+                    $group: {
+                        _id: "$_id",
+                        content: {
+                            $addToSet: "$noteElem.content"
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        content: 1
+                    }
+                }, {
+                    $unwind: "$content"
+                }]).toArray(function(err, data2) {
+                    if (data2 && data2[0]) {
+                        _.each(data2, function(z) {
+                            User.removemedia(z, function(respo) {
+                                i++;
+                                if (i == data2.length) {
+                                    callback({
+                                        value: "true"
+                                    });
+                                }
+                            });
+                        });
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
                         });
                     }
                 });

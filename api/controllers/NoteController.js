@@ -152,5 +152,11 @@ module.exports = {
             res.json(data);
         };
         Note.timebomb(req.body, callback);
+    },
+    deletemedia:function(req,res){
+        function callback(data) {
+            res.json(data);
+        };
+        Note.deletemedia(req.body, callback);
     }
 };

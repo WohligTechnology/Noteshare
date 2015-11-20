@@ -114,96 +114,148 @@ module.exports = {
                     comment: "Error"
                 });
             } else if (db) {
-                db.collection('user').find(matchobj).toArray(function(err, data2) {
-                    if (err) {
-                        console.log(err);
-                        callback({
-                            value: "false"
-                        });
-                        db.close();
-                    } else if (data2 && data2[0]) {
-                        if (data2[0].profilepic.indexOf("/") != -1) {
-                            db.collection('user').update({
-                                    _id: sails.ObjectID(data2[0]._id)
-                                }, {
-                                    $set: data
-                                },
-                                function(err, updated) {
-                                    if (err) {
-                                        console.log(err);
-                                        callback({
-                                            value: "false"
-                                        });
-                                        db.close();
-                                    } else if (updated) {
-                                        data._id = data2[0]._id;
-                                        delete data.num;
-                                        callback(data);
-                                        db.close();
-                                    } else {
-                                        callback({
-                                            value: "false",
-                                            comment: "No data found"
-                                        });
-                                        db.close();
-                                    }
-                                });
-                        } else if (data2[0].name != data.name || data2[0].email != data.email) {
-                            delete data.profilepic;
-                            db.collection('user').update({
-                                    _id: sails.ObjectID(data2[0]._id)
-                                }, {
-                                    $set: data
-                                },
-                                function(err, updated) {
-                                    if (err) {
-                                        console.log(err);
-                                        callback({
-                                            value: "false"
-                                        });
-                                        db.close();
-                                    } else if (updated) {
-                                        data._id = data2[0]._id;
-                                        data.profilepic = data2[0].profilepic;
-                                        delete data.num;
-                                        callback(data);
-                                        db.close();
-                                    } else {
-                                        callback({
-                                            value: "false",
-                                            comment: "No data found"
-                                        });
-                                        db.close();
-                                    }
-                                });
-                        } else {
-                            delete data2[0].num;
-                            callback(data2[0]);
+                if (data.email) {
+                    db.collection('user').find({
+                        isreg: "false",
+                        email: data.email
+                    }).toArray(function(err, data3) {
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: "false"
+                            });
                             db.close();
+                        } else if (data3 && data3[0]) {
+                            data.isreg = "true";
+                            db.collection('user').update({
+                                _id: sails.ObjectID(data3[0]._id)
+                            }, {
+                                $set: data
+                            }, function(err, updated) {
+                                if (err) {
+                                    console.log(err);
+                                    callback({
+                                        value: "false"
+                                    });
+                                    db.close();
+                                } else if (updated) {
+                                    data._id = data3[0]._id;
+                                    delete data.num;
+                                    delete data.isreg;
+                                    callback(data);
+                                    db.close();
+                                } else {
+                                    console.log(err);
+                                    callback({
+                                        value: "false",
+                                        comment: "Error"
+                                    });
+                                    db.close();
+                                }
+                            });
+                        } else {
+                            notmail();
                         }
-                    } else {
-                        data._id = sails.ObjectID();
-                        db.collection('user').insert(data, function(err, created) {
-                            if (err) {
-                                console.log(err);
-                                callback({
-                                    value: "false"
-                                });
-                                db.close();
-                            } else if (created) {
-                                delete data.num;
-                                callback(data);
-                                db.close();
+                    });
+                } else {
+                    notmail();
+                }
+
+                function notmail() {
+                    db.collection('user').find(matchobj).toArray(function(err, data2) {
+                        if (err) {
+                            console.log(err);
+                            callback({
+                                value: "false"
+                            });
+                            db.close();
+                        } else if (data2 && data2[0]) {
+                            if (data2[0].profilepic.indexOf("/") != -1) {
+                                db.collection('user').update({
+                                        _id: sails.ObjectID(data2[0]._id)
+                                    }, {
+                                        $set: data
+                                    },
+                                    function(err, updated) {
+                                        if (err) {
+                                            console.log(err);
+                                            callback({
+                                                value: "false"
+                                            });
+                                            db.close();
+                                        } else if (updated) {
+                                            data._id = data2[0]._id;
+                                            delete data.num;
+                                            delete data.isreg;
+                                            callback(data);
+                                            db.close();
+                                        } else {
+                                            callback({
+                                                value: "false",
+                                                comment: "No data found"
+                                            });
+                                            db.close();
+                                        }
+                                    });
+                            } else if (data2[0].name != data.name || data2[0].email != data.email) {
+                                delete data.profilepic;
+                                db.collection('user').update({
+                                        _id: sails.ObjectID(data2[0]._id)
+                                    }, {
+                                        $set: data
+                                    },
+                                    function(err, updated) {
+                                        if (err) {
+                                            console.log(err);
+                                            callback({
+                                                value: "false"
+                                            });
+                                            db.close();
+                                        } else if (updated) {
+                                            data._id = data2[0]._id;
+                                            data.profilepic = data2[0].profilepic;
+                                            delete data.num;
+                                            delete data.isreg;
+                                            callback(data);
+                                            db.close();
+                                        } else {
+                                            callback({
+                                                value: "false",
+                                                comment: "No data found"
+                                            });
+                                            db.close();
+                                        }
+                                    });
                             } else {
-                                callback({
-                                    value: "false",
-                                    comment: "User not created"
-                                });
+                                delete data2[0].num;
+                                delete data2[0].isreg;
+                                callback(data2[0]);
                                 db.close();
                             }
-                        });
-                    }
-                });
+                        } else {
+                            data._id = sails.ObjectID();
+                            db.collection('user').insert(data, function(err, created) {
+                                if (err) {
+                                    console.log(err);
+                                    callback({
+                                        value: "false"
+                                    });
+                                    db.close();
+                                } else if (created) {
+                                    delete data.num;
+                                    callback(data);
+                                    db.close();
+                                } else {
+                                    callback({
+                                        value: "false",
+                                        comment: "User not created"
+                                    });
+                                    db.close();
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
     },
@@ -1117,5 +1169,76 @@ module.exports = {
                 });
             }
         });
-    }
+    },
+    removemedia: function(data, callback) {
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("fs.files").find({
+                    filename: data.content
+                }).toArray(function(err, found) {
+                    if (err) {
+                        console.log(err);
+                        res.json({
+                            value: "false",
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (found && found[0]) {
+                        db.collection("fs.files").remove({
+                            _id: sails.ObjectID(found[0]._id)
+                        }, function(err, data2) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: "false"
+                                });
+                                db.close();
+                            } else if (data2) {
+                                db.collection("fs.chunks").remove({
+                                    files_id: sails.ObjectID(found[0]._id)
+                                }, function(err, data3) {
+                                    if (err) {
+                                        console.log(err);
+                                        callback({
+                                            value: "false",
+                                            comment: "Error"
+                                        });
+                                    } else if (data3) {
+                                        callback({
+                                            value: "true"
+                                        });
+                                        db.close();
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "No data found"
+                                        });
+                                        db.close();
+                                    }
+                                });
+                            } else {
+                                callback({
+                                    value: "false",
+                                    comment: "No data found"
+                                });
+                                db.close();
+                            }
+                        });
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
 };

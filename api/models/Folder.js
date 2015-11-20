@@ -9,7 +9,7 @@ module.exports = {
     save: function(data, callback) {
         var user = sails.ObjectID(data.user);
         delete data.user;
-        if (!data._id) {
+        if (!data._id || data._id == "") {
             data._id = sails.ObjectID();
             sails.query(function(err, db) {
                 if (err) {
@@ -269,9 +269,7 @@ module.exports = {
         }
     },
     servertolocal: function(data, callback) {
-        console.log(data.modifytime);
         var d = new Date(data.modifytime);
-        console.log(d);
         var user = sails.ObjectID(data.user);
         sails.query(function(err, db) {
             if (err) {

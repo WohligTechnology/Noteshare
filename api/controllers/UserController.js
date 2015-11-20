@@ -84,6 +84,8 @@ module.exports = {
     // },
 
     uploadfile: function(req, res) {
+        res.connection.setTimeout(200000);
+        req.connection.setTimeout(200000);
         sails.query(function(err, db) {
             if (err) {
                 console.log(err);
@@ -93,7 +95,7 @@ module.exports = {
                 });
             } else if (db) {
                 req.file("file").upload({
-                    maxBytes: 100000000
+                    maxBytes: 10000000000
                 }, function(err, uploadedFiles) {
                     if (err) {
                         console.log(err);
@@ -476,11 +478,187 @@ module.exports = {
         }
         User.countnotes(req.body, print);
     },
+    removemedia: function(req, res) {
+        var print = function(data) {
+            res.json(data);
+        }
+        User.removemedia(req.body, print);
+    },
     dataDisplay: function(req, res) {
         var dataToDisplay = req.query("data");
         res.view("data", dataToDisplay);
     },
     currentTime: function(req, res) {
         res.json(new Date());
+    },
+    mediaupload: function(req, res) {
+        res.connection.setTimeout(200000);
+        req.connection.setTimeout(200000);
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                res.json({
+                    value: "false",
+                    comment: "Error"
+                });
+            } else if (db) {
+                req.file("file").upload({
+                    maxBytes: 10000000000
+                }, function(err, uploadedFiles) {
+                    if (err) {
+                        console.log(err);
+                        res.json({
+                            value: "false",
+                            comment: "Error"
+                        });
+                        db.close();
+                    } else if (uploadedFiles) {
+                        _.each(uploadedFiles, function(n) {
+                            var newfilepath = n.fd;
+                            var newfilenamearr = newfilepath.split(".");
+                            var extension = newfilenamearr.pop();
+                            var mimetype = sails.mime.lookup(n.fd);
+                            var filename = 'image' + "_" + n.filename;
+                            db.open(function(err, db) {
+                                if (err) {
+                                    console.log(err);
+                                    res.json({
+                                        value: "false",
+                                        comment: "Error"
+                                    });
+                                    db.close();
+                                } else if (db) {
+                                    var fileId = new sails.ObjectID();
+                                    var gridStore = new sails.GridStore(db, fileId, filename, 'w', {
+                                        content_type: mimetype
+                                    });
+                                    gridStore.open(function(err, gridStore) {
+                                        if (err) {
+                                            console.log(err);
+                                            res.json({
+                                                value: "false",
+                                                comment: "Error"
+                                            });
+                                            db.close();
+                                        } else if (gridStore) {
+                                            gridStore.writeFile(n.fd, function(err, doc) {
+                                                if (err) {
+                                                    console.log(err);
+                                                    res.json({
+                                                        value: "false",
+                                                        comment: "Error"
+                                                    });
+                                                    db.close();
+                                                } else if (doc) {
+                                                    sails.fs.unlink(n.fd, function(err) {
+                                                        if (err) {
+                                                            console.log(err);
+                                                        }
+                                                        res.json({
+                                                            value: "true"
+                                                        });
+                                                        db.close();
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        });
+                    }
+                });
+            }
+        });
+    },
+    getmedia: function(req, res) {
+        if (req.query.file && req.query.file != "") {
+            sails.query(function(err, db) {
+                if (err) {
+                    console.log(err);
+                } else if (db) {
+                    var filename = req.query.file;
+                    var file = new sails.GridStore(db, filename, "r");
+                    db.collection("fs.files").find({
+                        filename: filename
+                    }).toArray(function(err, found) {
+                        if (err) {
+                            console.log(err);
+                            res.json({
+                                value: "false",
+                                comment: "Error"
+                            });
+                            db.close();
+                        } else if (found && found[0]) {
+                            file.open(function(err, file) {
+                                if (err) {
+                                    console.log(err);
+                                    res.json({
+                                        value: "false",
+                                        comment: "Error"
+                                    });
+                                    db.close();
+                                } else if (file) {
+                                    res.set('Content-Type', file.contentType);
+                                    var stream = file.stream();
+                                    stream.pipe(res);
+                                    file.close();
+                                }
+                            });
+                        } else {
+                            res.json({
+                                value: "false",
+                                comment: "No data found"
+                            });
+                            db.close();
+                        }
+                    });
+                }
+            });
+        } else {
+            res.json({
+                value: "false",
+                comment: "Upload-id is incorrect"
+            });
+        }
+    },
+    searchmedia: function(req, res) {
+        if (req.query.file && req.query.file != "") {
+            sails.query(function(err, db) {
+                if (err) {
+                    console.log(err);
+                } else if (db) {
+                    var filename = req.query.file;
+                    db.collection("fs.files").find({
+                        filename: filename
+                    }).toArray(function(err, found) {
+                        if (err) {
+                            console.log(err);
+                            res.json({
+                                value: "false",
+                                comment: "Error"
+                            });
+                            db.close();
+                        } else if (found && found[0]) {
+                            res.json({
+                                value: "true"
+                            });
+                            db.close();
+                        } else {
+                            res.json({
+                                value: "false",
+                                comment: "No data found"
+                            });
+                            db.close();
+                        }
+                    });
+                }
+            });
+        } else {
+            res.json({
+                value: "false",
+                comment: "Search is incorrect"
+            });
+        }
     }
 };
