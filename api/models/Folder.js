@@ -8,10 +8,10 @@
 module.exports = {
     save: function(data, callback) {
         if (data.creationtime) {
-            data.creationtime = new Date(data.creationtime);
+            data.creationtime = User.formatMyDate(data.creationtime);
         }
         if (data.modifytime) {
-            data.modifytime = new Date(data.modifytime);
+            data.modifytime = User.formatMyDate(data.modifytime);
         }
         var user = sails.ObjectID(data.user);
         delete data.user;
@@ -107,12 +107,11 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
-        console.log(data);
-        if (data.creationtime) {
-            data.creationtime = new Date(data.creationtime);
-        }
+        delete data.name;
+        delete data.creationtime;
+        delete data.order;
         if (data.modifytime) {
-            data.modifytime = new Date(data.modifytime);
+            data.modifytime = User.formatMyDate(data.modifytime);
         }
         var user = sails.ObjectID(data.user);
         delete data.user;
@@ -261,18 +260,24 @@ module.exports = {
         });
     },
     localtoserver: function(data, callback) {
-        if (data.creationtime) {
+        if (data.creationtime != "0") {
             Folder.save(data, callback);
         } else if (!data._id && !data.creationtime) {
             callback({
                 value: "false"
             });
-        } else if (data._id && !data.creationtime) {
+        } else if (data._id && data.creationtime == "0") {
             Folder.delete(data, callback)
+        } else {
+            callback({
+                value: "false"
+            });
         }
     },
     servertolocal: function(data, callback) {
-        var d = new Date(data.modifytime);
+        if (data.modifytime) {
+            var d = User.formatMyDate(data.modifytime);
+        }
         var user = sails.ObjectID(data.user);
         sails.query(function(err, db) {
             if (err) {

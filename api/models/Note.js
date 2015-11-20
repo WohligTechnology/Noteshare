@@ -12,16 +12,16 @@ module.exports = {
             data.folder = sails.ObjectID(data.folder);
         }
         if (data.remindertime) {
-            data.remindertime = new Date(data.remindertime);
+            data.remindertime = User.formatMyDate(data.remindertime);
         }
         if (data.timebomb) {
-            data.timebomb = new Date(data.timebomb);
+            data.timebomb = User.formatMyDate(data.timebomb);
         }
         if (data.creationtime) {
-            data.creationtime = new Date(data.creationtime);
+            data.creationtime = User.formatMyDate(data.creationtime);
         }
         if (data.modifytime) {
-            data.modifytime = new Date(data.modifytime);
+            data.modifytime = User.formatMyDate(data.modifytime);
         }
         delete data.user;
         if (!data._id || data._id == "") {
@@ -121,7 +121,7 @@ module.exports = {
         delete data.user;
         data._id = sails.ObjectID(data._id);
         if (data.modifytime) {
-            data.modifytime = new Date(data.modifytime);
+            data.modifytime = User.formatMyDate(data.modifytime);
         }
         sails.query(function(err, db) {
             if (err) {
@@ -340,18 +340,24 @@ module.exports = {
         });
     },
     localtoserver: function(data, callback) {
-        if (data.creationtime) {
+        if (data.creationtime != "0") {
             Note.save(data, callback);
         } else if (!data._id && !data.creationtime) {
             callback({
                 value: "false"
             });
-        } else if (data._id && !data.creationtime) {
+        } else if (data._id && data.creationtime == "0") {
             Note.delete(data, callback)
+        } else {
+            callback({
+                value: "false"
+            });
         }
     },
     servertolocal: function(data, callback) {
-        var d = new Date(data.modifytime);
+        if (data.modifytime) {
+            var d = User.formatMyDate(data.modifytime);
+        }
         var user = sails.ObjectID(data.user);
         sails.query(function(err, db) {
             if (err) {

@@ -4,7 +4,19 @@
  * @description :: TODO: You might write a short summary of how this model works and what it represents here.
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
+
+var moment = require('moment-timezone');
 module.exports = {
+
+
+    formatMyDate: function(str) {
+        if (str == "0") {
+            return 0;
+        } else {
+            return moment.tz(str, Intl.DateTimeFormat().resolvedOptions().timeZone)._d;
+        }
+    },
+
     // save: function(data, callback) {
     //     if (data.password) {
     //         data.password = sails.md5(data.password);
