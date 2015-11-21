@@ -8,14 +8,8 @@
 module.exports = {
     save: function(data, callback) {
         var user = sails.ObjectID(data.user);
-        if (data.folder) {
+        if (data.folder && data.folder !="") {
             data.folder = sails.ObjectID(data.folder);
-        }
-        if (data.remindertime) {
-            data.remindertime = User.formatMyDate(data.remindertime);
-        }
-        if (data.timebomb) {
-            data.timebomb = User.formatMyDate(data.timebomb);
         }
         if (data.creationtime) {
             data.creationtime = User.formatMyDate(data.creationtime);
@@ -117,6 +111,7 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
+        data.creationtime = "";
         var user = sails.ObjectID(data.user);
         delete data.user;
         data._id = sails.ObjectID(data._id);
@@ -131,22 +126,29 @@ module.exports = {
                 });
             }
             if (db) {
-                var newdata = {};
-                newdata.user = user;
-                newdata._id = data._id;
-                Note.findone(newdata, function(noterespo) {
-                    if (!noterespo.value) {
-                        data.num = 0;
-                        if (noterespo.noteelements) {
-                            data.noteelements = noterespo.noteelements;
-                        }
-                        Note.save(data, callback);
+                db.collection("user").update({
+                    "_id": user,
+                    "folder._id": data._id
+                }, {
+                    $set: {
+                        "folder.$": data
+                    }
+                }, function(err, updated) {
+                    if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                    } else if (updated) {
+                        callback({
+                            value: "true"
+                        });
+                        db.close();
                     } else {
                         callback({
                             value: "false",
-                            comment: "Id is incorrect"
+                            comment: "No data found"
                         });
-                        db.close();
                     }
                 });
             }
@@ -369,10 +371,7 @@ module.exports = {
             if (db) {
                 db.collection("user").aggregate([{
                     $match: {
-                        _id: user,
-                        "note.modifytime": {
-                            $gt: d
-                        }
+                        _id: user
                     }
                 }, {
                     $unwind: "$note"
@@ -383,9 +382,91 @@ module.exports = {
                         }
                     }
                 }, {
-                    $project: {
-                        note: 1
+                    $group: {
+                        _id: "$_id",
+                        title: {
+                            $addToSet: "$note.title"
+                        },
+                        creationtime: {
+                            $addToSet: "$note.creationtime"
+                        },
+                        modifytime: {
+                            $addToSet: "$note.modifytime"
+                        },
+                        noteid: {
+                            $addToSet: "$note._id"
+                        },
+                        folder: {
+                            $addToSet: "$note.folder"
+                        },
+                        noteelements: {
+                            $addToSet: "$note.noteelements"
+                        },
+                        color: {
+                            $addToSet: "$note.color"
+                        },
+                        background: {
+                            $addToSet: "$note.background"
+                        },
+                        reminderTime: {
+                            $addToSet: "$note.reminderTime"
+                        },
+                        tags: {
+                            $addToSet: "$note.tags"
+                        },
+                        paper: {
+                            $addToSet: "$note.paper"
+                        },
+                        islocked: {
+                            $addToSet: "$note.islocked"
+                        },
+                        timebomb: {
+                            $addToSet: "$note.timebomb"
+                        }
                     }
+                }, {
+                    $project: {
+                        _id: 0,
+                        noteid:1,
+                        title:1,
+                        creationtime:1,
+                        modifytime:1,
+                        noteelements:1,
+                        folder:1,
+                        color:1,
+                        background:1,
+                        reminderTime:1,
+                        tags:1,
+                        paper:1,
+                        islocked:1,
+                        timebomb:1,
+                    }
+                }, {
+                    $unwind: "$title"
+                }, {
+                    $unwind: "$creationtime"
+                }, {
+                    $unwind: "$modifytime"
+                }, {
+                    $unwind: "$noteid"
+                }, {
+                    $unwind: "$noteelements"
+                }, {
+                    $unwind: "$folder"
+                }, {
+                    $unwind: "$color"
+                }, {
+                    $unwind: "$background"
+                }, {
+                    $unwind: "$reminderTime"
+                }, {
+                    $unwind: "$tags"
+                }, {
+                    $unwind: "$paper"
+                }, {
+                    $unwind: "$islocked"
+                }, {
+                    $unwind: "$timebomb"
                 }]).toArray(function(err, data2) {
                     if (data2 && data2[0]) {
                         callback(data2);

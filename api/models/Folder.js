@@ -107,9 +107,7 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
-        delete data.name;
-        delete data.creationtime;
-        delete data.order;
+        data.creationtime = "";
         if (data.modifytime) {
             data.modifytime = User.formatMyDate(data.modifytime);
         }
@@ -279,6 +277,7 @@ module.exports = {
             var d = User.formatMyDate(data.modifytime);
         }
         var user = sails.ObjectID(data.user);
+        delete data.user;
         sails.query(function(err, db) {
             if (err) {
                 console.log(err);
@@ -289,10 +288,7 @@ module.exports = {
             if (db) {
                 db.collection("user").aggregate([{
                     $match: {
-                        _id: user,
-                        "folder.modifytime": {
-                            $gt: d
-                        }
+                        _id: user
                     }
                 }, {
                     $unwind: "$folder"
@@ -303,9 +299,43 @@ module.exports = {
                         }
                     }
                 }, {
-                    $project: {
-                        folder: 1
+                    $group: {
+                        _id: "$_id",
+                        name: {
+                            $addToSet: "$folder.name"
+                        },
+                        creationtime: {
+                            $addToSet: "$folder.creationtime"
+                        },
+                        modifytime: {
+                            $addToSet: "$folder.modifytime"
+                        },
+                        order: {
+                            $addToSet: "$folder.order"
+                        },
+                        folderid: {
+                            $addToSet: "$folder._id"
+                        },
                     }
+                }, {
+                    $project: {
+                        _id: 0,
+                        name: 1,
+                        creationtime: 1,
+                        modifytime: 1,
+                        order: 1,
+                        folderid: 1
+                    }
+                }, {
+                    $unwind: "$name"
+                }, {
+                    $unwind: "$creationtime"
+                }, {
+                    $unwind: "$modifytime"
+                }, {
+                    $unwind: "$order"
+                }, {
+                    $unwind: "$folderid"
                 }]).toArray(function(err, data2) {
                     if (err) {
                         console.log(err);

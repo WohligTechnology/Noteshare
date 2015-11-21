@@ -13,7 +13,7 @@ module.exports = {
         if (str == "0") {
             return 0;
         } else {
-            return moment.tz(str, Intl.DateTimeFormat().resolvedOptions().timeZone)._d;
+            return moment(str)._d;
         }
     },
 

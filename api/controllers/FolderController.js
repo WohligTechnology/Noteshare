@@ -122,9 +122,23 @@ module.exports = {
         Folder.localtoserver(req.body, callback);
     },
     servertolocal: function(req, res) {
-        function callback(data) {
-            res.json(data);
-        };
-        Folder.servertolocal(req.body, callback);
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
+                function callback(data) {
+                    res.json(data);
+                };
+                Folder.servertolocal(req.body, callback);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
     }
 };

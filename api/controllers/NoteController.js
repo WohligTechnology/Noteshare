@@ -142,10 +142,24 @@ module.exports = {
         Note.localtoserver(req.body, callback);
     },
     servertolocal: function(req, res) {
-        function callback(data) {
-            res.json(data);
-        };
-        Note.servertolocal(req.body, callback);
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
+                function callback(data) {
+                    res.json(data);
+                };
+                Note.servertolocal(req.body, callback);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
     },
     timebomb: function(req, res) {
         function callback(data) {
@@ -153,7 +167,7 @@ module.exports = {
         };
         Note.timebomb(req.body, callback);
     },
-    deletemedia:function(req,res){
+    deletemedia: function(req, res) {
         function callback(data) {
             res.json(data);
         };
