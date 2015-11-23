@@ -7,8 +7,11 @@
 
 module.exports = {
     save: function(data, callback) {
+        if (data.noteelements && Array.isArray(data.noteelements) == false) {
+            data.noteelements = JSON.parse(data.noteelements);
+        }
         var user = sails.ObjectID(data.user);
-        if (data.folder && data.folder !="") {
+        if (data.folder && data.folder != "") {
             data.folder = sails.ObjectID(data.folder);
         }
         if (data.creationtime) {
@@ -124,14 +127,13 @@ module.exports = {
                 callback({
                     value: "false"
                 });
-            }
-            if (db) {
+            } else if (db) {
                 db.collection("user").update({
                     "_id": user,
-                    "folder._id": data._id
+                    "note._id": data._id
                 }, {
                     $set: {
-                        "folder.$": data
+                        "note.$": data
                     }
                 }, function(err, updated) {
                     if (err) {
@@ -350,13 +352,11 @@ module.exports = {
             });
         } else if (data._id && data.creationtime == "0") {
             Note.delete(data, callback)
-        } else {
-            callback({
-                value: "false"
-            });
         }
     },
     servertolocal: function(data, callback) {
+        var lastresult = [];
+        var i = 0;
         if (data.modifytime) {
             var d = User.formatMyDate(data.modifytime);
         }
@@ -384,93 +384,27 @@ module.exports = {
                 }, {
                     $group: {
                         _id: "$_id",
-                        title: {
-                            $addToSet: "$note.title"
-                        },
-                        creationtime: {
-                            $addToSet: "$note.creationtime"
-                        },
-                        modifytime: {
-                            $addToSet: "$note.modifytime"
-                        },
-                        noteid: {
-                            $addToSet: "$note._id"
-                        },
-                        folder: {
-                            $addToSet: "$note.folder"
-                        },
-                        noteelements: {
-                            $addToSet: "$note.noteelements"
-                        },
-                        color: {
-                            $addToSet: "$note.color"
-                        },
-                        background: {
-                            $addToSet: "$note.background"
-                        },
-                        reminderTime: {
-                            $addToSet: "$note.reminderTime"
-                        },
-                        tags: {
-                            $addToSet: "$note.tags"
-                        },
-                        paper: {
-                            $addToSet: "$note.paper"
-                        },
-                        islocked: {
-                            $addToSet: "$note.islocked"
-                        },
-                        timebomb: {
-                            $addToSet: "$note.timebomb"
+                        note: {
+                            $addToSet: "$note"
                         }
                     }
                 }, {
                     $project: {
                         _id: 0,
-                        noteid:1,
-                        title:1,
-                        creationtime:1,
-                        modifytime:1,
-                        noteelements:1,
-                        folder:1,
-                        color:1,
-                        background:1,
-                        reminderTime:1,
-                        tags:1,
-                        paper:1,
-                        islocked:1,
-                        timebomb:1,
+                        note: 1
                     }
                 }, {
-                    $unwind: "$title"
-                }, {
-                    $unwind: "$creationtime"
-                }, {
-                    $unwind: "$modifytime"
-                }, {
-                    $unwind: "$noteid"
-                }, {
-                    $unwind: "$noteelements"
-                }, {
-                    $unwind: "$folder"
-                }, {
-                    $unwind: "$color"
-                }, {
-                    $unwind: "$background"
-                }, {
-                    $unwind: "$reminderTime"
-                }, {
-                    $unwind: "$tags"
-                }, {
-                    $unwind: "$paper"
-                }, {
-                    $unwind: "$islocked"
-                }, {
-                    $unwind: "$timebomb"
+                    $unwind: "$note"
                 }]).toArray(function(err, data2) {
                     if (data2 && data2[0]) {
-                        callback(data2);
-                        db.close();
+                        _.each(data2, function(z) {
+                            lastresult.push(z.note);
+                            i++;
+                            if (i == data2.length) {
+                                callback(lastresult);
+                                db.close();
+                            }
+                        });
                     } else if (err) {
                         console.log(err);
                         callback({
