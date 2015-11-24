@@ -518,7 +518,6 @@ module.exports = {
                             var newfilenamearr = newfilepath.split(".");
                             var extension = newfilenamearr.pop();
                             var mimetype = sails.mime.lookup(n.fd);
-                            var filename = 'image' + "_" + n.filename;
                             db.open(function(err, db) {
                                 if (err) {
                                     console.log(err);
@@ -529,7 +528,7 @@ module.exports = {
                                     db.close();
                                 } else if (db) {
                                     var fileId = new sails.ObjectID();
-                                    var gridStore = new sails.GridStore(db, fileId, filename, 'w', {
+                                    var gridStore = new sails.GridStore(db, fileId, n.filename, 'w', {
                                         content_type: mimetype
                                     });
                                     gridStore.open(function(err, gridStore) {
@@ -627,6 +626,10 @@ module.exports = {
             sails.query(function(err, db) {
                 if (err) {
                     console.log(err);
+                    res.json({
+                        value: "false",
+                        comment: "Error"
+                    });
                 } else if (db) {
                     var filename = req.query.file;
                     db.collection("fs.files").find({
