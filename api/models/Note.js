@@ -12,7 +12,7 @@ module.exports = {
             data.noteelements = JSON.parse(data.noteelements);
         }
         var user = sails.ObjectID(data.user);
-        if (data.folder && data.folder != "" && data.folder == '0') {
+        if (data.folder && data.folder != "" && data.folder != '0') {
             data.folder = sails.ObjectID(data.folder);
         }
         if (data.creationtime) {
