@@ -7,6 +7,7 @@
 
 module.exports = {
     save: function(data, callback) {
+        console.log(data);
         if (data.noteelements && Array.isArray(data.noteelements) == false) {
             data.noteelements = JSON.parse(data.noteelements);
         }
