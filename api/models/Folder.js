@@ -273,6 +273,7 @@ module.exports = {
         }
     },
     servertolocal: function(data, callback) {
+        var returns=[];
         if (data.modifytime) {
             var d = User.formatMyDate(data.modifytime);
         }
@@ -302,7 +303,7 @@ module.exports = {
                         });
                         db.close();
                     } else if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
-                        callback(data2[0].folder);
+                        callback(data2);
                         db.close();
                     } else {
                         callback({
