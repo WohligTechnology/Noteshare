@@ -300,7 +300,7 @@ module.exports = {
                     }
                 }, {
                     $group: {
-                        _id: "$_id",
+                        folderid: "$folder._id",
                         name: {
                             $addToSet: "$folder.name"
                         },
@@ -312,14 +312,10 @@ module.exports = {
                         },
                         order: {
                             $addToSet: "$folder.order"
-                        },
-                        folderid: {
-                            $addToSet: "$folder._id"
-                        },
+                        }
                     }
                 }, {
                     $project: {
-                        _id: 0,
                         name: 1,
                         creationtime: 1,
                         modifytime: 1,
