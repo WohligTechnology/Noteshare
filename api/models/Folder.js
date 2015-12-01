@@ -107,7 +107,7 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
-        data.creationtime = "";
+        data.creationtime = "0";
         if (data.modifytime) {
             data.modifytime = User.formatMyDate(data.modifytime);
         }
