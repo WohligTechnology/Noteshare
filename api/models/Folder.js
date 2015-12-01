@@ -107,7 +107,7 @@ module.exports = {
         }
     },
     delete: function(data, callback) {
-        data.creationtime = "0";
+        data.creationtime = "";
         if (data.modifytime) {
             data.modifytime = User.formatMyDate(data.modifytime);
         }
@@ -300,7 +300,7 @@ module.exports = {
                     }
                 }, {
                     $group: {
-                        folderid: "$folder._id",
+                        _id: "$_id",
                         name: {
                             $addToSet: "$folder.name"
                         },
@@ -312,10 +312,14 @@ module.exports = {
                         },
                         order: {
                             $addToSet: "$folder.order"
-                        }
+                        },
+                        folderid: {
+                            $addToSet: "$folder._id"
+                        },
                     }
                 }, {
                     $project: {
+                        _id: 0,
                         name: 1,
                         creationtime: 1,
                         modifytime: 1,
