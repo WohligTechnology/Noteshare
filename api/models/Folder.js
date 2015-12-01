@@ -286,57 +286,15 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").aggregate([{
-                    $match: {
-                        _id: user
+                db.collection("user").find({
+                    _id: user,
+                    "folder.modifytime": {
+                        $gt: d
                     }
                 }, {
-                    $unwind: "$folder"
-                }, {
-                    $match: {
-                        "folder.modifytime": {
-                            $gt: d
-                        }
-                    }
-                }, {
-                    $group: {
-                        _id: "$_id",
-                        name: {
-                            $addToSet: "$folder.name"
-                        },
-                        creationtime: {
-                            $addToSet: "$folder.creationtime"
-                        },
-                        modifytime: {
-                            $addToSet: "$folder.modifytime"
-                        },
-                        order: {
-                            $addToSet: "$folder.order"
-                        },
-                        folderid: {
-                            $addToSet: "$folder._id"
-                        },
-                    }
-                }, {
-                    $project: {
-                        _id: 0,
-                        name: 1,
-                        creationtime: 1,
-                        modifytime: 1,
-                        order: 1,
-                        folderid: 1
-                    }
-                }, {
-                    $unwind: "$name"
-                }, {
-                    $unwind: "$creationtime"
-                }, {
-                    $unwind: "$modifytime"
-                }, {
-                    $unwind: "$order"
-                }, {
-                    $unwind: "$folderid"
-                }]).toArray(function(err, data2) {
+                    _id: 0
+                }).toArray(function(err, data2) {
+                    console.log(data2);
                     if (err) {
                         console.log(err);
                         callback({
