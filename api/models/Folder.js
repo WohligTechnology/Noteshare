@@ -294,7 +294,6 @@ module.exports = {
                 }, {
                     "folder.$": 1
                 }).toArray(function(err, data2) {
-                    console.log(data2);
                     if (err) {
                         console.log(err);
                         callback({
