@@ -272,50 +272,6 @@ module.exports = {
             });
         }
     },
-    // servertolocal: function(data, callback) {
-    //     var returns=[];
-    //     if (data.modifytime) {
-    //         var d = User.formatMyDate(data.modifytime);
-    //     }
-    //     var user = sails.ObjectID(data.user);
-    //     delete data.user;
-    //     sails.query(function(err, db) {
-    //         if (err) {
-    //             console.log(err);
-    //             callback({
-    //                 value: "false"
-    //             });
-    //         }
-    //         if (db) {
-    //             db.collection("user").find({
-    //                 _id: user,
-    //                 "folder.modifytime": {
-    //                     $gt: d
-    //                 }
-    //             }, {
-    //                 "folder.$": 1
-    //             }).toArray(function(err, data2) {
-    //                 if (err) {
-    //                     console.log(err);
-    //                     callback({
-    //                         value: "false",
-    //                         comment: "Error"
-    //                     });
-    //                     db.close();
-    //                 } else if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
-    //                     callback(data2);
-    //                     db.close();
-    //                 } else {
-    //                     callback({
-    //                         value: "false",
-    //                         comment: "No data found"
-    //                     });
-    //                     db.close();
-    //                 }
-    //             });
-    //         }
-    //     });
-    // },
     servertolocal: function(data, callback) {
         var lastresult = [];
         var i = 0;
