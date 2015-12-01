@@ -303,7 +303,7 @@ module.exports = {
                         });
                         db.close();
                     } else if (data2 && data2[0]) {
-                        callback(data2);
+                        callback(data2[0].folder);
                         db.close();
                     } else {
                         callback({
