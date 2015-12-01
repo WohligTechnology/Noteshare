@@ -292,7 +292,7 @@ module.exports = {
                         $gt: d
                     }
                 }, {
-                    folder: 1
+                    "folder.$": 1
                 }).toArray(function(err, data2) {
                     console.log(data2);
                     if (err) {
@@ -302,8 +302,8 @@ module.exports = {
                             comment: "Error"
                         });
                         db.close();
-                    } else if (data2 && data2[0]) {
-                        callback(data2[0].folder);
+                    } else if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
+                        callback(data2);
                         db.close();
                     } else {
                         callback({
