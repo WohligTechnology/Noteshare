@@ -292,7 +292,7 @@ module.exports = {
                         $gt: d
                     }
                 }, {
-                    _id: 0
+                    folder: 1
                 }).toArray(function(err, data2) {
                     console.log(data2);
                     if (err) {
