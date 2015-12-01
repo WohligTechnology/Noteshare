@@ -346,7 +346,7 @@ module.exports = {
                 }, {
                     $group: {
                         _id: "$_id",
-                        note: {
+                        folder: {
                             $addToSet: "$folder"
                         }
                     }
