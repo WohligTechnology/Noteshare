@@ -272,13 +272,57 @@ module.exports = {
             });
         }
     },
+    // servertolocal: function(data, callback) {
+    //     var returns=[];
+    //     if (data.modifytime) {
+    //         var d = User.formatMyDate(data.modifytime);
+    //     }
+    //     var user = sails.ObjectID(data.user);
+    //     delete data.user;
+    //     sails.query(function(err, db) {
+    //         if (err) {
+    //             console.log(err);
+    //             callback({
+    //                 value: "false"
+    //             });
+    //         }
+    //         if (db) {
+    //             db.collection("user").find({
+    //                 _id: user,
+    //                 "folder.modifytime": {
+    //                     $gt: d
+    //                 }
+    //             }, {
+    //                 "folder.$": 1
+    //             }).toArray(function(err, data2) {
+    //                 if (err) {
+    //                     console.log(err);
+    //                     callback({
+    //                         value: "false",
+    //                         comment: "Error"
+    //                     });
+    //                     db.close();
+    //                 } else if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
+    //                     callback(data2);
+    //                     db.close();
+    //                 } else {
+    //                     callback({
+    //                         value: "false",
+    //                         comment: "No data found"
+    //                     });
+    //                     db.close();
+    //                 }
+    //             });
+    //         }
+    //     });
+    // },
     servertolocal: function(data, callback) {
-        var returns=[];
+        var lastresult = [];
+        var i = 0;
         if (data.modifytime) {
             var d = User.formatMyDate(data.modifytime);
         }
         var user = sails.ObjectID(data.user);
-        delete data.user;
         sails.query(function(err, db) {
             if (err) {
                 console.log(err);
@@ -287,23 +331,47 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("user").find({
-                    _id: user,
-                    "folder.modifytime": {
-                        $gt: d
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user
                     }
                 }, {
-                    "folder.$": 1
-                }).toArray(function(err, data2) {
-                    if (err) {
+                    $unwind: "$folder"
+                }, {
+                    $match: {
+                        "folder.modifytime": {
+                            $gt: d
+                        }
+                    }
+                }, {
+                    $group: {
+                        _id: "$_id",
+                        note: {
+                            $addToSet: "$folder"
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        folder: 1
+                    }
+                }, {
+                    $unwind: "$folder"
+                }]).toArray(function(err, data2) {
+                    if (data2 && data2[0]) {
+                        _.each(data2, function(z) {
+                            lastresult.push(z.folder);
+                            i++;
+                            if (i == data2.length) {
+                                callback(lastresult);
+                                db.close();
+                            }
+                        });
+                    } else if (err) {
                         console.log(err);
                         callback({
-                            value: "false",
-                            comment: "Error"
+                            value: "false"
                         });
-                        db.close();
-                    } else if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
-                        callback(data2);
                         db.close();
                     } else {
                         callback({
