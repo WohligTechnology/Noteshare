@@ -193,6 +193,40 @@ module.exports = {
             }
         });
     },
+    findbyid: function(data, callback) {
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("user").find({
+                    "note._id": sails.ObjectID(data.note)
+                }, {
+                    "note.$": 1
+                }).toArray(function(err, data2) {
+                    if (data2 && data2[0] && data2[0].note && data2[0].note[0]) {
+                        callback(data2[0].note[0]);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
     find: function(data, callback) {
         var user = sails.ObjectID(data.user);
         sails.query(function(err, db) {

@@ -42,8 +42,7 @@ module.exports = {
                                 data.user = data.userfrom;
                                 delete data.note;
                                 Note.findone(data, function(response) {
-                                    if (!response.value) {
-                                        delete response._id;
+                                    if (response.value != "false") {
                                         db.collection("user").find({
                                             email: data.email
                                         }).toArray(function(err, data2) {
@@ -54,109 +53,131 @@ module.exports = {
                                                 });
                                                 db.close();
                                             } else if (data2 && data2[0]) {
-                                                response.user = data2[0]._id;
-                                                Note.save(response, function(noterespo) {
-                                                    if (noterespo.value == "true") {
-                                                        var userdata = {};
-                                                        userdata._id = user;
-                                                        User.findoneuser(userdata, function(userrespo) {
-                                                            if (!userrespo.value) {
-                                                                var template_name = "share";
-                                                                var template_content = [{
-                                                                    "name": "share",
-                                                                    "content": "share"
+                                                var userdata = {};
+                                                userdata._id = user;
+                                                User.findoneuser(userdata, function(userrespo) {
+                                                    var notifydata = {};
+                                                    notifydata.user = data2[0]._id;
+                                                    notifydata.note = response._id;
+                                                    notifydata.notename = response.title;
+                                                    notifydata.username = userrespo.name;
+                                                    Notification.save(notifydata, function(notifyrespo) {
+                                                        if (notifyrespo.value != "false") {
+                                                            var template_name = "share";
+                                                            var template_content = [{
+                                                                "name": "share",
+                                                                "content": "share"
+                                                            }]
+                                                            var message = {
+                                                                "from_email": sails.fromEmail,
+                                                                "from_name": sails.fromName,
+                                                                "to": [{
+                                                                    "email": data.email,
+                                                                    "type": "to"
+                                                                }],
+                                                                "global_merge_vars": [{
+                                                                    "name": "note",
+                                                                    "content": response.title
+                                                                }, {
+                                                                    "name": "sentby",
+                                                                    "content": userrespo.name
                                                                 }]
-                                                                var message = {
-                                                                    "from_email": sails.fromEmail,
-                                                                    "from_name": sails.fromName,
-                                                                    "to": [{
-                                                                        "email": data.email,
-                                                                        "type": "to"
-                                                                    }],
-                                                                    "global_merge_vars": [{
-                                                                        "name": "note",
-                                                                        "content": response.title
-                                                                    }, {
-                                                                        "name": "sentby",
-                                                                        "content": userrespo.firstname
-                                                                    }]
-                                                                };
-                                                                sails.mandrill_client.messages.sendTemplate({
-                                                                    "template_name": template_name,
-                                                                    "template_content": template_content,
-                                                                    "message": message
-                                                                }, function(result) {
-                                                                    callback({
-                                                                        value: "true",
-                                                                        comment: "Mail Sent"
-                                                                    });
-                                                                    db.close();
-                                                                }, function(e) {
-                                                                    callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                            };
+                                                            sails.mandrill_client.messages.sendTemplate({
+                                                                "template_name": template_name,
+                                                                "template_content": template_content,
+                                                                "message": message
+                                                            }, function(result) {
+                                                                callback({
+                                                                    value: "true",
+                                                                    comment: "Mail Sent"
                                                                 });
-                                                            }
-                                                        });
-                                                    }
+                                                                db.close();
+                                                            }, function(e) {
+                                                                callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                            });
+                                                        } else {
+                                                            callback({
+                                                                value: "false",
+                                                                comment: "User not found"
+                                                            });
+                                                            db.close();
+                                                        }
+                                                    });
                                                 });
                                             } else {
                                                 var newdata = {};
                                                 newdata.email = data.email;
                                                 User.saveuser(newdata, function(newrespo) {
                                                     if (newrespo.value && newrespo.value == "true") {
-                                                        response.user = newrespo._id;
-                                                        Note.save(response, function(noterespo) {
-                                                            if (noterespo.value == "true") {
-                                                                var userdata = {};
-                                                                userdata._id = user;
-                                                                User.findoneuser(userdata, function(userrespo) {
-                                                                    if (!userrespo.value) {
-                                                                        var template_name = "newnote";
-                                                                        var template_content = [{
-                                                                            "name": "newnote",
-                                                                            "content": "newnote"
+                                                        var userdata = {};
+                                                        userdata._id = user;
+                                                        User.findoneuser(userdata, function(userrespo) {
+                                                            var notifydata = {};
+                                                            notifydata.user = newrespo._id;
+                                                            notifydata.note = response._id;
+                                                            notifydata.notename = response.title;
+                                                            notifydata.username = userrespo.name;
+                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                                if (!userrespo.value) {
+                                                                    var template_name = "newnote";
+                                                                    var template_content = [{
+                                                                        "name": "newnote",
+                                                                        "content": "newnote"
+                                                                    }]
+                                                                    var message = {
+                                                                        "from_email": sails.fromEmail,
+                                                                        "from_name": sails.fromName,
+                                                                        "to": [{
+                                                                            "email": data.email,
+                                                                            "type": "to"
+                                                                        }],
+                                                                        "global_merge_vars": [{
+                                                                            "name": "note",
+                                                                            "content": response.title
+                                                                        }, {
+                                                                            "name": "sentby",
+                                                                            "content": userrespo.name
                                                                         }]
-                                                                        var message = {
-                                                                            "from_email": sails.fromEmail,
-                                                                            "from_name": sails.fromName,
-                                                                            "to": [{
-                                                                                "email": data.email,
-                                                                                "type": "to"
-                                                                            }],
-                                                                            "global_merge_vars": [{
-                                                                                "name": "note",
-                                                                                "content": response.title
-                                                                            }, {
-                                                                                "name": "sentby",
-                                                                                "content": userrespo.firstname
-                                                                            }]
-                                                                        };
-                                                                        sails.mandrill_client.messages.sendTemplate({
-                                                                            "template_name": template_name,
-                                                                            "template_content": template_content,
-                                                                            "message": message
-                                                                        }, function(result) {
-                                                                            callback({
-                                                                                value: "true",
-                                                                                comment: "Mail Sent"
-                                                                            });
-                                                                            db.close();
-                                                                        }, function(e) {
-                                                                            callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                                    };
+                                                                    sails.mandrill_client.messages.sendTemplate({
+                                                                        "template_name": template_name,
+                                                                        "template_content": template_content,
+                                                                        "message": message
+                                                                    }, function(result) {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Mail Sent"
                                                                         });
-                                                                    }
-                                                                });
-                                                            }
+                                                                        db.close();
+                                                                    }, function(e) {
+                                                                        callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                                    });
+                                                                }
+                                                            });
                                                         });
+                                                    } else {
+                                                        callback({
+                                                            value: "false",
+                                                            comment: "Error"
+                                                        });
+                                                        db.close();
                                                     }
                                                 });
                                             }
                                         });
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "Note not found"
+                                        });
+                                        db.close();
                                     }
                                 });
                             } else {
                                 callback({
                                     value: "false",
-                                    comment: "No data found"
+                                    comment: "User not found"
                                 });
                                 db.close();
                             }
