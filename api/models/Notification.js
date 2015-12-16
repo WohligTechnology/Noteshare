@@ -249,7 +249,7 @@ module.exports = {
                 if (db) {
                     db.collection("user").find({
                         _id: user,
-                        "notification._id": sails.ObjectID(data._id)
+                        "notification.note": sails.ObjectID(data.note)
                     }, {
                         "notification.$": 1
                     }).toArray(function(err, data2) {
@@ -367,9 +367,6 @@ module.exports = {
                     db.collection("user").update({
                         "_id": user,
                         "notification.note": data.note,
-                        "notification.status": {
-                            $exists: false
-                        }
                     }, {
                         $set: tobechanged
                     }, function(err, updated) {

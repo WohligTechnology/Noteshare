@@ -61,45 +61,56 @@ module.exports = {
                                                     notifydata.note = response._id;
                                                     notifydata.notename = response.title;
                                                     notifydata.username = userrespo.name;
-                                                    Notification.save(notifydata, function(notifyrespo) {
-                                                        if (notifyrespo.value != "false") {
-                                                            var template_name = "share";
-                                                            var template_content = [{
-                                                                "name": "share",
-                                                                "content": "share"
-                                                            }]
-                                                            var message = {
-                                                                "from_email": sails.fromEmail,
-                                                                "from_name": sails.fromName,
-                                                                "to": [{
-                                                                    "email": data.email,
-                                                                    "type": "to"
-                                                                }],
-                                                                "global_merge_vars": [{
-                                                                    "name": "note",
-                                                                    "content": response.title
-                                                                }, {
-                                                                    "name": "sentby",
-                                                                    "content": userrespo.name
-                                                                }]
-                                                            };
-                                                            sails.mandrill_client.messages.sendTemplate({
-                                                                "template_name": template_name,
-                                                                "template_content": template_content,
-                                                                "message": message
-                                                            }, function(result) {
-                                                                callback({
-                                                                    value: "true",
-                                                                    comment: "Mail Sent"
-                                                                });
-                                                                db.close();
-                                                            }, function(e) {
-                                                                callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                    notifydata.profilepic = userrespo.profilepic;
+                                                    Notification.findone(notifydata, function(checkrespo) {
+                                                        if (checkrespo.value == "false") {
+                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                                if (notifyrespo.value != "false") {
+                                                                    var template_name = "share";
+                                                                    var template_content = [{
+                                                                        "name": "share",
+                                                                        "content": "share"
+                                                                    }]
+                                                                    var message = {
+                                                                        "from_email": sails.fromEmail,
+                                                                        "from_name": sails.fromName,
+                                                                        "to": [{
+                                                                            "email": data.email,
+                                                                            "type": "to"
+                                                                        }],
+                                                                        "global_merge_vars": [{
+                                                                            "name": "note",
+                                                                            "content": response.title
+                                                                        }, {
+                                                                            "name": "sentby",
+                                                                            "content": userrespo.name
+                                                                        }]
+                                                                    };
+                                                                    sails.mandrill_client.messages.sendTemplate({
+                                                                        "template_name": template_name,
+                                                                        "template_content": template_content,
+                                                                        "message": message
+                                                                    }, function(result) {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Mail Sent"
+                                                                        });
+                                                                        db.close();
+                                                                    }, function(e) {
+                                                                        callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                                    });
+                                                                } else {
+                                                                    callback({
+                                                                        value: "false",
+                                                                        comment: "User not found"
+                                                                    });
+                                                                    db.close();
+                                                                }
                                                             });
                                                         } else {
                                                             callback({
-                                                                value: "false",
-                                                                comment: "User not found"
+                                                                value: "true",
+                                                                comment: "Mail Sent"
                                                             });
                                                             db.close();
                                                         }
