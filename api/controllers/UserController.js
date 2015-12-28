@@ -77,11 +77,26 @@ module.exports = {
     //         res.json({});
     //     }
     // },
-    // logout: function(req, res) {
-    //     req.session.destroy(function(err) {
-    //         res.send(req.session);
-    //     });
-    // },
+    logout: function(req, res) {
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user) && req.body.deviceid && req.body.deviceid != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.logout(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
 
     uploadfile: function(req, res) {
         res.connection.setTimeout(200000);
@@ -413,6 +428,26 @@ module.exports = {
                     res.json(data);
                 }
                 User.sociallogin(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Please provide parameters"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
+    sociallogin1: function(req, res) {
+        if (req.body) {
+            if (req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "" && (req.body.fbid && req.body.fbid != "" || req.body.googleid && req.body.googleid != "") && req.body.deviceid && req.body.deviceid != "") {
+                var print = function(data) {
+                    res.json(data);
+                }
+                User.sociallogin1(req.body, print);
             } else {
                 res.json({
                     value: "false",

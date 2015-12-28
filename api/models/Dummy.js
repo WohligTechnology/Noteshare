@@ -14,9 +14,9 @@ var canvaswidth = 1024;
 var canvasheight = 768;
 var i = 0;
 module.exports = {
-    find: function (data, callback) {
+    find: function(data, callback) {
         var returns = [];
-        sails.query(function (err, db) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -24,7 +24,7 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("fs.files").find({}, {}).each(function (err, found) {
+                db.collection("fs.files").find({}, {}).each(function(err, found) {
                     if (err) {
                         console.log({
                             value: "false"
@@ -41,8 +41,8 @@ module.exports = {
             }
         });
     },
-    remove: function (data, callback) {
-        sails.query(function (err, db) {
+    remove: function(data, callback) {
+        sails.query(function(err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -50,37 +50,73 @@ module.exports = {
                 });
             }
             if (db) {
-                db.collection("fs.files").remove({}, function (err, data) {
+                db.collection("fs.files").find({
+                    filename: data.filename
+                }).toArray(function(err, found) {
                     if (err) {
                         console.log(err);
-                        callback({
-                            value: "false"
+                        res.json({
+                            value: "false",
+                            comment: "Error"
                         });
-                    }
-                    if (data) {
-                        db.collection("fs.chunks").remove({}, function (err, data) {
+                        db.close();
+                    } else if (found && found[0]) {
+                        db.collection("fs.files").remove({
+                            _id: sails.ObjectID(found[0]._id)
+                        }, function(err, data2) {
                             if (err) {
                                 console.log(err);
                                 callback({
                                     value: "false"
                                 });
-                            }
-                            if (data) {
-                                callback({
-                                    value: "true"
+                                db.close();
+                            } else if (data2) {
+                                db.collection("fs.chunks").remove({
+                                    files_id: sails.ObjectID(found[0]._id)
+                                }, function(err, data3) {
+                                    if (err) {
+                                        console.log(err);
+                                        callback({
+                                            value: "false",
+                                            comment: "Error"
+                                        });
+                                    } else if (data3) {
+                                        callback({
+                                            value: "true"
+                                        });
+                                        db.close();
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "No data found"
+                                        });
+                                        db.close();
+                                    }
                                 });
+                            } else {
+                                callback({
+                                    value: "false",
+                                    comment: "No data found"
+                                });
+                                db.close();
                             }
                         });
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
                     }
                 });
             }
         });
     },
 
-    findeach: function (data, callback) {
-        sails.query(function (err, db) {
+    findeach: function(data, callback) {
+        sails.query(function(err, db) {
             var returns = data;
-            sails.lwip.create(canvaswidth, canvasheight, 'white', function (err, canvas) {
+            sails.lwip.create(canvaswidth, canvasheight, 'white', function(err, canvas) {
                 canvasdata = canvas;
 
                 function recimage(num) {
@@ -91,7 +127,7 @@ module.exports = {
                     if (db) {
                         db.collection('image').find({
                             "id": n.id
-                        }).toArray(function (err, image) {
+                        }).toArray(function(err, image) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -101,9 +137,9 @@ module.exports = {
                             if (image && image != null) {
                                 var fd = sails.ObjectID(image[0].imagefs);
                                 if (fd && fd != null) {
-                                    sails.GridStore.read(db, fd, function (err, fileData) {
+                                    sails.GridStore.read(db, fd, function(err, fileData) {
                                         var file = new sails.GridStore(db, fd, "r");
-                                        file.open(function (err, file) {
+                                        file.open(function(err, file) {
                                             if (file) {
                                                 filetype = file.contentType;
                                                 if (filetype == 'image/jpeg') {
@@ -120,16 +156,16 @@ module.exports = {
                                         function imagecreate() {
                                             if (type != '') {
                                                 if (canvasdata != "") {
-                                                    sails.lwip.open(fileData, type, function (err, imagefile) {
+                                                    sails.lwip.open(fileData, type, function(err, imagefile) {
 
                                                         if (imagefile) {
                                                             var cropRight = canvaswidth - n.left - 1;
                                                             var cropBottom = canvasheight - n.top - 1;
                                                             console.log(cropRight);
                                                             console.log(cropBottom);
-                                                            imagefile.crop(0, 0, cropRight, cropBottom, function (err, cropedimage) {
+                                                            imagefile.crop(0, 0, cropRight, cropBottom, function(err, cropedimage) {
                                                                 newimagedata = cropedimage;
-                                                                canvasdata.paste(n.left, n.top, newimagedata, function (err, newimage) {
+                                                                canvasdata.paste(n.left, n.top, newimagedata, function(err, newimage) {
                                                                     num++;
                                                                     canvasdata = newimage;
                                                                     if (newimage) {
@@ -161,17 +197,17 @@ module.exports = {
                     var gridStore = new sails.GridStore(db, fileId, 'w', {
                         content_type: mimetype
                     });
-                    gridStore.open(function (err, gridStore) {
+                    gridStore.open(function(err, gridStore) {
                         if (err) {
                             console.log(err);
                         }
-                        imagedata.toBuffer('jpeg', {}, function (err, imagebuf) {
-                            gridStore.write(imagebuf, function (err, doc) {
+                        imagedata.toBuffer('jpeg', {}, function(err, imagebuf) {
+                            gridStore.write(imagebuf, function(err, doc) {
                                 if (err) {
                                     console.log(err);
                                 }
                                 if (doc) {
-                                    gridStore.close(function () {
+                                    gridStore.close(function() {
                                         returns.imagefnal = fileId;
                                         console.log(returns);
                                         callback(returns);

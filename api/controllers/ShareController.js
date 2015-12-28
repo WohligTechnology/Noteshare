@@ -4,7 +4,7 @@
  * @description :: Server-side logic for managing Shares
  * @help        :: See http://sailsjs.org/#!/documentation/concepts/Controllers
  */
-
+var gcm = require('node-gcm');
 module.exports = {
     save: function(req, res) {
         if (req.body) {
@@ -114,5 +114,31 @@ module.exports = {
                 comment: "Please provide parameters"
             });
         }
+    },
+    sendnoti: function(req, res) {
+        var message = new gcm.Message();
+        var title = "Noteshare";
+        var body = " Note has been shared with you";
+        message.addNotification('title', title);
+        message.addNotification('body', body);
+        var reg = "APA91bGkWGHylYXGyaUJxy7-Rs_79c5NmXUKeNV3vWg3RAGwR-Kgm5HIYk5oCgP4d0STqhzoAZlvsSxb0zu3N7KTz4q7JZyzLl9aZ8kZk9ZD29bGEOfTqylwKiNfOq1gFHkJcSLBzyNy";
+        var sender = new gcm.Sender('AIzaSyC5cKwyfT8_iAg5H62rg5E6DHyg67KVqxE');
+        sender.send(message, {
+            registrationTokens: reg
+        }, function(err, response) {
+            if (err) {
+                callback({
+                    value: "false",
+                    comment: err
+                });
+                db.close();
+            } else {
+                callback({
+                    value: "true",
+                    comment: "Mail sent"
+                });
+                db.close();
+            }
+        });
     }
 };
