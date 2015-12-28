@@ -873,11 +873,43 @@ module.exports = {
                     });
                     db.close();
                 } else if (err) {
-                    console.log(err);
-                    callback({
-                        value: "false"
+                    db.collection("fs.files").remove(function(err, found) {
+                        if (err) {
+                            console.log(err);
+                            res.json({
+                                value: "false",
+                                comment: "Error"
+                            });
+                            db.close();
+                        } else if (found && found[0]) {
+                            db.collection("fs.chunks").remove(function(err, data2) {
+                                if (err) {
+                                    console.log(err);
+                                    callback({
+                                        value: "false"
+                                    });
+                                    db.close();
+                                } else if (data2) {
+                                    callback({
+                                        value: "true"
+                                    });
+                                    db.close();
+                                } else {
+                                    callback({
+                                        value: "false",
+                                        comment: "No data found"
+                                    });
+                                    db.close();
+                                }
+                            });
+                        } else {
+                            callback({
+                                value: "false",
+                                comment: "No data found"
+                            });
+                            db.close();
+                        }
                     });
-                    db.close();
                 } else {
                     callback({
                         value: "false",
