@@ -206,6 +206,140 @@ module.exports = {
             }
         });
     },
+    findbyname: function(data, callback) {
+        var user = sails.ObjectID(data.user);
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("user").find({
+                    "_id": user,
+                    "folder.name": data.name
+                }, {
+                    "folder.$": 1
+                }).toArray(function(err, data2) {
+                    if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
+                        callback(data2[0].folder[0]);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
+    findbyid: function(data, callback) {
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("user").find({
+                    "folder._id": sails.ObjectID(data.folder)
+                }, {
+                    "folder.$": 1
+                }).toArray(function(err, data2) {
+                    if (data2 && data2[0] && data2[0].folder && data2[0].folder[0]) {
+                        callback(data2[0].folder[0]);
+                        db.close();
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
+    findnotes: function(data, callback) {
+        var lastresult = [];
+        var i = 0;
+        var user = sails.ObjectID(data.user);
+        delete data.user;
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user
+                    }
+                }, {
+                    $unwind: "$note"
+                }, {
+                    $match: {
+                        "note.folder": sails.ObjectID(data._id)
+                    }
+                }, {
+                    $group: {
+                        _id: "$_id",
+                        note: {
+                            $addToSet: "$note"
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        note: 1
+                    }
+                }, {
+                    $unwind: "$note"
+                }]).toArray(function(err, data2) {
+                    if (data2 && data2[0]) {
+                        _.each(data2, function(z) {
+                            lastresult.push(z.note);
+                            i++;
+                            if (i == data2.length) {
+                                callback(lastresult);
+                                db.close();
+                            }
+                        });
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
     find: function(data, callback) {
         var user = sails.ObjectID(data.user);
         sails.query(function(err, db) {

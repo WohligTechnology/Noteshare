@@ -81,6 +81,15 @@ module.exports = {
         });
     },
     delete: function(data, callback) {
+        if (data.note) {
+            var matchobj = {
+                "note": sails.ObjectID(data.note)
+            };
+        } else {
+            var matchobj = {
+                "folder": sails.ObjectID(data.folder)
+            };
+        }
         if (data.user && data.user != "") {
             var user = sails.ObjectID(data.user);
             delete data.user;
@@ -99,9 +108,7 @@ module.exports = {
                         }
                     }, {
                         $pull: {
-                            "notification": {
-                                "note": sails.ObjectID(data.note)
-                            }
+                            "notification": matchobj
                         }
                     }, function(err, updated) {
                         if (err) {
@@ -354,65 +361,222 @@ module.exports = {
             } else if (db) {
                 var user = sails.ObjectID(data.user);
                 delete data.user;
-                data.note = sails.ObjectID(data.note);
-                var tobechanged = {};
-                var attribute = "notification.$.";
-                _.forIn(data, function(value, key) {
-                    tobechanged[attribute + key] = value;
-                });
-                if (data.status && data.status != "" && data.status == "false") {
-                    data.user = user;
-                    Notification.delete(data, callback);
+                if (data.note) {
+                    data.note = sails.ObjectID(data.note);
+                    var tobechanged = {};
+                    var attribute = "notification.$.";
+                    _.forIn(data, function(value, key) {
+                        tobechanged[attribute + key] = value;
+                    });
+                    if (data.status && data.status != "" && data.status == "false") {
+                        data.user = user;
+                        Notification.delete(data, callback);
+                    } else {
+                        db.collection("user").update({
+                            "_id": user,
+                            "notification.note": data.note,
+                        }, {
+                            $set: tobechanged
+                        }, function(err, updated) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: "false"
+                                });
+                                db.close();
+                            } else if (updated) {
+                                Note.findbyid(data, function(noterespo) {
+                                    if (noterespo.value != "false") {
+                                        delete noterespo._id;
+                                        noterespo.user = user;
+                                        delete noterespo.folder;
+                                        noterespo.creationtime = new Date();
+                                        noterespo.modifytime = new Date();
+                                        Note.save(noterespo, function(saverespo) {
+                                            if (saverespo.value != "false") {
+                                                callback({
+                                                    value: "true",
+                                                    comment: "Note accepted"
+                                                });
+                                                db.close();
+                                            } else {
+                                                callback({
+                                                    value: "false",
+                                                    comment: "Note not saved"
+                                                });
+                                                db.close();
+                                            }
+                                        });
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "Note not found"
+                                        });
+                                        db.close();
+                                    }
+                                });
+                            } else {
+                                callback({
+                                    value: "false",
+                                    comment: "No data found"
+                                });
+                                db.close();
+                            }
+                        });
+                    }
+                } else if (data.folder) {
+                    data.folder = sails.ObjectID(data.folder);
+                    var tobechanged = {};
+                    var attribute = "notification.$.";
+                    _.forIn(data, function(value, key) {
+                        tobechanged[attribute + key] = value;
+                    });
+                    if (data.status && data.status != "" && data.status == "false") {
+                        data.user = user;
+                        Notification.delete(data, callback);
+                    } else {
+                        db.collection("user").update({
+                            "_id": user,
+                            "notification.folder": data.folder,
+                        }, {
+                            $set: tobechanged
+                        }, function(err, updated) {
+                            if (err) {
+                                console.log(err);
+                                callback({
+                                    value: "false"
+                                });
+                                db.close();
+                            } else if (updated) {
+                                Folder.findbyid(data, function(folrespo) {
+                                    if (folrespo.value != "false") {
+                                        var newdata = {};
+                                        newdata.user = user;
+                                        newdata.name = folrespo.name;
+                                        Folder.findbyname(newdata, function(findrespo) {
+                                            if (findrespo.value == "false") {
+                                                delete folrespo._id;
+                                                folrespo.creationtime = new Date();
+                                                folrespo.modifytime = new Date();
+                                                folrespo.user = user;
+                                                Folder.save(folrespo, function(saverespo) {
+                                                    if (saverespo.value == "true") {
+                                                        var findno = {};
+                                                        findno._id = data.folder;
+                                                        findno.user = sails.ObjectID(data.userid);
+                                                        Folder.findnotes(findno, function(noterespo) {
+                                                            if (noterespo.value != "false") {
+                                                                var i = 0;
+                                                                _.each(noterespo, function(f) {
+                                                                    delete f._id;
+                                                                    f.folder = sails.ObjectID(saverespo.id);
+                                                                    f.user = user;
+                                                                    f.creationtime = new Date();
+                                                                    f.modifytime = new Date();
+                                                                    Note.save(f, function(notesave) {
+                                                                        if (notesave.value != "false") {
+                                                                            i++;
+                                                                            if (i == noterespo.length) {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Folder accepted"
+                                                                                });
+                                                                                db.close();
+                                                                            }
+                                                                        } else {
+                                                                            i++;
+                                                                            if (i == noterespo.length) {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Folder accepted"
+                                                                                });
+                                                                                db.close();
+                                                                            }
+                                                                        }
+                                                                    });
+                                                                });
+                                                            } else {
+                                                                callback({
+                                                                    value: "false",
+                                                                    comment: "Notes not found"
+                                                                });
+                                                                db.close();
+                                                            }
+                                                        });
+                                                    } else {
+                                                        callback({
+                                                            value: "false",
+                                                            comment: "Error"
+                                                        });
+                                                        db.close();
+                                                    }
+                                                });
+                                            } else {
+                                                var findno = {};
+                                                findno._id = data.folder;
+                                                findno.user = sails.ObjectID(data.userid);
+                                                Folder.findnotes(findno, function(noterespo) {
+                                                    if (noterespo.value != "false") {
+                                                        var i = 0;
+                                                        _.each(noterespo, function(f) {
+                                                            delete f._id;
+                                                            f.folder = sails.ObjectID(findrespo._id);
+                                                            f.user = user;
+                                                            f.creationtime = new Date();
+                                                            f.modifytime = new Date();
+                                                            Note.save(f, function(notesave) {
+                                                                if (notesave.value != "false") {
+                                                                    i++;
+                                                                    if (i == noterespo.length) {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Folder accepted"
+                                                                        });
+                                                                        db.close();
+                                                                    }
+                                                                } else {
+                                                                    i++;
+                                                                    if (i == noterespo.length) {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Folder accepted"
+                                                                        });
+                                                                        db.close();
+                                                                    }
+                                                                }
+                                                            });
+                                                        });
+                                                    } else {
+                                                        callback({
+                                                            value: "false",
+                                                            comment: "Notes not found"
+                                                        });
+                                                        db.close();
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        callback({
+                                            value: "false",
+                                            comment: "No folder found"
+                                        });
+                                        db.close();
+                                    }
+                                });
+                            } else {
+                                callback({
+                                    value: "false",
+                                    comment: "No data found"
+                                });
+                                db.close();
+                            }
+                        });
+                    }
                 } else {
-                    db.collection("user").update({
-                        "_id": user,
-                        "notification.note": data.note,
-                    }, {
-                        $set: tobechanged
-                    }, function(err, updated) {
-                        if (err) {
-                            console.log(err);
-                            callback({
-                                value: "false"
-                            });
-                            db.close();
-                        } else if (updated) {
-                            Note.findbyid(data, function(noterespo) {
-                                if (noterespo.value != "false") {
-                                    delete noterespo._id;
-                                    noterespo.user = user;
-                                    noterespo.creationtime = new Date();
-                                    noterespo.modifytime = new Date();
-                                    Note.save(noterespo, function(saverespo) {
-                                        if (saverespo.value != "false") {
-                                            callback({
-                                                value: "true",
-                                                comment: "Note accepted"
-                                            });
-                                            db.close();
-                                        } else {
-                                            callback({
-                                                value: "false",
-                                                comment: "Note not saved"
-                                            });
-                                            db.close();
-                                        }
-                                    });
-                                } else {
-                                    callback({
-                                        value: "false",
-                                        comment: "Note not found"
-                                    });
-                                    db.close();
-                                }
-                            });
-                        } else {
-                            callback({
-                                value: "false",
-                                comment: "No data found"
-                            });
-                            db.close();
-                        }
+                    callback({
+                        value: "false",
+                        comment: "Please provide parameters"
                     });
                 }
             }

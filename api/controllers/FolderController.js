@@ -88,6 +88,26 @@ module.exports = {
             });
         }
     },
+    findbyname: function(req, res) {
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
+                function callback(data) {
+                    res.json(data);
+                };
+                Folder.findbyname(req.body, callback);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
     findone: function(req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
@@ -96,6 +116,53 @@ module.exports = {
                         res.json(data);
                     }
                     Folder.findone(req.body, print);
+                } else {
+                    res.json({
+                        value: "false",
+                        comment: "Folder-id is incorrect"
+                    });
+                }
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "User-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
+    findbyid: function(req, res) {
+        if (req.body) {
+            if (req.body.folder && req.body.folder != "" && sails.ObjectID.isValid(req.body.folder)) {
+                var print = function(data) {
+                    res.json(data);
+                }
+                Folder.findbyid(req.body, print);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "Folder-id is incorrect"
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
+    findnotes: function(req, res) {
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
+                if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
+                    var print = function(data) {
+                        res.json(data);
+                    }
+                    Folder.findnotes(req.body, print);
                 } else {
                     res.json({
                         value: "false",

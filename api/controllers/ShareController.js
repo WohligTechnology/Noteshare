@@ -8,18 +8,21 @@ var gcm = require('node-gcm');
 module.exports = {
     save: function(req, res) {
         if (req.body) {
-            if (req.body.userfrom && req.body.userfrom != "" && sails.ObjectID.isValid(req.body.userfrom)) {
-                if (req.body.note) {
-                    if (req.body.note != "" && sails.ObjectID.isValid(req.body.note)) {
+            if (req.body.userfrom && req.body.userfrom != "" && sails.ObjectID.isValid(req.body.userfrom) && req.body.email && req.body.email != "") {
+                if (req.body.note || req.body.folder) {
+                    if ((req.body.note != "" && sails.ObjectID.isValid(req.body.note)) || (req.body.folder != "" && sails.ObjectID.isValid(req.body.folder))) {
                         share();
                     } else {
                         res.json({
                             value: "false",
-                            comment: "Share-id is incorrect"
+                            comment: "Id is incorrect"
                         });
                     }
                 } else {
-                    share();
+                    res.json({
+                        value: "false",
+                        comment: "Please provide parameters"
+                    });
                 }
 
                 function share() {
@@ -31,7 +34,7 @@ module.exports = {
             } else {
                 res.json({
                     value: "false",
-                    comment: "User-id is incorrect"
+                    comment: "Please provide parameters"
                 });
             }
         } else {

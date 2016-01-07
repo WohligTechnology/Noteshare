@@ -144,7 +144,7 @@ module.exports = {
     },
     noteStatus: function(req, res) {
         if (req.body) {
-            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user) && req.body.note && req.body.note != "" && sails.ObjectID.isValid(req.body.note)) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user) && ((req.body.note && req.body.note != "" && sails.ObjectID.isValid(req.body.note)) || (req.body.folder && req.body.folder != "" && sails.ObjectID.isValid(req.body.folder)))) {
                 if (req.body.status && req.body.status != "") {
                     function callback(data) {
                         res.json(data);
@@ -159,7 +159,7 @@ module.exports = {
             } else {
                 res.json({
                     value: "false",
-                    comment: "id is incorrect "
+                    comment: "Id is incorrect "
                 });
             }
         } else {
