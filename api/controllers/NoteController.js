@@ -192,5 +192,8 @@ module.exports = {
             res.json(data);
         };
         Note.deletemedia(req.body, callback);
+    },
+    get: function(req,res) {
+        res.view("index");
     }
 };

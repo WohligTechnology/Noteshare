@@ -1,0 +1,68 @@
+$light: #fff !default;
+$stable: #ff5a60 !default;
+$positive: #387ef5 !default;
+$calm: #11c1f3 !default;
+$balanced: #33cd5f !default;
+$energized: #ffc900 !default;
+$assertive: #ef473a !default;
+$royal: #886aea !default;
+$dark: #444 !default;
+$font-family-sans-serif: "Helvetica Neue",
+"Roboto",
+"Segoe UI",
+sans-serif !default;
+$font-family-light-sans-serif: "HelveticaNeue-Light",
+"Roboto-Light",
+"Segoe UI-Light",
+sans-serif-light !default;
+$font-family-serif: serif !default;
+.bar-stable {
+    .title {
+        color: #fff !important;
+    }
+}
+.img {
+    margin-top: 15px;
+    .item {
+        border-width: 0px;
+    }
+}
+.mtop {
+    margin: 33px 0px;
+}
+.mbot {
+    margin-bottom:33px;
+}
+.list {
+    ol {
+        margin: 12px 10px;
+            list-style-type: decimal;
+            padding: 20px;
+  
+    }
+    ul {
+            list-style: initial;
+margin-left: 10px;
+    padding: 14px;
+    
+        }
+    }
+
+.main-png{
+        height: 30px;
+    margin: 0 auto;
+}
+label.item {
+    border: 0px solid;
+        border-width: 0px;
+    
+}
+.checkbox input:checked:before, .checkbox input:checked + .checkbox-icon:before {
+    background: #FF5A60 !important;
+    border-color: #FF5A60 !important;
+}
+.checkbox input:before, .checkbox-icon:before {
+
+    border-radius: 4px !important;
+ 
+}
