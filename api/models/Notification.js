@@ -368,10 +368,10 @@ module.exports = {
                     _.forIn(data, function(value, key) {
                         tobechanged[attribute + key] = value;
                     });
-                    if (data.status && data.status != "" && data.status == "false") {
+                    if (data.status == "false") {
                         data.user = user;
                         Notification.delete(data, callback);
-                    } else {
+                    } else if (data.status == "true") {
                         db.collection("user").update({
                             "_id": user,
                             "notification.note": data.note,
@@ -423,6 +423,11 @@ module.exports = {
                                 db.close();
                             }
                         });
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "Please provide status"
+                        });
                     }
                 } else if (data.folder) {
                     data.folder = sails.ObjectID(data.folder);
@@ -431,10 +436,10 @@ module.exports = {
                     _.forIn(data, function(value, key) {
                         tobechanged[attribute + key] = value;
                     });
-                    if (data.status && data.status != "" && data.status == "false") {
+                    if (data.status == "false") {
                         data.user = user;
                         Notification.delete(data, callback);
-                    } else {
+                    } else if (data.status == "true") {
                         db.collection("user").update({
                             "_id": user,
                             "notification.folder": data.folder,
@@ -571,6 +576,11 @@ module.exports = {
                                 });
                                 db.close();
                             }
+                        });
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "Please provide status"
                         });
                     }
                 } else {
