@@ -81,7 +81,7 @@ module.exports = {
         res.json({
             value: "true"
         });
-    }
+    },
     logout: function(req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user) && req.body.deviceid && req.body.deviceid != "") {
