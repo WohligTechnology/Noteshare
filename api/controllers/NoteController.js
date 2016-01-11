@@ -195,5 +195,8 @@ module.exports = {
     },
     get: function(req,res) {
         res.view("index");
+    },
+    getUrl: function(req,res) {
+        res.view("index2");
     }
 };
