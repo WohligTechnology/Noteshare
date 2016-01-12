@@ -11,6 +11,7 @@ module.exports = {
                 var user = sails.ObjectID(data.user);
                 delete data.user;
                 if (!data._id) {
+                    data.status = "pending";
                     db.collection("user").update({
                         _id: user
                     }, {
@@ -81,6 +82,7 @@ module.exports = {
         });
     },
     delete: function(data, callback) {
+        console.log(data);
         if (data.note) {
             var matchobj = {
                 "note": sails.ObjectID(data.note)
@@ -104,7 +106,7 @@ module.exports = {
                     db.collection("user").update({
                         _id: user,
                         "notification.status": {
-                            $exists: false
+                            $eq: "pending"
                         }
                     }, {
                         $pull: {
@@ -256,7 +258,10 @@ module.exports = {
                 if (db) {
                     db.collection("user").find({
                         _id: user,
-                        "notification.note": sails.ObjectID(data.note)
+                        "notification.note": sails.ObjectID(data.note),
+                        "notification.status": {
+                            $eq: "pending"
+                        }
                     }, {
                         "notification.$": 1
                     }).toArray(function(err, data2) {
@@ -307,14 +312,7 @@ module.exports = {
                 }, {
                     $match: {
                         "notification.status": {
-                            $exists: false
-                        }
-                    }
-                }, {
-                    $group: {
-                        _id: "$_id",
-                        notification: {
-                            $addToSet: "$notification"
+                            $eq: "pending"
                         }
                     }
                 }, {
@@ -322,10 +320,9 @@ module.exports = {
                         _id: 0,
                         notification: 1
                     }
-                }, {
-                    $unwind: "$notification"
                 }]).toArray(function(err, data2) {
                     if (data2 && data2[0]) {
+                        // callback(data2);
                         _.each(data2, function(z) {
                             lastresult.push(z.notification);
                             i++;
@@ -502,7 +499,7 @@ module.exports = {
                                                                 });
                                                             } else {
                                                                 callback({
-                                                                    value: "false",
+                                                                    value: "true",
                                                                     comment: "Notes not found"
                                                                 });
                                                                 db.close();
@@ -553,7 +550,7 @@ module.exports = {
                                                         });
                                                     } else {
                                                         callback({
-                                                            value: "false",
+                                                            value: "true",
                                                             comment: "Notes not found"
                                                         });
                                                         db.close();

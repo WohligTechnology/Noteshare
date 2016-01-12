@@ -63,100 +63,14 @@ module.exports = {
                                                     notifydata.username = userrespo.name;
                                                     notifydata.userid = user;
                                                     notifydata.profilepic = userrespo.profilepic;
-                                                    // Notification.findone(notifydata, function(checkrespo) {
-                                                    //     if (checkrespo.value == "false") {
-                                                    Notification.save(notifydata, function(notifyrespo) {
-                                                        if (notifyrespo.value != "false") {
-                                                            // var template_name = "share";
-                                                            // var template_content = [{
-                                                            //     "name": "share",
-                                                            //     "content": "share"
-                                                            // }]
-                                                            // var message = {
-                                                            //     "from_email": sails.fromEmail,
-                                                            //     "from_name": sails.fromName,
-                                                            //     "to": [{
-                                                            //         "email": data.email,
-                                                            //         "type": "to"
-                                                            //     }],
-                                                            //     "global_merge_vars": [{
-                                                            //         "name": "note",
-                                                            //         "content": response.title
-                                                            //     }, {
-                                                            //         "name": "sentby",
-                                                            //         "content": userrespo.name
-                                                            //     }]
-                                                            // };
-                                                            // sails.mandrill_client.messages.sendTemplate({
-                                                            //     "template_name": template_name,
-                                                            //     "template_content": template_content,
-                                                            //     "message": message
-                                                            // }, function(result) {
-                                                            if (data2[0].deviceid && data2[0].deviceid[0]) {
-                                                                var message = new gcm.Message();
-                                                                var title = "Noteshare";
-                                                                var body = response.title + " Note has been shared with you by " + userrespo.name;
-                                                                message.addNotification('title', title);
-                                                                message.addNotification('body', body);
-                                                                var sender = new gcm.Sender('AIzaSyC5cKwyfT8_iAg5H62rg5E6DHyg67KVqxE');
-                                                                sender.send(message, {
-                                                                    registrationTokens: data2[0].deviceid
-                                                                }, function(err, response) {
-                                                                    callback({
-                                                                        value: "true",
-                                                                        comment: "Mail sent"
-                                                                    });
-                                                                    db.close();
-                                                                });
-                                                            } else {
-                                                                callback({
-                                                                    value: "true",
-                                                                    comment: "Mail sent"
-                                                                });
-                                                                db.close();
-                                                            }
-                                                            // }, function(e) {
-                                                            //     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                                            // });
-                                                        } else {
-                                                            callback({
-                                                                value: "false",
-                                                                comment: "User not found"
-                                                            });
-                                                            db.close();
-                                                        }
-                                                    });
-                                                    //     } else {
-                                                    //         callback({
-                                                    //             value: "true",
-                                                    //             comment: "Mail Sent"
-                                                    //         });
-                                                    //         db.close();
-                                                    //     }
-                                                    // });
-
-                                                });
-                                            } else {
-                                                var newdata = {};
-                                                newdata.email = data.email;
-                                                User.saveuser(newdata, function(newrespo) {
-                                                    if (newrespo.value && newrespo.value == "true") {
-                                                        var userdata = {};
-                                                        userdata._id = user;
-                                                        User.findoneuser(userdata, function(userrespo) {
-                                                            var notifydata = {};
-                                                            notifydata.user = newrespo._id;
-                                                            notifydata.note = response._id;
-                                                            notifydata.notename = response.title;
-                                                            notifydata.username = userrespo.name;
-                                                            notifydata.userid = user;
-                                                            notifydata.profilepic = userrespo.profilepic;
+                                                    Notification.findone(notifydata, function(checkrespo) {
+                                                        if (checkrespo.value == "false") {
                                                             Notification.save(notifydata, function(notifyrespo) {
-                                                                if (userrespo.value == "true") {
-                                                                    // var template_name = "newnote";
+                                                                if (notifyrespo.value != "false") {
+                                                                    // var template_name = "share";
                                                                     // var template_content = [{
-                                                                    //     "name": "newnote",
-                                                                    //     "content": "newnote"
+                                                                    //     "name": "share",
+                                                                    //     "content": "share"
                                                                     // }]
                                                                     // var message = {
                                                                     //     "from_email": sails.fromEmail,
@@ -178,14 +92,100 @@ module.exports = {
                                                                     //     "template_content": template_content,
                                                                     //     "message": message
                                                                     // }, function(result) {
-                                                                    callback({
-                                                                        value: "true",
-                                                                        comment: "Mail Sent"
-                                                                    });
-                                                                    db.close();
+                                                                    if (data2[0].deviceid && data2[0].deviceid[0]) {
+                                                                        var message = new gcm.Message();
+                                                                        var title = "Noteshare";
+                                                                        var body = response.title + " Note has been shared with you by " + userrespo.name;
+                                                                        message.addNotification('title', title);
+                                                                        message.addNotification('body', body);
+                                                                        var sender = new gcm.Sender('AIzaSyC5cKwyfT8_iAg5H62rg5E6DHyg67KVqxE');
+                                                                        sender.send(message, {
+                                                                            registrationTokens: data2[0].deviceid
+                                                                        }, function(err, response) {
+                                                                            callback({
+                                                                                value: "true",
+                                                                                comment: "Mail sent"
+                                                                            });
+                                                                            db.close();
+                                                                        });
+                                                                    } else {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Mail sent"
+                                                                        });
+                                                                        db.close();
+                                                                    }
                                                                     // }, function(e) {
                                                                     //     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                                                                     // });
+                                                                } else {
+                                                                    callback({
+                                                                        value: "false",
+                                                                        comment: "User not found"
+                                                                    });
+                                                                    db.close();
+                                                                }
+                                                            });
+                                                        } else {
+                                                            callback({
+                                                                value: "true",
+                                                                comment: "Mail Sent"
+                                                            });
+                                                            db.close();
+                                                        }
+                                                    });
+
+                                                });
+                                            } else {
+                                                var newdata = {};
+                                                newdata.email = data.email;
+                                                User.saveuser(newdata, function(newrespo) {
+                                                    if (newrespo.value && newrespo.value == "true") {
+                                                        var userdata = {};
+                                                        userdata._id = user;
+                                                        User.findoneuser(userdata, function(userrespo) {
+                                                            var notifydata = {};
+                                                            notifydata.user = newrespo._id;
+                                                            notifydata.note = response._id;
+                                                            notifydata.notename = response.title;
+                                                            notifydata.username = userrespo.name;
+                                                            notifydata.userid = user;
+                                                            notifydata.profilepic = userrespo.profilepic;
+                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                                if (userrespo.value == "true") {
+                                                                    var template_name = "newnote";
+                                                                    var template_content = [{
+                                                                        "name": "newnote",
+                                                                        "content": "newnote"
+                                                                    }]
+                                                                    var message = {
+                                                                        "from_email": sails.fromEmail,
+                                                                        "from_name": sails.fromName,
+                                                                        "to": [{
+                                                                            "email": data.email,
+                                                                            "type": "to"
+                                                                        }],
+                                                                        "global_merge_vars": [{
+                                                                            "name": "note",
+                                                                            "content": response.title
+                                                                        }, {
+                                                                            "name": "sentby",
+                                                                            "content": userrespo.name
+                                                                        }]
+                                                                    };
+                                                                    sails.mandrill_client.messages.sendTemplate({
+                                                                        "template_name": template_name,
+                                                                        "template_content": template_content,
+                                                                        "message": message
+                                                                    }, function(result) {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Mail Sent"
+                                                                        });
+                                                                        db.close();
+                                                                    }, function(e) {
+                                                                        callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
+                                                                    });
                                                                 } else {
                                                                     callback({
                                                                         value: "false",
