@@ -7,22 +7,36 @@
 var gcm = require('node-gcm');
 module.exports = {
     save: function(req, res) {
+        var i = 0;
         if (req.body) {
             if (req.body.userfrom && req.body.userfrom != "" && sails.ObjectID.isValid(req.body.userfrom) && req.body.email && req.body.email != "") {
                 if ((req.body.note && req.body.note != "" && sails.ObjectID.isValid(req.body.note)) || (req.body.folder && req.body.folder != "" && sails.ObjectID.isValid(req.body.folder))) {
-                    share();
+
+                    var emails = req.body.email.split(",");
+                    _.each(emails, function(n) {
+                        var obj = _.cloneDeep(req.body);
+                        obj.email = n;
+                        share(obj, emails.length);
+                    });
+
                 } else {
                     res.json({
                         value: "false",
                         comment: "Id is incorrect"
                     });
                 }
+                var arr = [];
 
-                function share() {
+                function share(obj, length) {
                     var print = function(data) {
-                        res.json(data);
+                        i++;
+                        data.email = obj.email;
+                        arr.push(data);
+                        if (i == length) {
+                            res.json(arr);
+                        }
                     }
-                    Share.save(req.body, print);
+                    Share.save(obj, print);
                 }
             } else {
                 res.json({

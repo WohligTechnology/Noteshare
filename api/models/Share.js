@@ -67,31 +67,6 @@ module.exports = {
                                                         if (checkrespo.value == "false") {
                                                             Notification.save(notifydata, function(notifyrespo) {
                                                                 if (notifyrespo.value != "false") {
-                                                                    // var template_name = "share";
-                                                                    // var template_content = [{
-                                                                    //     "name": "share",
-                                                                    //     "content": "share"
-                                                                    // }]
-                                                                    // var message = {
-                                                                    //     "from_email": sails.fromEmail,
-                                                                    //     "from_name": sails.fromName,
-                                                                    //     "to": [{
-                                                                    //         "email": data.email,
-                                                                    //         "type": "to"
-                                                                    //     }],
-                                                                    //     "global_merge_vars": [{
-                                                                    //         "name": "note",
-                                                                    //         "content": response.title
-                                                                    //     }, {
-                                                                    //         "name": "sentby",
-                                                                    //         "content": userrespo.name
-                                                                    //     }]
-                                                                    // };
-                                                                    // sails.mandrill_client.messages.sendTemplate({
-                                                                    //     "template_name": template_name,
-                                                                    //     "template_content": template_content,
-                                                                    //     "message": message
-                                                                    // }, function(result) {
                                                                     if (data2[0].deviceid && data2[0].deviceid[0]) {
                                                                         var message = new gcm.Message();
                                                                         var title = "Noteshare";
@@ -115,9 +90,6 @@ module.exports = {
                                                                         });
                                                                         db.close();
                                                                     }
-                                                                    // }, function(e) {
-                                                                    //     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                                                    // });
                                                                 } else {
                                                                     callback({
                                                                         value: "false",
@@ -152,7 +124,7 @@ module.exports = {
                                                             notifydata.userid = user;
                                                             notifydata.profilepic = userrespo.profilepic;
                                                             Notification.save(notifydata, function(notifyrespo) {
-                                                                if (userrespo.value == "true") {
+                                                                if (userrespo.value != "false") {
                                                                     var template_name = "newnote";
                                                                     var template_content = [{
                                                                         "name": "newnote",
@@ -266,31 +238,6 @@ module.exports = {
                                                     //     if (checkrespo.value == "false") {
                                                     Notification.save(notifydata, function(notifyrespo) {
                                                         if (notifyrespo.value != "false") {
-                                                            // var template_name = "share";
-                                                            // var template_content = [{
-                                                            //     "name": "share",
-                                                            //     "content": "share"
-                                                            // }]
-                                                            // var message = {
-                                                            //     "from_email": sails.fromEmail,
-                                                            //     "from_name": sails.fromName,
-                                                            //     "to": [{
-                                                            //         "email": data.email,
-                                                            //         "type": "to"
-                                                            //     }],
-                                                            //     "global_merge_vars": [{
-                                                            //         "name": "note",
-                                                            //         "content": response.title
-                                                            //     }, {
-                                                            //         "name": "sentby",
-                                                            //         "content": userrespo.name
-                                                            //     }]
-                                                            // };
-                                                            // sails.mandrill_client.messages.sendTemplate({
-                                                            //     "template_name": template_name,
-                                                            //     "template_content": template_content,
-                                                            //     "message": message
-                                                            // }, function(result) {
                                                             if (data2[0].deviceid && data2[0].deviceid[0]) {
                                                                 var message = new gcm.Message();
                                                                 var title = "Noteshare";
@@ -314,9 +261,6 @@ module.exports = {
                                                                 });
                                                                 db.close();
                                                             }
-                                                            // }, function(e) {
-                                                            //     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                                            // });
                                                         } else {
                                                             callback({
                                                                 value: "false",
@@ -333,7 +277,6 @@ module.exports = {
                                                     //         db.close();
                                                     //     }
                                                     // });
-
                                                 });
                                             } else {
                                                 var newdata = {};
@@ -352,39 +295,11 @@ module.exports = {
                                                             notifydata.profilepic = userrespo.profilepic;
                                                             Notification.save(notifydata, function(notifyrespo) {
                                                                 if (userrespo.value == "true") {
-                                                                    // var template_name = "newnote";
-                                                                    // var template_content = [{
-                                                                    //     "name": "newnote",
-                                                                    //     "content": "newnote"
-                                                                    // }]
-                                                                    // var message = {
-                                                                    //     "from_email": sails.fromEmail,
-                                                                    //     "from_name": sails.fromName,
-                                                                    //     "to": [{
-                                                                    //         "email": data.email,
-                                                                    //         "type": "to"
-                                                                    //     }],
-                                                                    //     "global_merge_vars": [{
-                                                                    //         "name": "note",
-                                                                    //         "content": response.title
-                                                                    //     }, {
-                                                                    //         "name": "sentby",
-                                                                    //         "content": userrespo.name
-                                                                    //     }]
-                                                                    // };
-                                                                    // sails.mandrill_client.messages.sendTemplate({
-                                                                    //     "template_name": template_name,
-                                                                    //     "template_content": template_content,
-                                                                    //     "message": message
-                                                                    // }, function(result) {
                                                                     callback({
                                                                         value: "true",
                                                                         comment: "Mail Sent"
                                                                     });
                                                                     db.close();
-                                                                    // }, function(e) {
-                                                                    //     callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
-                                                                    // });
                                                                 } else {
                                                                     callback({
                                                                         value: "false",
