@@ -132,7 +132,7 @@ module.exports = {
         message.addNotification('title', title);
         message.addNotification('body', body);
         var reg = "APA91bGkWGHylYXGyaUJxy7-Rs_79c5NmXUKeNV3vWg3RAGwR-Kgm5HIYk5oCgP4d0STqhzoAZlvsSxb0zu3N7KTz4q7JZyzLl9aZ8kZk9ZD29bGEOfTqylwKiNfOq1gFHkJcSLBzyNy";
-        var sender = new gcm.Sender('AIzaSyC5cKwyfT8_iAg5H62rg5E6DHyg67KVqxE');
+        var sender = new gcm.Sender('AIzaSyA8mIwgUtfLJAc2BXLWTWfxGadfQdwDc0s');
         sender.send(message, {
             registrationTokens: reg
         }, function(err, response) {
