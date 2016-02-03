@@ -6,14 +6,14 @@
  */
 var gcm = require('node-gcm');
 module.exports = {
-    save: function(req, res) {
+    save: function (req, res) {
         var i = 0;
         if (req.body) {
             if (req.body.userfrom && req.body.userfrom != "" && sails.ObjectID.isValid(req.body.userfrom) && req.body.email && req.body.email != "") {
                 if ((req.body.note && req.body.note != "" && sails.ObjectID.isValid(req.body.note)) || (req.body.folder && req.body.folder != "" && sails.ObjectID.isValid(req.body.folder))) {
 
                     var emails = req.body.email.split(",");
-                    _.each(emails, function(n) {
+                    _.each(emails, function (n) {
                         var obj = _.cloneDeep(req.body);
                         obj.email = n;
                         share(obj, emails.length);
@@ -25,15 +25,15 @@ module.exports = {
                         comment: "Id is incorrect"
                     });
                 }
-                var arr = [];
 
                 function share(obj, length) {
-                    var print = function(data) {
+                    var print = function (data) {
                         i++;
                         data.email = obj.email;
-                        arr.push(data);
                         if (i == length) {
-                            res.json(arr);
+                            res.json({
+                                value: "true"
+                            });
                         }
                     }
                     Share.save(obj, print);
@@ -51,11 +51,11 @@ module.exports = {
             });
         }
     },
-    delete: function(req, res) {
+    delete: function (req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
                 if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                    var print = function(data) {
+                    var print = function (data) {
                         res.json(data);
                     }
                     Share.delete(req.body, print);
@@ -78,7 +78,7 @@ module.exports = {
             });
         }
     },
-    find: function(req, res) {
+    find: function (req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
                 function callback(data) {
@@ -98,11 +98,11 @@ module.exports = {
             });
         }
     },
-    findone: function(req, res) {
+    findone: function (req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
                 if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                    var print = function(data) {
+                    var print = function (data) {
                         res.json(data);
                     }
                     Share.findone(req.body, print);
@@ -125,7 +125,7 @@ module.exports = {
             });
         }
     },
-    sendnoti: function(req, res) {
+    sendnoti: function (req, res) {
         var message = new gcm.Message();
         var title = "Noteshare";
         var body = " Note has been shared with you";
@@ -135,7 +135,7 @@ module.exports = {
         var sender = new gcm.Sender('AIzaSyA8mIwgUtfLJAc2BXLWTWfxGadfQdwDc0s');
         sender.send(message, {
             registrationTokens: reg
-        }, function(err, response) {
+        }, function (err, response) {
             if (err) {
                 callback({
                     value: "false",
