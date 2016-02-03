@@ -5,7 +5,7 @@ angular.module('starter.controllers', [])
 })
 
 .controller('HomeCtrl', function($scope, $ionicPlatform, $http,$stateParams) {
-  var id = $stateParams.id;
+  var id = noteId;
   function onSuccess(data, status) {
     console.log(data);
     $scope.note = data;

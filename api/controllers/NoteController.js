@@ -204,7 +204,8 @@ module.exports = {
 
       return localAppURL;
     }
-    res.view("index",{adminURL:getBaseurl()});
+
+    res.view("index",{adminURL:getBaseurl(),noteID:req.param("id")});
   },
   getUrl: function(req, res) {
     res.view("index2");

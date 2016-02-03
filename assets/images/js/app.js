@@ -25,41 +25,29 @@ angular.module('starter', ['ionic', 'starter.controllers'])
   });
 })
 
-.config(function($stateProvider, $urlRouterProvider) {
-  $stateProvider
+.config(function($stateProvider, $urlRouterProvider,$locationProvider) {
+    $stateProvider
 
-    .state('app', {
-    url: '/app',
-    abstract: true,
-    templateUrl: 'templates/menu.html',
-    controller: 'AppCtrl'
-  })
-
-    .state('app.home', {
-      url: '/note/:id',
-      views: {
-        'menuContent': {
-          templateUrl: 'templates/home.html',
-          controller: 'HomeCtrl'
-        }
-      }
+      .state('app', {
+      url: '/',
+      templateUrl: 'templates/home.html',
+      controller: 'HomeCtrl'
     });
-
-
-  // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/note/56b1d905111647bd4090a48c');
-})
-.directive('chSrc', function() {
+    // if none of the above states are matched, use this as the fallback
+    $urlRouterProvider.otherwise('/');
+    // $locationProvider.html5Mode(true);
+  })
+  .directive('chSrc', function() {
     return {
-        restrict: 'A',
-        scope: {
-            chSrc: '='
-        },
-        replace: false,
-        link: function(scope,element,attrs) {
-          var $element = $(element);
-          console.log(scope.chSrc);
-          $element.attr("src",adminURL+'user/getmedia?file='+scope.chSrc);
-        }
+      restrict: 'A',
+      scope: {
+        chSrc: '='
+      },
+      replace: false,
+      link: function(scope, element, attrs) {
+        var $element = $(element);
+        console.log(scope.chSrc);
+        $element.attr("src", adminURL + 'user/getmedia?file=' + scope.chSrc);
+      }
     };
-});
+  });
