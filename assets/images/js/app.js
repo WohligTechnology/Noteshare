@@ -4,6 +4,9 @@
 // 'starter' is the name of this angular module example (also set in a <body> attribute in index.html)
 // the 2nd parameter is an array of 'requires'
 // 'starter.controllers' is found in controllers.js
+
+
+
 angular.module('starter', ['ionic', 'starter.controllers'])
 
 .run(function($ionicPlatform) {
@@ -44,7 +47,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
 
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/app/note/568cea9012a7abe1049810d1');
+  $urlRouterProvider.otherwise('/app/note/56b1d905111647bd4090a48c');
 })
 .directive('chSrc', function() {
     return {
@@ -56,7 +59,7 @@ angular.module('starter', ['ionic', 'starter.controllers'])
         link: function(scope,element,attrs) {
           var $element = $(element);
           console.log(scope.chSrc);
-          $element.attr("src",'http://104.197.47.172/user/getmedia?file='+scope.chSrc);
+          $element.attr("src",adminURL+'user/getmedia?file='+scope.chSrc);
         }
     };
 });

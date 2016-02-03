@@ -1,8 +1,8 @@
 <ion-view hide-nav-bar="true">
     <ion-header-bar class="bar-stable">
-      
+
         <img src="img/logo.png" style="height: 38px;position: absolute;">
-        
+
      <h4 style="margin: 7px auto 0px;color: #fff;">{{note.title}}</h4>
     </ion-header-bar>
   <ion-content class="has-header">
@@ -10,7 +10,7 @@
     <div ng-repeat="element in note.noteelements" >
 
       <div class="img" ng-if="element.type=='image'">
-        <img class="full-image" ng-src="{{'http://104.197.47.172/user/getmedia?file='+element.content}}">
+        <img class="full-image" ng-src="{{element.content}}">
       </div>
 
       <div class="text padding-horizontal list" ng-bind-html="element.content" ng-if="element.type=='text'"></div>
@@ -21,7 +21,7 @@
         </audio>
       </div>
       <div class="scribble padding-horizontal mbot" ng-if="element.type=='scribble'" style="position:absolute;top:{{element.contentA}}px;left:0;width:100%;">
-        <img class="full-image" ng-src="{{'http://104.197.47.172/user/getmedia?file='+element.content}}">
+        <img class="full-image" ng-src="{{element.content}}">
       </div>
       <div class="">
       <div class="checkbox2" ng-if="element.type=='checkbox'">

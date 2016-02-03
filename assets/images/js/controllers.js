@@ -10,6 +10,9 @@ angular.module('starter.controllers', [])
     console.log(data);
     $scope.note = data;
     _.each($scope.note.noteelements, function(n) {
+      if(n.type == "image" || n.type == "scribble" ) {
+        n.content = adminURL + "user/getmedia?file=" + n.content;
+      }
       if (n.type == "checkbox") {
         if (n.contentA == "true") {
           n.contentA = true;
@@ -19,7 +22,7 @@ angular.module('starter.controllers', [])
       }
     });
   }
-  $http.post("http://104.197.47.172/note/findbyid", {
+  $http.post(adminURL+"note/findbyid", {
     "note": id
   }).success(onSuccess);
 });
