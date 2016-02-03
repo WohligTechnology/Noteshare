@@ -32,10 +32,8 @@ module.exports.routes = {
   *                                                                          *
   ***************************************************************************/
 
-  '/': {
-    view: 'homepage',
-  },
-  '/view/:id': 'NoteController.get',
+  '/': 'NoteController.getUrl',
+  '/view/:id': 'NoteController.get'
 
   /***************************************************************************
   *                                                                          *
