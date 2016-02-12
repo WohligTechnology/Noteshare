@@ -73,7 +73,7 @@ module.exports = {
                                                                         var body = response.title + " Note has been shared with you by " + userrespo.name;
                                                                         message.addNotification('title', title);
                                                                         message.addNotification('body', body);
-                                                                        var sender = new gcm.Sender('AIzaSyA8mIwgUtfLJAc2BXLWTWfxGadfQdwDc0s');
+                                                                        var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
                                                                         sender.send(message, {
                                                                             registrationTokens: data2[0].deviceid
                                                                         }, function(err, response) {
@@ -244,7 +244,7 @@ module.exports = {
                                                                 var body = response.name + " Folder has been shared with you by " + userrespo.name;
                                                                 message.addNotification('title', title);
                                                                 message.addNotification('body', body);
-                                                                var sender = new gcm.Sender('AIzaSyA8mIwgUtfLJAc2BXLWTWfxGadfQdwDc0s');
+                                                                var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
                                                                 sender.send(message, {
                                                                     registrationTokens: data2[0].deviceid
                                                                 }, function(err, response) {
