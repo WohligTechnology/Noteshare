@@ -348,6 +348,66 @@ module.exports = {
             }
         });
     },
+    countNoti: function(data, callback) {
+        var lastresult = [];
+        var i = 0;
+        var user = sails.ObjectID(data.user);
+        sails.query(function(err, db) {
+            if (err) {
+                console.log(err);
+                callback({
+                    value: "false"
+                });
+            }
+            if (db) {
+                db.collection("user").aggregate([{
+                    $match: {
+                        _id: user
+                    }
+                }, {
+                    $unwind: "$notification"
+                }, {
+                    $match: {
+                        "notification.status": {
+                            $eq: "pending"
+                        }
+                    }
+                }, {
+                    $group: {
+                        _id: user,
+                        count: {
+                            $sum: 1
+                        }
+                    }
+                }, {
+                    $project: {
+                        _id: 0,
+                        count: 1
+                    }
+                }]).toArray(function(err, data2) {
+                    if (data2 && data2.length > 0) {
+                        callback(data2[0]);
+                    } else if (data2 && data2.length == 0) {
+                        callback({
+                            count: 0
+                        });
+                    } else if (err) {
+                        console.log(err);
+                        callback({
+                            value: "false"
+                        });
+                        db.close();
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "No data found"
+                        });
+                        db.close();
+                    }
+                });
+            }
+        });
+    },
     noteStatus: function(data, callback) {
         sails.query(function(err, db) {
             if (err) {

@@ -168,5 +168,25 @@ module.exports = {
                 comment: "Please provide parameters"
             });
         }
+    },
+    countNoti: function(req, res) {
+        if (req.body) {
+            if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user)) {
+                function callback(data) {
+                    res.json(data);
+                };
+                Notification.countNoti(req.body, callback);
+            } else {
+                res.json({
+                    value: "false",
+                    comment: "user-id is incorrect "
+                });
+            }
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
     }
 };
