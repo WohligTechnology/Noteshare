@@ -315,12 +315,12 @@ module.exports = {
         }
         User.saveuser(req.body, print);
     },
-    find: function(req, res) {
-        var print = function(data) {
-            res.json(data);
-        }
-        User.find(req.body, print);
-    },
+    // find: function(req, res) {
+    //     var print = function(data) {
+    //         res.json(data);
+    //     }
+    //     User.find(req.body, print);
+    // },
     findlimited: function(req, res) {
         if (req.body) {
             if (req.body.pagesize && req.body.pagesize != "" && req.body.pagenumber && req.body.paenumber != "") {
@@ -407,12 +407,12 @@ module.exports = {
             });
         }
     },
-    deletealluser: function(req, res) {
-        var print = function(data) {
-            res.json(data);
-        }
-        User.deletealluser(req.body, print);
-    },
+    // deletealluser: function(req, res) {
+    //     var print = function(data) {
+    //         res.json(data);
+    //     }
+    //     User.deletealluser(req.body, print);
+    // },
     // login: function(req, res) {
     //     if (req.body.email && req.body.email != "" && req.body.password && req.body.password != "") {
     //         var print = function(data) {
