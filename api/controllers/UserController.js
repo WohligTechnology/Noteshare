@@ -12,7 +12,7 @@ passport.use(new GoogleStrategy({
         clientSecret: "evdpiycmTSRae_mk2vQVWBzZ",
         callbackURL: "callbackg"
     },
-    function(token, tokenSecret, profile, done) {
+    function (token, tokenSecret, profile, done) {
         profile.token = token;
         profile.tokenSecret = tokenSecret;
         profile.provider = "Google";
@@ -20,11 +20,11 @@ passport.use(new GoogleStrategy({
     }
 ));
 
-passport.serializeUser(function(user, done) {
+passport.serializeUser(function (user, done) {
     done(null, user);
 });
 
-passport.deserializeUser(function(id, done) {
+passport.deserializeUser(function (id, done) {
     done(null, id);
 });
 
@@ -77,15 +77,15 @@ module.exports = {
     //         res.json({});
     //     }
     // },
-    checkTrue: function(req, res) {
+    checkTrue: function (req, res) {
         res.json({
             value: "true"
         });
     },
-    logout: function(req, res) {
+    logout: function (req, res) {
         if (req.body) {
             if (req.body.user && req.body.user != "" && sails.ObjectID.isValid(req.body.user) && req.body.deviceid && req.body.deviceid != "") {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.logout(req.body, print);
@@ -103,10 +103,10 @@ module.exports = {
         }
     },
 
-    uploadfile: function(req, res) {
+    uploadfile: function (req, res) {
         res.connection.setTimeout(200000);
         req.connection.setTimeout(200000);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -116,7 +116,7 @@ module.exports = {
             } else if (db) {
                 req.file("file").upload({
                     maxBytes: 10000000000
-                }, function(err, uploadedFiles) {
+                }, function (err, uploadedFiles) {
                     if (err) {
                         console.log(err);
                         res.json({
@@ -125,7 +125,7 @@ module.exports = {
                         });
                         db.close();
                     } else if (uploadedFiles) {
-                        _.each(uploadedFiles, function(n) {
+                        _.each(uploadedFiles, function (n) {
                             var filepath = n.fd;
                             var newfilepath = n.fd;
                             var newfilenamearr = newfilepath.split(".");
@@ -133,7 +133,7 @@ module.exports = {
                             var mimetype = sails.mime.lookup(n.fd);
                             var newdate = sails.moment(new Date()).format('YYYY-MM-DDh-mm-ss-SSSSa');
                             var filename = 'image' + newdate + '.' + extension;
-                            db.open(function(err, db) {
+                            db.open(function (err, db) {
                                 if (err) {
                                     console.log(err);
                                     res.json({
@@ -146,7 +146,7 @@ module.exports = {
                                     var gridStore = new sails.GridStore(db, fileId, filename, 'w', {
                                         content_type: mimetype
                                     });
-                                    gridStore.open(function(err, gridStore) {
+                                    gridStore.open(function (err, gridStore) {
                                         if (err) {
                                             console.log(err);
                                             res.json({
@@ -155,7 +155,7 @@ module.exports = {
                                             });
                                             db.close();
                                         } else if (gridStore) {
-                                            gridStore.writeFile(filepath, function(err, doc) {
+                                            gridStore.writeFile(filepath, function (err, doc) {
                                                 if (err) {
                                                     console.log(err);
                                                     res.json({
@@ -164,7 +164,7 @@ module.exports = {
                                                     });
                                                     db.close();
                                                 } else if (doc) {
-                                                    sails.fs.unlink(filepath, function(err) {
+                                                    sails.fs.unlink(filepath, function (err) {
                                                         if (err) {
                                                             console.log(err);
                                                         }
@@ -177,7 +177,7 @@ module.exports = {
                                                             $set: {
                                                                 profilepic: fileId
                                                             }
-                                                        }, function(err, updated) {
+                                                        }, function (err, updated) {
                                                             if (err) {
                                                                 console.log(err);
                                                                 res.json({
@@ -216,9 +216,9 @@ module.exports = {
             }
         });
     },
-    getupload: function(req, res) {
+    getupload: function (req, res) {
         if (req.query.file && req.query.file != "" && sails.ObjectID.isValid(req.query.file)) {
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                 } else if (db) {
@@ -227,7 +227,7 @@ module.exports = {
                     var file = new sails.GridStore(db, fileId, "r");
                     db.collection("fs.files").find({
                         _id: fileId
-                    }).toArray(function(err, found) {
+                    }).toArray(function (err, found) {
                         if (err) {
                             console.log(err);
                             res.json({
@@ -236,7 +236,7 @@ module.exports = {
                             });
                             db.close();
                         } else if (found && found[0]) {
-                            file.open(function(err, file) {
+                            file.open(function (err, file) {
                                 if (err) {
                                     console.log(err);
                                     res.json({
@@ -268,10 +268,10 @@ module.exports = {
             });
         }
     },
-    deleteupload: function(req, res) {
+    deleteupload: function (req, res) {
         if (req.body) {
             if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.deleteupload(req.body, print);
@@ -309,22 +309,29 @@ module.exports = {
     //         User.save(req.body, print);
     //     }
     // },
-    saveuser: function(req, res) {
-        var print = function(data) {
+    saveuser: function (req, res) {
+        var print = function (data) {
             res.json(data);
         }
         User.saveuser(req.body, print);
     },
-    // find: function(req, res) {
-    //     var print = function(data) {
-    //         res.json(data);
-    //     }
-    //     User.find(req.body, print);
-    // },
-    findlimited: function(req, res) {
+    findAll: function (req, res) {
+        if (req.body) {
+            var print = function (data) {
+                res.json(data);
+            }
+            User.find(req.body, print);
+        } else {
+            res.json({
+                value: "false",
+                comment: "Please provide parameters"
+            });
+        }
+    },
+    findlimited: function (req, res) {
         if (req.body) {
             if (req.body.pagesize && req.body.pagesize != "" && req.body.pagenumber && req.body.paenumber != "") {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.findlimited(req.body, print);
@@ -341,10 +348,10 @@ module.exports = {
             });
         }
     },
-    findone: function(req, res) {
+    findone: function (req, res) {
         if (req.body) {
             if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.findone(req.body, print);
@@ -361,16 +368,16 @@ module.exports = {
             });
         }
     },
-    findoneuser: function(req, res) {
-        var print = function(data) {
+    findoneuser: function (req, res) {
+        var print = function (data) {
             res.json(data);
         }
         User.findoneuser(req.body, print);
     },
-    searchmail: function(req, res) {
+    searchmail: function (req, res) {
         if (req.body) {
             if (req.body.email && req.body.email != "") {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.searchmail(req.body, print);
@@ -387,10 +394,10 @@ module.exports = {
             });
         }
     },
-    delete: function(req, res) {
+    delete: function (req, res) {
         if (req.body) {
             if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.delete(req.body, print);
@@ -426,10 +433,10 @@ module.exports = {
     //         });
     //     }
     // },
-    sociallogin: function(req, res) {
+    sociallogin: function (req, res) {
         if (req.body) {
             if (req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "" && (req.body.fbid && req.body.fbid != "" || req.body.googleid && req.body.googleid != "")) {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.sociallogin(req.body, print);
@@ -446,10 +453,10 @@ module.exports = {
             });
         }
     },
-    sociallogin1: function(req, res) {
+    sociallogin1: function (req, res) {
         if (req.body) {
             if (req.body.profilepic && req.body.profilepic != "" && req.body.name && req.body.name != "" && (req.body.fbid && req.body.fbid != "" || req.body.googleid && req.body.googleid != "") && req.body.deviceid && req.body.deviceid != "") {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.sociallogin1(req.body, print);
@@ -466,10 +473,10 @@ module.exports = {
             });
         }
     },
-    changepassword: function(req, res) {
+    changepassword: function (req, res) {
         if (req.body) {
             if (req.body._id && req.body._id != "" && sails.ObjectID.isValid(req.body._id)) {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.changepassword(req.body, print);
@@ -486,10 +493,10 @@ module.exports = {
             });
         }
     },
-    forgotpassword: function(req, res) {
+    forgotpassword: function (req, res) {
         if (req.body) {
             if (req.body.email && req.body.email != "") {
-                var print = function(data) {
+                var print = function (data) {
                     res.json(data);
                 }
                 User.forgotpassword(req.body, print);
@@ -506,35 +513,35 @@ module.exports = {
             });
         }
     },
-    countusers: function(req, res) {
-        var print = function(data) {
+    countusers: function (req, res) {
+        var print = function (data) {
             res.json(data);
         }
         User.countusers(req.body, print);
     },
-    countnotes: function(req, res) {
-        var print = function(data) {
+    countnotes: function (req, res) {
+        var print = function (data) {
             res.json(data);
         }
         User.countnotes(req.body, print);
     },
-    removemedia: function(req, res) {
-        var print = function(data) {
+    removemedia: function (req, res) {
+        var print = function (data) {
             res.json(data);
         }
         User.removemedia(req.body, print);
     },
-    dataDisplay: function(req, res) {
+    dataDisplay: function (req, res) {
         var dataToDisplay = req.query("data");
         res.view("data", dataToDisplay);
     },
-    currentTime: function(req, res) {
+    currentTime: function (req, res) {
         res.json(new Date());
     },
-    mediaupload: function(req, res) {
+    mediaupload: function (req, res) {
         res.connection.setTimeout(200000);
         req.connection.setTimeout(200000);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 res.json({
@@ -544,7 +551,7 @@ module.exports = {
             } else if (db) {
                 req.file("file").upload({
                     maxBytes: 10000000000
-                }, function(err, uploadedFiles) {
+                }, function (err, uploadedFiles) {
                     if (err) {
                         console.log(err);
                         res.json({
@@ -553,12 +560,12 @@ module.exports = {
                         });
                         db.close();
                     } else if (uploadedFiles) {
-                        _.each(uploadedFiles, function(n) {
+                        _.each(uploadedFiles, function (n) {
                             var newfilepath = n.fd;
                             var newfilenamearr = newfilepath.split(".");
                             var extension = newfilenamearr.pop();
                             var mimetype = sails.mime.lookup(n.fd);
-                            db.open(function(err, db) {
+                            db.open(function (err, db) {
                                 if (err) {
                                     console.log(err);
                                     res.json({
@@ -571,7 +578,7 @@ module.exports = {
                                     var gridStore = new sails.GridStore(db, fileId, n.filename, 'w', {
                                         content_type: mimetype
                                     });
-                                    gridStore.open(function(err, gridStore) {
+                                    gridStore.open(function (err, gridStore) {
                                         if (err) {
                                             console.log(err);
                                             res.json({
@@ -580,7 +587,7 @@ module.exports = {
                                             });
                                             db.close();
                                         } else if (gridStore) {
-                                            gridStore.writeFile(n.fd, function(err, doc) {
+                                            gridStore.writeFile(n.fd, function (err, doc) {
                                                 if (err) {
                                                     console.log(err);
                                                     res.json({
@@ -589,7 +596,7 @@ module.exports = {
                                                     });
                                                     db.close();
                                                 } else if (doc) {
-                                                    sails.fs.unlink(n.fd, function(err) {
+                                                    sails.fs.unlink(n.fd, function (err) {
                                                         if (err) {
                                                             console.log(err);
                                                         }
@@ -610,9 +617,9 @@ module.exports = {
             }
         });
     },
-    getmedia: function(req, res) {
+    getmedia: function (req, res) {
         if (req.query.file && req.query.file != "") {
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                 } else if (db) {
@@ -620,7 +627,7 @@ module.exports = {
                     var file = new sails.GridStore(db, filename, "r");
                     db.collection("fs.files").find({
                         filename: filename
-                    }).toArray(function(err, found) {
+                    }).toArray(function (err, found) {
                         if (err) {
                             console.log(err);
                             res.json({
@@ -629,7 +636,7 @@ module.exports = {
                             });
                             db.close();
                         } else if (found && found[0]) {
-                            file.open(function(err, file) {
+                            file.open(function (err, file) {
                                 if (err) {
                                     console.log(err);
                                     res.json({
@@ -661,9 +668,9 @@ module.exports = {
             });
         }
     },
-    searchmedia: function(req, res) {
+    searchmedia: function (req, res) {
         if (req.query.file && req.query.file != "") {
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                     res.json({
@@ -674,7 +681,7 @@ module.exports = {
                     var filename = req.query.file;
                     db.collection("fs.files").find({
                         filename: filename
-                    }).toArray(function(err, found) {
+                    }).toArray(function (err, found) {
                         if (err) {
                             console.log(err);
                             res.json({
