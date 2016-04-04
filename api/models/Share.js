@@ -5,6 +5,8 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 var gcm = require('node-gcm');
+var apns = require("apns"),
+    options, connection, notification;
 module.exports = {
     save: function(data, callback) {
         if (data.userfrom) {
@@ -67,22 +69,53 @@ module.exports = {
                                                         if (checkrespo.value == "false") {
                                                             Notification.save(notifydata, function(notifyrespo) {
                                                                 if (notifyrespo.value != "false") {
-                                                                    if (data2[0].deviceid && data2[0].deviceid[0]) {
-                                                                        var message = new gcm.Message();
-                                                                        var title = "Noteshare";
-                                                                        var body = response.title + " Note has been shared with you by " + userrespo.name;
-                                                                        message.addNotification('title', title);
-                                                                        message.addNotification('body', body);
-                                                                        var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
-                                                                        sender.send(message, {
-                                                                            registrationTokens: data2[0].deviceid
-                                                                        }, function(err, response) {
+                                                                    if (data2[0].os) {
+                                                                        if (data2[0].os && data2[0].os == "Android") {
+                                                                            if (data2[0].deviceid && data2[0].deviceid[0]) {
+                                                                                var message = new gcm.Message();
+                                                                                var title = "Noteshare";
+                                                                                var body = response.title + " Note has been shared with you by " + userrespo.name;
+                                                                                message.addNotification('title', title);
+                                                                                message.addNotification('body', body);
+                                                                                var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
+                                                                                sender.send(message, {
+                                                                                    registrationTokens: data2[0].deviceid
+                                                                                }, function(err, response) {
+                                                                                    callback({
+                                                                                        value: "true",
+                                                                                        comment: "Mail sent"
+                                                                                    });
+                                                                                    db.close();
+                                                                                });
+                                                                            } else {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Mail sent"
+                                                                                });
+                                                                                db.close();
+                                                                            }
+                                                                        } else {
+                                                                            //     options = {
+                                                                            //    keyFile : "conf/key.pem",
+                                                                            //    certFile : "conf/cert.pem",
+                                                                            //    debug : true
+                                                                            // };
+                                                                            // connection = new apns.Connection(options);
+                                                                            // notification = new apns.Notification();
+                                                                            // notification.device = new apns.Device("iphone_token");
+                                                                            // notification.payload = {
+                                                                            //     "description": "A good news !"
+                                                                            // };
+                                                                            // notification.badge = 1;
+                                                                            // notification.sound = "dong.aiff";
+                                                                            // notification.alert = "Hello World !";
+                                                                            // connection.sendNotification(notification);
                                                                             callback({
                                                                                 value: "true",
                                                                                 comment: "Mail sent"
                                                                             });
                                                                             db.close();
-                                                                        });
+                                                                        }
                                                                     } else {
                                                                         callback({
                                                                             value: "true",
@@ -193,8 +226,7 @@ module.exports = {
                                 db.close();
                             }
                         });
-                    }
-                    if (data.folder) {
+                    } else if (data.folder) {
                         data.folder = sails.ObjectID(data.folder);
                         db.collection("user").update({
                             _id: user
@@ -335,6 +367,12 @@ module.exports = {
                                 db.close();
                             }
                         });
+                    } else {
+                        callback({
+                            value: "false",
+                            comment: "Please provide params"
+                        });
+                        db.close();
                     }
                 }
             });
