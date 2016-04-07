@@ -1,6 +1,6 @@
 module.exports = {
-    save: function(data, callback) {
-        sails.query(function(err, db) {
+    save: function (data, callback) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -18,7 +18,7 @@ module.exports = {
                         $push: {
                             notification: data
                         }
-                    }, function(err, updated) {
+                    }, function (err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -42,7 +42,7 @@ module.exports = {
                     data._id = sails.ObjectID(data._id);
                     var tobechanged = {};
                     var attribute = "notification.$.";
-                    _.forIn(data, function(value, key) {
+                    _.forIn(data, function (value, key) {
                         tobechanged[attribute + key] = value;
                     });
                     db.collection("user").update({
@@ -50,7 +50,7 @@ module.exports = {
                         "notification._id": data._id
                     }, {
                         $set: tobechanged
-                    }, function(err, updated) {
+                    }, function (err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -81,8 +81,7 @@ module.exports = {
             }
         });
     },
-    delete: function(data, callback) {
-        console.log(data);
+    delete: function (data, callback) {
         if (data.note) {
             var matchobj = {
                 "note": sails.ObjectID(data.note)
@@ -95,7 +94,7 @@ module.exports = {
         if (data.user && data.user != "") {
             var user = sails.ObjectID(data.user);
             delete data.user;
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -112,7 +111,7 @@ module.exports = {
                         $pull: {
                             "notification": matchobj
                         }
-                    }, function(err, updated) {
+                    }, function (err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -143,8 +142,8 @@ module.exports = {
         }
     },
     //Findlimited
-    findlimited: function(data, callback) {
-        sails.query(function(err, db) {
+    findlimited: function (data, callback) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -187,7 +186,7 @@ module.exports = {
                         $project: {
                             count: 1
                         }
-                    }]).toArray(function(err, result) {
+                    }]).toArray(function (err, result) {
                         if (result && result[0]) {
                             newreturns.total = result[0].count;
                             newreturns.totalpages = Math.ceil(result[0].count / data.pagesize);
@@ -220,7 +219,7 @@ module.exports = {
                             $project: {
                                 notification: 1
                             }
-                        }]).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function(err, found) {
+                        }]).skip(pagesize * (pagenumber - 1)).limit(pagesize).toArray(function (err, found) {
                             if (found && found[0]) {
                                 newreturns.data = found;
                                 callback(newreturns);
@@ -245,10 +244,10 @@ module.exports = {
         });
     },
     //Findlimited
-    findone: function(data, callback) {
+    findone: function (data, callback) {
         if (data.user && data.user != "") {
             var user = sails.ObjectID(data.user);
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -264,7 +263,7 @@ module.exports = {
                         }
                     }, {
                         "notification.$": 1
-                    }).toArray(function(err, data2) {
+                    }).toArray(function (err, data2) {
                         if (data2 && data2[0] && data2[0].notification && data2[0].notification[0]) {
                             callback(data2[0].notification[0]);
                             db.close();
@@ -291,11 +290,11 @@ module.exports = {
             });
         }
     },
-    find: function(data, callback) {
+    find: function (data, callback) {
         var lastresult = [];
         var i = 0;
         var user = sails.ObjectID(data.user);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -320,9 +319,9 @@ module.exports = {
                         _id: 0,
                         notification: 1
                     }
-                }]).toArray(function(err, data2) {
+                }]).toArray(function (err, data2) {
                     if (data2 && data2[0]) {
-                        _.each(data2, function(z) {
+                        _.each(data2, function (z) {
                             lastresult.push(z.notification);
                             i++;
                             if (i == data2.length) {
@@ -347,11 +346,11 @@ module.exports = {
             }
         });
     },
-    countNoti: function(data, callback) {
+    countNoti: function (data, callback) {
         var lastresult = [];
         var i = 0;
         var user = sails.ObjectID(data.user);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -383,7 +382,7 @@ module.exports = {
                         _id: 0,
                         count: 1
                     }
-                }]).toArray(function(err, data2) {
+                }]).toArray(function (err, data2) {
                     if (data2 && data2.length > 0) {
                         callback(data2[0]);
                     } else if (data2 && data2.length == 0) {
@@ -407,8 +406,8 @@ module.exports = {
             }
         });
     },
-    noteStatus: function(data, callback) {
-        sails.query(function(err, db) {
+    noteStatus: function (data, callback) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -421,14 +420,14 @@ module.exports = {
                     data.note = sails.ObjectID(data.note);
                     var tobechanged = {};
                     var attribute = "notification.$.";
-                    _.forIn(data, function(value, key) {
+                    _.forIn(data, function (value, key) {
                         tobechanged[attribute + key] = value;
                     });
                     if (data.status == "false") {
                         data.user = user;
                         Notification.delete(data, callback);
                     } else if (data.status == "true") {
-                        Note.findbyid(data, function(noterespo) {
+                        Note.findbyid(data, function (noterespo) {
                             if (noterespo.value != "false") {
                                 if (noterespo.creationtime != "" && noterespo.creationtime != "0") {
                                     db.collection("user").update({
@@ -436,7 +435,7 @@ module.exports = {
                                         "notification.note": data.note,
                                     }, {
                                         $set: tobechanged
-                                    }, function(err, updated) {
+                                    }, function (err, updated) {
                                         if (err) {
                                             console.log(err);
                                             callback({
@@ -449,7 +448,7 @@ module.exports = {
                                             delete noterespo.folder;
                                             noterespo.creationtime = new Date();
                                             noterespo.modifytime = new Date();
-                                            Note.save(noterespo, function(saverespo) {
+                                            Note.save(noterespo, function (saverespo) {
                                                 if (saverespo.value != "false") {
                                                     callback({
                                                         value: "true",
@@ -474,7 +473,7 @@ module.exports = {
                                     });
                                 } else {
                                     data.user = user;
-                                    Notification.delete(data, function(deleteRespo) {
+                                    Notification.delete(data, function (deleteRespo) {
                                         callback({
                                             value: "false",
                                             comment: "Note has been deleted by the sender"
@@ -484,7 +483,7 @@ module.exports = {
                                 }
                             } else {
                                 data.user = user;
-                                Notification.delete(data, function(deleteRespo) {
+                                Notification.delete(data, function (deleteRespo) {
                                     callback({
                                         value: "false",
                                         comment: "Note not found"
@@ -503,14 +502,14 @@ module.exports = {
                     data.folder = sails.ObjectID(data.folder);
                     var tobechanged = {};
                     var attribute = "notification.$.";
-                    _.forIn(data, function(value, key) {
+                    _.forIn(data, function (value, key) {
                         tobechanged[attribute + key] = value;
                     });
                     if (data.status == "false") {
                         data.user = user;
                         Notification.delete(data, callback);
                     } else if (data.status == "true") {
-                        Folder.findbyid(data, function(folrespo) {
+                        Folder.findbyid(data, function (folrespo) {
                             if (folrespo.value != "false") {
                                 if (folrespo.creationtime != "" || folrespo.creationtime != "0") {
                                     db.collection("user").update({
@@ -518,7 +517,7 @@ module.exports = {
                                         "notification.folder": data.folder,
                                     }, {
                                         $set: tobechanged
-                                    }, function(err, updated) {
+                                    }, function (err, updated) {
                                         if (err) {
                                             console.log(err);
                                             callback({
@@ -529,28 +528,28 @@ module.exports = {
                                             var newdata = {};
                                             newdata.user = user;
                                             newdata.name = folrespo.name;
-                                            Folder.findbyname(newdata, function(findrespo) {
+                                            Folder.findbyname(newdata, function (findrespo) {
                                                 if (findrespo.value == "false") {
                                                     delete folrespo._id;
                                                     folrespo.creationtime = new Date();
                                                     folrespo.modifytime = new Date();
                                                     folrespo.user = user;
-                                                    Folder.save(folrespo, function(saverespo) {
+                                                    Folder.save(folrespo, function (saverespo) {
                                                         if (saverespo.value == "true") {
                                                             var findno = {};
                                                             findno._id = data.folder;
                                                             findno.user = sails.ObjectID(data.userid);
-                                                            Folder.findnotes(findno, function(noterespo) {
+                                                            Folder.findnotes(findno, function (noterespo) {
                                                                 if (noterespo.value != "false") {
                                                                     var i = 0;
-                                                                    _.each(noterespo, function(f) {
+                                                                    _.each(noterespo, function (f) {
                                                                         if (f.creationtime != "" && f.creationtime != "0") {
                                                                             delete f._id;
                                                                             f.folder = sails.ObjectID(saverespo.id);
                                                                             f.user = user;
                                                                             f.creationtime = new Date();
                                                                             f.modifytime = new Date();
-                                                                            Note.save(f, function(notesave) {
+                                                                            Note.save(f, function (notesave) {
                                                                                 if (notesave.value != "false") {
                                                                                     i++;
                                                                                     if (i == noterespo.length) {
@@ -602,16 +601,16 @@ module.exports = {
                                                     var findno = {};
                                                     findno._id = data.folder;
                                                     findno.user = sails.ObjectID(data.userid);
-                                                    Folder.findnotes(findno, function(noterespo) {
+                                                    Folder.findnotes(findno, function (noterespo) {
                                                         if (noterespo.value != "false") {
                                                             var i = 0;
-                                                            _.each(noterespo, function(f) {
+                                                            _.each(noterespo, function (f) {
                                                                 delete f._id;
                                                                 f.folder = sails.ObjectID(findrespo._id);
                                                                 f.user = user;
                                                                 f.creationtime = new Date();
                                                                 f.modifytime = new Date();
-                                                                Note.save(f, function(notesave) {
+                                                                Note.save(f, function (notesave) {
                                                                     if (notesave.value != "false") {
                                                                         i++;
                                                                         if (i == noterespo.length) {
@@ -654,7 +653,7 @@ module.exports = {
                                     });
                                 } else {
                                     data.user = user;
-                                    Notification.delete(data, function(deleteRespo) {
+                                    Notification.delete(data, function (deleteRespo) {
                                         callback({
                                             value: "false",
                                             comment: "Folder has been deleted by the sender"
@@ -664,7 +663,7 @@ module.exports = {
                                 }
                             } else {
                                 data.user = user;
-                                Notification.delete(data, function(deleteRespo) {
+                                Notification.delete(data, function (deleteRespo) {
                                     callback({
                                         value: "false",
                                         comment: "Folder has been deleted by the sender"

@@ -378,7 +378,6 @@ module.exports = {
         });
     },
     localtoserver: function (data, callback) {
-        console.log(data);
         if (data.creationtime != "0") {
             Note.save(data, callback);
         } else if (!data._id && !data.creationtime) {
@@ -436,7 +435,6 @@ module.exports = {
                             lastresult.push(z.note);
                             i++;
                             if (i == data2.length) {
-                                console.log(lastresult);
                                 callback(lastresult);
                                 db.close();
                             }

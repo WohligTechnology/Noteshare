@@ -5,10 +5,9 @@
  * @docs        :: http://sailsjs.org/#!documentation/models
  */
 var gcm = require('node-gcm');
-var apns = require("apns"),
-    options, connection, notification;
+var apn = require("apn");
 module.exports = {
-    save: function(data, callback) {
+    save: function (data, callback) {
         if (data.userfrom) {
             var user = sails.ObjectID(data.userfrom);
             data.userfrom = sails.ObjectID(data.userfrom);
@@ -17,7 +16,7 @@ module.exports = {
         if (!data._id) {
             data.email = data.email.toLowerCase();
             data._id = sails.ObjectID();
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -33,7 +32,7 @@ module.exports = {
                             $push: {
                                 share: data
                             }
-                        }, function(err, updated) {
+                        }, function (err, updated) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -43,11 +42,11 @@ module.exports = {
                                 data._id = data.note;
                                 data.user = data.userfrom;
                                 delete data.note;
-                                Note.findone(data, function(response) {
+                                Note.findone(data, function (response) {
                                     if (response.value != "false") {
                                         db.collection("user").find({
                                             email: data.email
-                                        }).toArray(function(err, data2) {
+                                        }).toArray(function (err, data2) {
                                             if (err) {
                                                 console.log(err);
                                                 callback({
@@ -57,7 +56,7 @@ module.exports = {
                                             } else if (data2 && data2[0]) {
                                                 var userdata = {};
                                                 userdata._id = user;
-                                                User.findoneuser(userdata, function(userrespo) {
+                                                User.findoneuser(userdata, function (userrespo) {
                                                     var notifydata = {};
                                                     notifydata.user = data2[0]._id;
                                                     notifydata.note = response._id;
@@ -65,13 +64,13 @@ module.exports = {
                                                     notifydata.username = userrespo.name;
                                                     notifydata.userid = user;
                                                     notifydata.profilepic = userrespo.profilepic;
-                                                    Notification.findone(notifydata, function(checkrespo) {
+                                                    Notification.findone(notifydata, function (checkrespo) {
                                                         if (checkrespo.value == "false") {
-                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                            Notification.save(notifydata, function (notifyrespo) {
                                                                 if (notifyrespo.value != "false") {
                                                                     if (data2[0].os) {
                                                                         if (data2[0].os && data2[0].os == "Android") {
-                                                                            if (data2[0].deviceid && data2[0].deviceid[0]) {
+                                                                            if (data2[0].deviceid && data2[0].deviceid.length > 0) {
                                                                                 var message = new gcm.Message();
                                                                                 var title = "Noteshare";
                                                                                 var body = response.title + " Note has been shared with you by " + userrespo.name;
@@ -80,7 +79,7 @@ module.exports = {
                                                                                 var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
                                                                                 sender.send(message, {
                                                                                     registrationTokens: data2[0].deviceid
-                                                                                }, function(err, response) {
+                                                                                }, function (err, response) {
                                                                                     callback({
                                                                                         value: "true",
                                                                                         comment: "Mail sent"
@@ -95,26 +94,58 @@ module.exports = {
                                                                                 db.close();
                                                                             }
                                                                         } else {
-                                                                            //     options = {
-                                                                            //    keyFile : "conf/key.pem",
-                                                                            //    certFile : "conf/cert.pem",
-                                                                            //    debug : true
-                                                                            // };
-                                                                            // connection = new apns.Connection(options);
-                                                                            // notification = new apns.Notification();
-                                                                            // notification.device = new apns.Device("iphone_token");
-                                                                            // notification.payload = {
-                                                                            //     "description": "A good news !"
-                                                                            // };
-                                                                            // notification.badge = 1;
-                                                                            // notification.sound = "dong.aiff";
-                                                                            // notification.alert = "Hello World !";
-                                                                            // connection.sendNotification(notification);
-                                                                            callback({
-                                                                                value: "true",
-                                                                                comment: "Mail sent"
-                                                                            });
-                                                                            db.close();
+                                                                            if (data2[0].deviceid && data2[0].deviceid.length > 0) {
+                                                                                var options = {
+                                                                                    cert: './conf/deploycert.pem',
+                                                                                    certData: null,
+                                                                                    key: './conf/deploykey.pem',
+                                                                                    keyData: null,
+                                                                                    production: false,
+                                                                                    ca: null,
+                                                                                    pfx: null,
+                                                                                    pfxData: null,
+                                                                                    port: 2195,
+                                                                                    rejectUnauthorized: true,
+                                                                                    enhanced: true,
+                                                                                    cacheLength: 100,
+                                                                                    autoAdjustCache: true,
+                                                                                    connectionTimeout: 0,
+                                                                                };
+                                                                                var apnConnection = new apn.Connection(options);
+                                                                                var note = new apn.Notification();
+                                                                                note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+                                                                                Notification.countNoti({
+                                                                                    user: data2[0]._id
+                                                                                }, function (courespo) {
+                                                                                    note.badge = courespo.count;
+                                                                                });
+                                                                                note.sound = "ping.aiff";
+                                                                                note.alert = response.title + " Note has been shared with you by " + userrespo.name;
+                                                                                note.payload = { 'messageFrom': 'NoteShare' };
+
+                                                                                function callNot(num) {
+                                                                                    apnConnection.pushNotification(note, data2[0].deviceid[num]);
+                                                                                    apnConnection.on('transmitted', function (e) {
+                                                                                        num++;
+                                                                                        if (num == data2[0].deviceid.length) {
+                                                                                            callback({
+                                                                                                value: "true",
+                                                                                                comment: "Mail sent"
+                                                                                            });
+                                                                                            db.close();
+                                                                                        } else {
+                                                                                            callNot(num);
+                                                                                        }
+                                                                                    });
+                                                                                }
+                                                                                callNot(0);
+                                                                            } else {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Mail sent"
+                                                                                });
+                                                                                db.close();
+                                                                            }
                                                                         }
                                                                     } else {
                                                                         callback({
@@ -144,11 +175,11 @@ module.exports = {
                                             } else {
                                                 var newdata = {};
                                                 newdata.email = data.email;
-                                                User.saveuser(newdata, function(newrespo) {
+                                                User.saveuser(newdata, function (newrespo) {
                                                     if (newrespo.value && newrespo.value == "true") {
                                                         var userdata = {};
                                                         userdata._id = user;
-                                                        User.findoneuser(userdata, function(userrespo) {
+                                                        User.findoneuser(userdata, function (userrespo) {
                                                             var notifydata = {};
                                                             notifydata.user = newrespo._id;
                                                             notifydata.note = response._id;
@@ -156,7 +187,7 @@ module.exports = {
                                                             notifydata.username = userrespo.name;
                                                             notifydata.userid = user;
                                                             notifydata.profilepic = userrespo.profilepic;
-                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                            Notification.save(notifydata, function (notifyrespo) {
                                                                 if (userrespo.value != "false") {
                                                                     var template_name = "newnote";
                                                                     var template_content = [{
@@ -182,13 +213,13 @@ module.exports = {
                                                                         "template_name": template_name,
                                                                         "template_content": template_content,
                                                                         "message": message
-                                                                    }, function(result) {
+                                                                    }, function (result) {
                                                                         callback({
                                                                             value: "true",
                                                                             comment: "Mail Sent"
                                                                         });
                                                                         db.close();
-                                                                    }, function(e) {
+                                                                    }, function (e) {
                                                                         callback('A mandrill error occurred: ' + e.name + ' - ' + e.message);
                                                                     });
                                                                 } else {
@@ -234,7 +265,7 @@ module.exports = {
                             $push: {
                                 share: data
                             }
-                        }, function(err, updated) {
+                        }, function (err, updated) {
                             if (err) {
                                 console.log(err);
                                 callback({
@@ -244,11 +275,11 @@ module.exports = {
                                 data._id = data.folder;
                                 data.user = data.userfrom;
                                 delete data.note;
-                                Folder.findone(data, function(response) {
+                                Folder.findone(data, function (response) {
                                     if (response.value != "false") {
                                         db.collection("user").find({
                                             email: data.email
-                                        }).toArray(function(err, data2) {
+                                        }).toArray(function (err, data2) {
                                             if (err) {
                                                 console.log(err);
                                                 callback({
@@ -258,7 +289,7 @@ module.exports = {
                                             } else if (data2 && data2[0]) {
                                                 var userdata = {};
                                                 userdata._id = user;
-                                                User.findoneuser(userdata, function(userrespo) {
+                                                User.findoneuser(userdata, function (userrespo) {
                                                     var notifydata = {};
                                                     notifydata.user = data2[0]._id;
                                                     notifydata.folder = response._id;
@@ -266,58 +297,114 @@ module.exports = {
                                                     notifydata.username = userrespo.name;
                                                     notifydata.userid = user;
                                                     notifydata.profilepic = userrespo.profilepic;
-                                                    // Notification.findone(notifydata, function(checkrespo) {
-                                                    //     if (checkrespo.value == "false") {
-                                                    Notification.save(notifydata, function(notifyrespo) {
-                                                        if (notifyrespo.value != "false") {
-                                                            if (data2[0].deviceid && data2[0].deviceid[0]) {
-                                                                var message = new gcm.Message();
-                                                                var title = "Noteshare";
-                                                                var body = response.name + " Folder has been shared with you by " + userrespo.name;
-                                                                message.addNotification('title', title);
-                                                                message.addNotification('body', body);
-                                                                var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
-                                                                sender.send(message, {
-                                                                    registrationTokens: data2[0].deviceid
-                                                                }, function(err, response) {
+                                                    Notification.findone(notifydata, function (checkrespo) {
+                                                        if (checkrespo.value == "false") {
+                                                            Notification.save(notifydata, function (notifyrespo) {
+                                                                if (notifyrespo.value != "false") {
+                                                                    if (data2[0].os) {
+                                                                        if (data2[0].os && data2[0].os == "Android") {
+                                                                            if (data2[0].deviceid && data2[0].deviceid.length > 0) {
+                                                                                var message = new gcm.Message();
+                                                                                var title = "Noteshare";
+                                                                                var body = response.name + " Folder has been shared with you by " + userrespo.name;
+                                                                                message.addNotification('title', title);
+                                                                                message.addNotification('body', body);
+                                                                                var sender = new gcm.Sender('AIzaSyDhPfaMrNrxf3FX4s1WdCP3Jvwccf3uVn0');
+                                                                                sender.send(message, {
+                                                                                    registrationTokens: data2[0].deviceid
+                                                                                }, function (err, response) {
+                                                                                    callback({
+                                                                                        value: "true",
+                                                                                        comment: "Mail sent"
+                                                                                    });
+                                                                                    db.close();
+                                                                                });
+                                                                            } else {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Mail sent"
+                                                                                });
+                                                                                db.close();
+                                                                            }
+                                                                        } else {
+                                                                            if (data2[0].deviceid && data2[0].deviceid.length > 0) {
+                                                                                var options = {
+                                                                                    cert: './conf/deploycert.pem',
+                                                                                    certData: null,
+                                                                                    key: './conf/deploykey.pem',
+                                                                                    keyData: null,
+                                                                                    production: false,
+                                                                                    ca: null,
+                                                                                    pfx: null,
+                                                                                    pfxData: null,
+                                                                                    port: 2195,
+                                                                                    rejectUnauthorized: true,
+                                                                                    enhanced: true,
+                                                                                    cacheLength: 100,
+                                                                                    autoAdjustCache: true,
+                                                                                    connectionTimeout: 0,
+                                                                                };
+                                                                                var apnConnection = new apn.Connection(options);
+                                                                                var note = new apn.Notification();
+                                                                                note.expiry = Math.floor(Date.now() / 1000) + 3600; // Expires 1 hour from now.
+                                                                                note.sound = "ping.aiff";
+                                                                                note.alert = response.name + " Folder has been shared with you by " + userrespo.name;
+                                                                                note.payload = { 'messageFrom': 'NoteShare' };
+
+                                                                                function callNot(num) {
+                                                                                    apnConnection.pushNotification(note, data2[0].deviceid[num]);
+                                                                                    num++;
+                                                                                    if (num == data2[0].deviceid.length) {
+                                                                                        callback({
+                                                                                            value: "true",
+                                                                                            comment: "Mail sent"
+                                                                                        });
+                                                                                        db.close();
+                                                                                    } else {
+                                                                                        callNot(num);
+                                                                                    }
+                                                                                }
+                                                                                callNot(0);
+                                                                            } else {
+                                                                                callback({
+                                                                                    value: "true",
+                                                                                    comment: "Mail sent"
+                                                                                });
+                                                                                db.close();
+                                                                            }
+                                                                        }
+                                                                    } else {
+                                                                        callback({
+                                                                            value: "true",
+                                                                            comment: "Mail sent"
+                                                                        });
+                                                                        db.close();
+                                                                    }
+                                                                } else {
                                                                     callback({
-                                                                        value: "true",
-                                                                        comment: "Mail sent"
+                                                                        value: "false",
+                                                                        comment: "User not found"
                                                                     });
                                                                     db.close();
-                                                                });
-                                                            } else {
-                                                                callback({
-                                                                    value: "true",
-                                                                    comment: "Mail sent"
-                                                                });
-                                                                db.close();
-                                                            }
+                                                                }
+                                                            });
                                                         } else {
                                                             callback({
-                                                                value: "false",
-                                                                comment: "User not found"
+                                                                value: "true",
+                                                                comment: "Mail Sent"
                                                             });
                                                             db.close();
                                                         }
                                                     });
-                                                    //     } else {
-                                                    //         callback({
-                                                    //             value: "true",
-                                                    //             comment: "Mail Sent"
-                                                    //         });
-                                                    //         db.close();
-                                                    //     }
-                                                    // });
                                                 });
                                             } else {
                                                 var newdata = {};
                                                 newdata.email = data.email;
-                                                User.saveuser(newdata, function(newrespo) {
+                                                User.saveuser(newdata, function (newrespo) {
                                                     if (newrespo.value && newrespo.value == "true") {
                                                         var userdata = {};
                                                         userdata._id = user;
-                                                        User.findoneuser(userdata, function(userrespo) {
+                                                        User.findoneuser(userdata, function (userrespo) {
                                                             var notifydata = {};
                                                             notifydata.user = newrespo._id;
                                                             notifydata.folder = response._id;
@@ -325,7 +412,7 @@ module.exports = {
                                                             notifydata.username = userrespo.name;
                                                             notifydata.userid = user;
                                                             notifydata.profilepic = userrespo.profilepic;
-                                                            Notification.save(notifydata, function(notifyrespo) {
+                                                            Notification.save(notifydata, function (notifyrespo) {
                                                                 if (userrespo.value == "true") {
                                                                     callback({
                                                                         value: "true",
@@ -380,11 +467,11 @@ module.exports = {
             data._id = sails.ObjectID(data._id);
             var tobechanged = {};
             var attribute = "share.$.";
-            _.forIn(data, function(value, key) {
+            _.forIn(data, function (value, key) {
                 tobechanged[attribute + key] = value;
             });
 
-            sails.query(function(err, db) {
+            sails.query(function (err, db) {
                 if (err) {
                     console.log(err);
                     callback({
@@ -397,7 +484,7 @@ module.exports = {
                         "share._id": data._id
                     }, {
                         $set: tobechanged
-                    }, function(err, updated) {
+                    }, function (err, updated) {
                         if (err) {
                             console.log(err);
                             callback({
@@ -421,9 +508,9 @@ module.exports = {
             });
         }
     },
-    delete: function(data, callback) {
+    delete: function (data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -439,7 +526,7 @@ module.exports = {
                             "_id": sails.ObjectID(data._id)
                         }
                     }
-                }, function(err, updated) {
+                }, function (err, updated) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -462,9 +549,9 @@ module.exports = {
             }
         });
     },
-    findone: function(data, callback) {
+    findone: function (data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -477,7 +564,7 @@ module.exports = {
                     "share._id": sails.ObjectID(data._id)
                 }, {
                     "share.$": 1
-                }).toArray(function(err, data2) {
+                }).toArray(function (err, data2) {
                     if (err) {
                         console.log(err);
                         callback({
@@ -498,9 +585,9 @@ module.exports = {
             }
         });
     },
-    find: function(data, callback) {
+    find: function (data, callback) {
         var user = sails.ObjectID(data.user);
-        sails.query(function(err, db) {
+        sails.query(function (err, db) {
             if (err) {
                 console.log(err);
                 callback({
@@ -524,7 +611,7 @@ module.exports = {
                     $project: {
                         share: 1
                     }
-                }]).toArray(function(err, data2) {
+                }]).toArray(function (err, data2) {
                     if (data2 && data2[0]) {
                         callback(data2);
                         db.close();
